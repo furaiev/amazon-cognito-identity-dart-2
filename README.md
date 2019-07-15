@@ -403,7 +403,7 @@ print(credentials.sessionToken);
 
 #### For S3 Uploads
 
-S3 Uploads using HTTP Presigned Post.
+S3 Upload to user "folder" using HTTP Presigned Post.
 
 ```dart
 import 'dart:convert';
@@ -466,6 +466,7 @@ class Policy {
 
   @override
   String toString() {
+    // Safe to remove the "acl" line if your bucket has no ACL permissions
     return '''
     { "expiration": "${this.expiration}",
       "conditions": [
@@ -517,8 +518,12 @@ void main() async {
   final multipartFile = http.MultipartFile('file', stream, length,
       filename: path.basename(file.path));
 
+  final String fileName = 'square-cinnamon.jpg';
+  final String usrIdentityId = _credentials.userIdentityId;
+  final String bucketKey = 'test/$usrIdentityId/$fileName';
+
   final policy = Policy.fromS3PresignedPost(
-      'test/square-cinnamon.jpg',
+      bucketKey,
       'my-s3-bucket',
       15,
       _credentials.accessKeyId,
@@ -531,7 +536,7 @@ void main() async {
 
   req.files.add(multipartFile);
   req.fields['key'] = policy.key;
-  req.fields['acl'] = 'public-read';
+  req.fields['acl'] = 'public-read'; // Safe to remove this if your bucket has no ACL permissions
   req.fields['X-Amz-Credential'] = policy.credential;
   req.fields['X-Amz-Algorithm'] = 'AWS4-HMAC-SHA256';
   req.fields['X-Amz-Date'] = policy.datetime;
@@ -547,6 +552,19 @@ void main() async {
   } catch (e) {
     print(e.toString());
   }
+}
+```
+
+The role attached to the identity pool (e.g. the ..._poolAuth role) should contain a policy like this:
+
+```json
+{
+    "Effect": "Allow",
+    "Action": [
+        "s3:PutObject",
+        "s3:GetObject"
+    ],
+    "Resource": "arn:aws:s3:::BUCKET_NAME/test/${cognito-identity.amazonaws.com:sub}/*"
 }
 ```
 
@@ -866,4 +884,3 @@ CognitoCredentials _credential = new CognitoCredentials('ap-southeast-1_xxxxxxxx
 await _credential.getAwsCredentials(accessToken, 'graph.facebook.com')
 print(_credential.sessionToken);
 ```
-
