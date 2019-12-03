@@ -11,8 +11,9 @@ ios/Runner/GeneratedPluginRegistrant.m
 # If you're building an application, you may want to check-in your pubspec.lock
 pubspec.lock
 
-# Files and directories created by VSCode
+# Files and directories created by IDE
 .vscode
+.idea
 cognito-dart.code-workspace
 
 # Directory created by dartdoc

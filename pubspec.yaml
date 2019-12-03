@@ -1,10 +1,12 @@
-name: amazon_cognito_identity_dart
-version: 0.0.22
-author: Jon Saw <jon.saw@gmail.com>
-homepage: https://github.com/jonsaw/amazon-cognito-identity-dart/tree/master
+name: amazon_cognito_identity_dart_2
+version: 0.1.0
+author: Oleksii Furaiev <furaiev@gmail.com>
+homepage: https://github.com/furaiev/amazon-cognito-identity-dart
 description: Unofficial Amazon Cognito Identity Provider Dart SDK,
   to easily add user sign-up and sign-in to your mobile and web apps
-  with AWS Cloud Services.
+  with AWS Cloud Services. Based on unsupported
+  (https://github.com/jonsaw/amazon-cognito-identity-dart/tree/master) by
+  Jon Saw <jon.saw@gmail.com>
 
 dependencies:
   crypto: ^2.0.2+1

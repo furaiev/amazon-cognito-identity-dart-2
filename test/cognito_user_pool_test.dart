@@ -1,11 +1,11 @@
-import 'package:amazon_cognito_identity_dart/src/client.dart';
+import 'package:amazon_cognito_identity_dart_2/src/client.dart';
 import 'package:http/testing.dart';
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
-import 'package:amazon_cognito_identity_dart/src/cognito_user_pool.dart';
-import 'package:amazon_cognito_identity_dart/src/mocks/sign_up.dart'
+import 'package:amazon_cognito_identity_dart_2/src/cognito_user_pool.dart';
+import 'package:amazon_cognito_identity_dart_2/src/mocks/sign_up.dart'
     as signUpMock;
-import 'package:amazon_cognito_identity_dart/src/cognito_client_exceptions.dart';
+import 'package:amazon_cognito_identity_dart_2/src/cognito_client_exceptions.dart';
 
 void main() {
   test('initiating with invalid userPoolId', () {

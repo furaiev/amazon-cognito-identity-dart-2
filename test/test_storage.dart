@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:amazon_cognito_identity_dart/cognito.dart';
+import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 
 Map<String, String> testStorage = {};
 

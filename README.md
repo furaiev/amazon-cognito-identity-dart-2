@@ -14,6 +14,8 @@ Need ideas to get started?
     - S3 GET Object with Authorization found [here](https://github.com/jonsaw/amazon-cognito-identity-dart/#for-s3-get-object).
 - Follow the tutorial on [Serverless Stack](https://serverless-stack.com/chapters/create-a-cognito-user-pool.html) for best Cognito setup.
 
+Note: When creating the App, the generate client secret box must be unchecked.
+
 Please note that this package is _not_ production ready.
 
 ## Usage
@@ -259,6 +261,15 @@ __Use case 15.__ Global signout for authenticated users (invalidates all issued 
 
 ```dart
 await cognitoUser.globalSignOut();
+```
+
+__Use case 16.__ Manually set key value pairs that can be passed to Cognito Lambda Triggers.
+
+```dart
+Map<String, String> validationData = {
+  'myCustomKey1': 'myCustomValue1',
+  'myCustomKey2': 'myCustomValue2',
+};
 ```
 
 ## Addtional Features

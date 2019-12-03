@@ -2,7 +2,7 @@ import 'package:test/test.dart';
 import 'package:http/testing.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'package:amazon_cognito_identity_dart/src/client.dart';
+import 'package:amazon_cognito_identity_dart_2/src/client.dart';
 
 void main() {
   test('initiating Client should set default endpoint based on region', () {

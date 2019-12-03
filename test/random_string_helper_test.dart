@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:amazon_cognito_identity_dart/src/random_string_helper.dart';
+import 'package:amazon_cognito_identity_dart_2/src/random_string_helper.dart';
 
 void main() {
   test('.generates() generates correct length', () {
