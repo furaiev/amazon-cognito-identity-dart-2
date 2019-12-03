@@ -1,3 +1,6 @@
+## 0.1.1
+- minor changes (description, formatting)
+
 ## 0.1.0
 - Forked from unsupported https://github.com/jonsaw/amazon-cognito-identity-dart/tree/master
 - Fixed custom validationData

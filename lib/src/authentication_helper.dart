@@ -88,7 +88,7 @@ class AuthenticationHelper {
       throw new ArgumentError('U cannot be zero.');
     }
 
-    final String usernamePassword = '${this.poolName}${username}:${password}';
+    final String usernamePassword = '${this.poolName}$username:$password';
     final String usernamePasswordHash = hash(utf8.encode(usernamePassword));
     final xValue =
         BigInt.parse(hexHash(padHex(salt) + usernamePasswordHash), radix: 16);
