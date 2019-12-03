@@ -3,7 +3,7 @@ import 'attribute_arg.dart';
 class AuthenticationDetails {
   String username;
   String password;
-  List<AttributeArg> validationData;
+  Map<String, String> validationData;
   List<AttributeArg> authParameters;
   AuthenticationDetails({
     this.username,
@@ -20,7 +20,7 @@ class AuthenticationDetails {
     return this.password;
   }
 
-  List<AttributeArg> getValidationData() {
+  Map<String, String> getValidationData() {
     return this.validationData;
   }
 

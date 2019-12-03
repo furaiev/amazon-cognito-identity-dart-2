@@ -1,3 +1,9 @@
+## 0.1.0
+- Forked from unsupported https://github.com/jonsaw/amazon-cognito-identity-dart/tree/master
+- Fixed custom validationData
+
+______________________________________________
+
 ## 0.0.22
 - Fix empty canonical query string generation
 
