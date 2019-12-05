@@ -1,3 +1,6 @@
+## 0.1.2
+- added custom Authorization header option
+
 ## 0.1.1
 - minor changes (description, formatting)
 

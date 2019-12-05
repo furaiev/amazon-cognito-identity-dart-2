@@ -25,7 +25,9 @@ __Use Case 1.__ Registering a user with the application. One needs to create a C
 import 'package:amazon_cognito_identity_dart/cognito.dart';
 
 final userPool = new CognitoUserPool(
-    'ap-southeast-1_xxxxxxxxx', 'xxxxxxxxxxxxxxxxxxxxxxxxxx');
+  'ap-southeast-1_xxxxxxxxx',
+  'xxxxxxxxxxxxxxxxxxxxxxxxxx',
+);
 final userAttributes = [
   new AttributeArg(name: 'first_name', value: 'Jimmy'),
   new AttributeArg(name: 'last_name', value: 'Wong'),
@@ -33,8 +35,11 @@ final userAttributes = [
 
 var data;
 try {
-  data = await userPool.signUp('email@inspire.my', 'Password001',
-      userAttributes: userAttributes);
+  data = await userPool.signUp(
+    'email@inspire.my',
+    'Password001',
+     userAttributes: userAttributes,
+   );
 } catch (e) {
   print(e);
 }
@@ -46,10 +51,11 @@ __Use case 2.__ Confirming a registered, unauthenticated user using a confirmati
 import 'package:amazon_cognito_identity_dart/cognito.dart';
 
 final userPool = new CognitoUserPool(
-    'ap-southeast-1_xxxxxxxxx', 'xxxxxxxxxxxxxxxxxxxxxxxxxx');
+  'ap-southeast-1_xxxxxxxxx',
+  'xxxxxxxxxxxxxxxxxxxxxxxxxx',
+);
 
-final cognitoUser = new CognitoUser(
-    'email@inspire.my', userPool);
+final cognitoUser = new CognitoUser('email@inspire.my', userPool);
 
 bool registrationConfirmed = false;
 try {
@@ -66,9 +72,10 @@ __Use case 3.__ Resending a confirmation code via SMS/email for confirming regis
 import 'package:amazon_cognito_identity_dart/cognito.dart';
 
 final userPool = new CognitoUserPool(
-    'ap-southeast-1_xxxxxxxxx', 'xxxxxxxxxxxxxxxxxxxxxxxxxx');
-final cognitoUser = new CognitoUser(
-    'email@inspire.my', userPool);
+  'ap-southeast-1_xxxxxxxxx',
+  'xxxxxxxxxxxxxxxxxxxxxxxxxx',
+);
+final cognitoUser = new CognitoUser('email@inspire.my', userPool);
 final String status;
 try {
   status = await cognitoUser.resendConfirmationCode();
@@ -83,11 +90,14 @@ __Use case 4.__ Authenticating a user and establishing a user session with the A
 import 'package:amazon_cognito_identity_dart/cognito.dart';
 
 final userPool = new CognitoUserPool(
-    'ap-southeast-1_xxxxxxxxx', 'xxxxxxxxxxxxxxxxxxxxxxxxxx');
-final cognitoUser = new CognitoUser(
-    'email@inspire.my', userPool);
+  'ap-southeast-1_xxxxxxxxx',
+  'xxxxxxxxxxxxxxxxxxxxxxxxxx',
+);
+final cognitoUser = new CognitoUser('email@inspire.my', userPool);
 final authDetails = new AuthenticationDetails(
-    username: 'email@inspire.my', password: 'Password001');
+  username: 'email@inspire.my',
+  password: 'Password001',
+);
 CognitoUserSession session;
 try {
   session = await cognitoUser.authenticateUser(authDetails);
@@ -140,8 +150,7 @@ print(data);
 
 bool attributeVerified = false;
 try {
-  attributeVerified = await cognitoUser.verifyAttribute(
-      'email', '123456');
+  attributeVerified = await cognitoUser.verifyAttribute('email', '123456');
 } catch (e) {
   print(e);
 }
@@ -202,7 +211,9 @@ __Use case 11.__ Changing the current password for authenticated users.
 bool passwordChanged = false;
 try {
   passwordChanged = await cognitoUser.changePassword(
-      'oldPassword', 'newPassword');
+    'oldPassword',
+    'newPassword',
+  );
 } catch (e) {
   print(e);
 }
@@ -215,9 +226,10 @@ __Use case 12.__ Starting and completing a forgot password flow for an unauthent
 import 'package:amazon_cognito_identity_dart/cognito.dart';
 
 final userPool = new CognitoUserPool(
-    'ap-southeast-1_xxxxxxxxx', 'xxxxxxxxxxxxxxxxxxxxxxxxxx');
-final cognitoUser = new CognitoUser(
-    'email@inspire.my', userPool);
+  'ap-southeast-1_xxxxxxxxx',
+  'xxxxxxxxxxxxxxxxxxxxxxxxxx',
+);
+final cognitoUser = new CognitoUser('email@inspire.my', userPool);
 
 var data;
 try {
@@ -272,6 +284,26 @@ Map<String, String> validationData = {
 };
 ```
 
+__Use case 17.__ Manually set Authorization header (e.g. JWT token)
+
+```dart
+signedRequest = new SigV4Request(
+  awsSigV4Client,
+  method: Method.post,
+  authorizationHeader: session.idToken.jwtToken, // <---- custom authorizationHeader
+  path: '/path',
+  headers: new Map<String, String>.from({
+    CONTENT_TYPE: APPLICATION_GRAPHQL,
+    ACCEPT: APPLICATION_JSON,
+  }),
+  body: new Map<String, String>.from(
+    {
+      QUERY: query,
+    },
+  ),
+);
+```
+
 ## Addtional Features
 
 ### Get AWS Credentials
@@ -282,11 +314,13 @@ Get a authenticated user's AWS Credentials. Use with other signing processes lik
 import 'package:amazon_cognito_identity_dart/cognito.dart';
 
 final userPool = new CognitoUserPool(
-    'ap-southeast-1_xxxxxxxxx', 'xxxxxxxxxxxxxxxxxxxxxxxxxx');
-final cognitoUser = new CognitoUser(
-    'email@inspire.my', userPool);
+  'ap-southeast-1_xxxxxxxxx',
+  'xxxxxxxxxxxxxxxxxxxxxxxxxx',
+);
+final cognitoUser = new CognitoUser('email@inspire.my', userPool);
 final authDetails = new AuthenticationDetails(
-    username: 'email@inspire.my', password: 'Password001'
+    username: 'email@inspire.my',
+    password: 'Password001',
 );
 final session = await cognitoUser.authenticateUser(authDetails);
 
@@ -323,9 +357,16 @@ class Policy {
   String sessionToken;
   int maxFileSize;
 
-  Policy(this.key, this.bucket, this.datetime, this.expiration, this.credential,
-      this.maxFileSize, this.sessionToken,
-      {this.region = 'us-east-1'});
+  Policy(
+    this.key,
+    this.bucket,
+    this.datetime,
+    this.expiration,
+    this.credential,
+    this.maxFileSize,
+    this.sessionToken,
+    {this.region = 'us-east-1'},
+   );
 
   factory Policy.fromS3PresignedPost(
     String key,
@@ -333,9 +374,9 @@ class Policy {
     int expiryMinutes,
     String accessKeyId,
     int maxFileSize,
-    String sessionToken, {
-    String region,
-  }) {
+    String sessionToken,
+    {String region},
+   ) {
     final datetime = SigV4.generateDatetime();
     final expiration = (DateTime.now())
         .add(Duration(minutes: expiryMinutes))
@@ -359,19 +400,19 @@ class Policy {
   @override
   String toString() {
     return '''
-{ "expiration": "${this.expiration}",
-  "conditions": [
-    {"bucket": "${this.bucket}"},
-    ["starts-with", "\$key", "${this.key}"],
-    {"acl": "public-read"},
-    ["content-length-range", 1, ${this.maxFileSize}],
-    {"x-amz-credential": "${this.credential}"},
-    {"x-amz-algorithm": "AWS4-HMAC-SHA256"},
-    {"x-amz-date": "${this.datetime}" },
-    {"x-amz-security-token": "${this.sessionToken}" }
-  ]
-}
-''';
+    { "expiration": "${this.expiration}",
+      "conditions": [
+        {"bucket": "${this.bucket}"},
+        ["starts-with", "\$key", "${this.key}"],
+        {"acl": "public-read"},
+        ["content-length-range", 1, ${this.maxFileSize}],
+        {"x-amz-credential": "${this.credential}"},
+        {"x-amz-algorithm": "AWS4-HMAC-SHA256"},
+        {"x-amz-date": "${this.datetime}" },
+        {"x-amz-security-token": "${this.sessionToken}" }
+      ]
+    }
+    ''';
   }
 }
 
@@ -379,8 +420,7 @@ void main() async {
   const _awsUserPoolId = 'ap-southeast-xxxxxxxxxxx';
   const _awsClientId = 'xxxxxxxxxxxxxxxxxxxxxxxxxx';
 
-  const _identityPoolId =
-      'ap-southeast-1:xxxxxxxxx-xxxx-xxxx-xxxxxxxxxxx';
+  const _identityPoolId = 'ap-southeast-1:xxxxxxxxx-xxxx-xxxx-xxxxxxxxxxx';
   final _userPool = CognitoUserPool(_awsUserPoolId, _awsClientId);
 
   final _cognitoUser = CognitoUser('+60100000000', _userPool);
@@ -398,8 +438,7 @@ void main() async {
   await _credentials.getAwsCredentials(_session.getIdToken().getJwtToken());
 
   const _region = 'ap-southeast-1';
-  const _s3Endpoint =
-      'https://my-s3-bucket.s3-ap-southeast-1.amazonaws.com';
+  const _s3Endpoint = 'https://my-s3-bucket.s3-ap-southeast-1.amazonaws.com';
 
   final file = File(path.join('/path/to/my/folder', 'square-cinnamon.jpg'));
 
@@ -683,8 +722,10 @@ void main() async {
   http.Response response;
   try {
     response = await http.post(
-        signedRequest.url,
-        headers: signedRequest.headers, body: signedRequest.body);
+      signedRequest.url,
+      headers: signedRequest.headers,
+      body: signedRequest.body,
+    );
   } catch (e) {
     print(e);
   }
@@ -736,13 +777,14 @@ class CustomStorage extends CognitoStorage {
 final customStore = new CustomStorage('custom:');
 
 final userPool = new CognitoUserPool(
-    'ap-southeast-1_xxxxxxxxx', 'xxxxxxxxxxxxxxxxxxxxxxxxxx',
-    storage: customStore);
+  'ap-southeast-1_xxxxxxxxx',
+  'xxxxxxxxxxxxxxxxxxxxxxxxxx',
+  storage: customStore,
+);
 final cognitoUser = new CognitoUser(
-    'email@inspire.my', userPool,
-    storage: customStore);
+  'email@inspire.my', userPool, storage: customStore);
 final authDetails = new AuthenticationDetails(
-    username: 'email@inspire.my', password: 'Password001');
+  username: 'email@inspire.my', password: 'Password001');
 await cognitoUser.authenticateUser(authDetails);
 
 // some time later...

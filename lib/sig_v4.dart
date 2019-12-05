@@ -39,6 +39,7 @@ class SigV4Request {
   String path;
   Map<String, String> queryParams;
   Map<String, String> headers;
+  String authorizationHeader;
   String url;
   String body;
   AwsSigV4Client awsSigV4Client;
@@ -56,6 +57,7 @@ class SigV4Request {
     this.datetime,
     this.queryParams,
     this.headers,
+    this.authorizationHeader,
     dynamic body,
   }) {
     this.method = method.toUpperCase();
@@ -84,7 +86,8 @@ class SigV4Request {
     final endpointUri = Uri.parse(awsSigV4Client.endpoint);
     headers[_host] = endpointUri.host;
 
-    headers[_authorization] = _generateAuthorization(datetime);
+    headers[_authorization] =
+        authorizationHeader ?? _generateAuthorization(datetime);
     if (awsSigV4Client.sessionToken != null) {
       headers[_x_amz_security_token] = awsSigV4Client.sessionToken;
     }
