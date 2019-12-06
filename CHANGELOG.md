@@ -1,3 +1,6 @@
+## 0.1.3
+- fixed Sign Up custom validationData
+
 ## 0.1.2
 - added custom Authorization header option
 
@@ -5,8 +8,8 @@
 - minor changes (description, formatting)
 
 ## 0.1.0
-- Forked from unsupported https://github.com/jonsaw/amazon-cognito-identity-dart/tree/master
-- Fixed custom validationData
+- forked from unsupported https://github.com/jonsaw/amazon-cognito-identity-dart/tree/master
+- fixed custom validationData
 
 ______________________________________________
 

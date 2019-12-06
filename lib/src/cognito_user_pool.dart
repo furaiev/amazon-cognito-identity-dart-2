@@ -98,7 +98,7 @@ class CognitoUserPool {
     String username,
     String password, {
     List<AttributeArg> userAttributes,
-    List<AttributeArg> validationData,
+    Map<String, String> validationData,
   }) async {
     final Map<String, dynamic> params = {
       'ClientId': _clientId,
