@@ -1,3 +1,6 @@
+## 0.1.4
+- Sign Up custom validationData reverted to List
+
 ## 0.1.3+1
 - fixed link to repo
 
