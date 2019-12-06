@@ -1,3 +1,6 @@
+## 0.1.3+1
+- fixed link to repo
+
 ## 0.1.3
 - fixed Sign Up custom validationData
 
