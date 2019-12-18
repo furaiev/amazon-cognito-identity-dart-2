@@ -689,6 +689,48 @@ class CognitoUser {
     return _authenticateUserInternal(data, authenticationHelper);
   }
 
+  /// This is used by the user once he has the responses to the NEW_PASSWORD_REQUIRED challenge.
+  ///
+  /// Its allow set a new user password and optionally set new user attributes.
+  /// Attributes can be send in the *requiredAttributes* map where a map key is an attribute
+  /// name and a map value is an attribute value.
+  Future<CognitoUserSession> sendNewPasswordRequiredAnswer(
+      String newPassword, [Map<String, String> requiredAttributes]) async {
+    final Map<String, String> challengeResponses = {
+      'USERNAME': this.username,
+      'NEW_PASSWORD': newPassword,
+    };
+
+    if(requiredAttributes != null && requiredAttributes.isNotEmpty) {
+      requiredAttributes.forEach((key, value){
+        challengeResponses["userAttributes.$key"] = value;
+      });
+    }
+
+    final authenticationHelper =
+    AuthenticationHelper(pool.getUserPoolId().split('_')[1]);
+
+    getCachedDeviceKeyAndPassword();
+    if (_deviceKey != null) {
+      challengeResponses['DEVICE_KEY'] = _deviceKey;
+    }
+
+    final Map<String, dynamic> paramsReq = {
+      'ChallengeName': 'NEW_PASSWORD_REQUIRED',
+      'ChallengeResponses': challengeResponses,
+      'ClientId': this.pool.getClientId(),
+      'Session': _session,
+    };
+
+    if (getUserContextData() != null) {
+      paramsReq['UserContextData'] = getUserContextData();
+    }
+
+    final data = await client.request('RespondToAuthChallenge', paramsReq);
+
+    return _authenticateUserInternal(data, authenticationHelper);
+  }
+
   /// This is used by the user once he has an MFA code
   Future<CognitoUserSession> sendMFACode(String confirmationCode,
       [String mfaType = 'SMS_MFA']) async {
