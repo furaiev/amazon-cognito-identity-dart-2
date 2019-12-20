@@ -1,3 +1,6 @@
+## 0.1.5
+- Response to the NEW_PASSWORD_REQUIRED challenge
+
 ## 0.1.4
 - Sign Up custom validationData reverted to List
 
