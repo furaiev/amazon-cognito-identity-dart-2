@@ -304,6 +304,70 @@ signedRequest = new SigV4Request(
 );
 ```
 
+__Use case 18.__ Resetting an user password after first user authentication (when an account has status *FORCE_CHANGE_PASSWORD*).
+When an administrator creates the user pool account then an user has to change its password after first sign-in.
+Moreover the Cognito User Pool service can send a list of required attributes that user has to set when settings a new password.
+
+
+```dart
+import 'package:amazon_cognito_identity_dart_2/cognito.dart';
+
+final userPool = new CognitoUserPool(
+  'ap-southeast-1_xxxxxxxxx',
+  'xxxxxxxxxxxxxxxxxxxxxxxxxx'
+);
+final cognitoUser = new CognitoUser('email@inspire.my', userPool);
+final authDetails = new AuthenticationDetails(
+  username: 'email@inspire.my',
+  password: 'Password001!',
+);
+CognitoUserSession session;
+try {
+  session = await cognitoUser.authenticateUser(authDetails);
+} on CognitoUserNewPasswordRequiredException catch (e) {
+  try {
+    if(e.requiredAttributes.isEmpty) {
+      // No attribute hast to be set
+      session = await cognitoUser.sendNewPasswordRequiredAnswer("NewPassword002!");
+    } else {
+      // All attributes from the e.requiredAttributes has to be set.
+      print(e.requiredAttributes);
+      // For example obtain and set the name attribute.
+      var attributes = { "name": "Adam Kaminski"};
+      session = await cognitoUser.sendNewPasswordRequiredAnswer("NewPassword002!", attributes);
+    }
+  } on CognitoUserMfaRequiredException catch (e) {
+    // handle SMS_MFA challenge
+  } on CognitoUserSelectMfaTypeException catch (e) {
+    // handle SELECT_MFA_TYPE challenge
+  } on CognitoUserMfaSetupException catch (e) {
+    // handle MFA_SETUP challenge
+  } on CognitoUserTotpRequiredException catch (e) {
+    // handle SOFTWARE_TOKEN_MFA challenge
+  } on CognitoUserCustomChallengeException catch (e) {
+    // handle CUSTOM_CHALLENGE challenge
+  } catch (e) {
+    print(e);
+  }
+} on CognitoUserMfaRequiredException catch (e) {
+  // handle SMS_MFA challenge
+} on CognitoUserSelectMfaTypeException catch (e) {
+  // handle SELECT_MFA_TYPE challenge
+} on CognitoUserMfaSetupException catch (e) {
+  // handle MFA_SETUP challenge
+} on CognitoUserTotpRequiredException catch (e) {
+  // handle SOFTWARE_TOKEN_MFA challenge
+} on CognitoUserCustomChallengeException catch (e) {
+  // handle CUSTOM_CHALLENGE challenge
+} on CognitoUserConfirmationNecessaryException catch (e) {
+  // handle User Confirmation Necessary
+} catch (e) {
+  print(e);
+}
+print(session.getAccessToken().getJwtToken());
+```
+
+
 ## Addtional Features
 
 ### Get AWS Credentials
