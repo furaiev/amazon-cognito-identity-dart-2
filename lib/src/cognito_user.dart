@@ -1,20 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
+
 import 'attribute_arg.dart';
+import 'authentication_details.dart';
+import 'authentication_helper.dart';
+import 'client.dart';
+import 'cognito_access_token.dart';
+import 'cognito_client_exceptions.dart';
+import 'cognito_id_token.dart';
+import 'cognito_refresh_token.dart';
+import 'cognito_storage.dart';
 import 'cognito_user_attribute.dart';
 import 'cognito_user_exceptions.dart';
 import 'cognito_user_pool.dart';
 import 'cognito_user_session.dart';
-import 'cognito_id_token.dart';
-import 'cognito_access_token.dart';
-import 'cognito_refresh_token.dart';
-import 'client.dart';
-import 'cognito_client_exceptions.dart';
-import 'cognito_storage.dart';
-import 'authentication_details.dart';
-import 'authentication_helper.dart';
 import 'date_helper.dart';
 
 class CognitoUserAuthResult {
@@ -694,21 +696,21 @@ class CognitoUser {
   /// Its allow set a new user password and optionally set new user attributes.
   /// Attributes can be send in the *requiredAttributes* map where a map key is an attribute
   /// name and a map value is an attribute value.
-  Future<CognitoUserSession> sendNewPasswordRequiredAnswer(
-      String newPassword, [Map<String, String> requiredAttributes]) async {
+  Future<CognitoUserSession> sendNewPasswordRequiredAnswer(String newPassword,
+      [Map<String, String> requiredAttributes]) async {
     final Map<String, String> challengeResponses = {
       'USERNAME': this.username,
       'NEW_PASSWORD': newPassword,
     };
 
-    if(requiredAttributes != null && requiredAttributes.isNotEmpty) {
-      requiredAttributes.forEach((key, value){
+    if (requiredAttributes != null && requiredAttributes.isNotEmpty) {
+      requiredAttributes.forEach((key, value) {
         challengeResponses["userAttributes.$key"] = value;
       });
     }
 
     final authenticationHelper =
-    AuthenticationHelper(pool.getUserPoolId().split('_')[1]);
+        AuthenticationHelper(pool.getUserPoolId().split('_')[1]);
 
     getCachedDeviceKeyAndPassword();
     if (_deviceKey != null) {
