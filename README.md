@@ -1,17 +1,19 @@
 # Amazon Cognito Identity SDK for Dart
 Unofficial Amazon Cognito Identity SDK written in Dart for [Dart](https://www.dartlang.org/).
 
+Dart Packages: [https://pub.dev/packages/amazon_cognito_identity_dart_2](https://pub.dev/packages/amazon_cognito_identity_dart_2)
+
 Based on [amazon-cognito-identity-js](https://github.com/aws/aws-amplify/tree/master/packages/amazon-cognito-identity-js).
 
 Need ideas to get started?
 
-- Check out use cases [below](https://github.com/jonsaw/amazon-cognito-identity-dart/#usage).
-- Example Flutter app can be found [here](https://github.com/jonsaw/amazon-cognito-identity-dart/tree/master/example).
+- Check out use cases [below](https://github.com/furaiev/amazon-cognito-identity-dart-2/#usage).
+- Example Flutter app can be found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/tree/master/example).
 - Authenticated access to:
-    - AppSync + GraphQL found [here](https://github.com/jonsaw/amazon-cognito-identity-dart/#for-appsyncs-graphql).
-    - API Gateway + Lambda found [here](https://github.com/jonsaw/amazon-cognito-identity-dart/#for-api-gateway--lambda).
-    - S3 Presigned Post found [here](https://github.com/jonsaw/amazon-cognito-identity-dart/#for-s3-uploads).
-    - S3 GET Object with Authorization found [here](https://github.com/jonsaw/amazon-cognito-identity-dart/#for-s3-get-object).
+    - AppSync + GraphQL found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/#for-appsyncs-graphql).
+    - API Gateway + Lambda found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/#for-api-gateway--lambda).
+    - S3 Presigned Post found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/#for-s3-uploads).
+    - S3 GET Object with Authorization found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/#for-s3-get-object).
 - Follow the tutorial on [Serverless Stack](https://serverless-stack.com/chapters/create-a-cognito-user-pool.html) for best Cognito setup.
 
 Note: When creating the App, the generate client secret box must be unchecked.
@@ -801,7 +803,7 @@ void main() async {
 
 Persist user session using custom storage.
 
-[Shared Preferences Plugin](https://pub.dartlang.org/packages/shared_preferences) storage example found [here](https://github.com/jonsaw/amazon-cognito-identity-dart/blob/master/example/lib/main.dart#L72).
+[Shared Preferences Plugin](https://pub.dartlang.org/packages/shared_preferences) storage example found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/blob/master/example/lib/main.dart#L72).
 
 ```dart
 import 'dart:convert';
