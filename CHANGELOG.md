@@ -1,3 +1,6 @@
+## 0.1.5+2
+- Fixed wrong behaviour with Get Requests
+
 ## 0.1.5+1
 - Readme update, code formatting
 

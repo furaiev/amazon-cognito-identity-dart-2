@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 
@@ -65,7 +66,7 @@ class SigV4Request {
     if (headers == null) {
       headers = {};
     }
-    if (headers['Content-Type'] == null) {
+    if (headers['Content-Type'] == null && this.method != 'GET') {
       headers['Content-Type'] = awsSigV4Client.defaultContentType;
     }
     if (headers['Accept'] == null) {
@@ -94,10 +95,6 @@ class SigV4Request {
     headers.remove(_host);
 
     url = _generateUrl();
-
-    if (headers['Content-Type'] == null) {
-      headers['Content-Type'] = awsSigV4Client.defaultContentType;
-    }
   }
 
   String _generateUrl() {
