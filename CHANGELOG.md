@@ -1,3 +1,8 @@
+## 0.1.6
+- Added client secret support that is missing since original JS SDK
+- Fixed the bug that made DEVICE_PASSWORD_VERIFIER for remembered device fail
+- Fixed a custom authentication flow serialization issue (authParameters is an object, not an array)
+
 ## 0.1.5+2
 - Fixed wrong behaviour with Get Requests
 

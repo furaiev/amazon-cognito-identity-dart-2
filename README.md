@@ -4,6 +4,7 @@ Unofficial Amazon Cognito Identity SDK written in Dart for [Dart](https://www.da
 Dart Packages: [https://pub.dev/packages/amazon_cognito_identity_dart_2](https://pub.dev/packages/amazon_cognito_identity_dart_2)
 
 Based on [amazon-cognito-identity-js](https://github.com/aws/aws-amplify/tree/master/packages/amazon-cognito-identity-js).
+First version was created by Jonsaw [amazon-cognito-identity-dart](https://github.com/jonsaw/amazon-cognito-identity-dart/).
 
 Need ideas to get started?
 

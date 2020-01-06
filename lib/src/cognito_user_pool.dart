@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'client.dart';
+
 import 'attribute_arg.dart';
+import 'client.dart';
 import 'cognito_storage.dart';
 import 'cognito_user.dart';
 
@@ -36,7 +37,7 @@ class CognitoUserPool {
     String clientSecret,
     String endpoint,
     Client customClient,
-    String customUserAgent,  
+    String customUserAgent,
     this.storage,
     this.advancedSecurityDataCollectionFlag = true,
   }) {
@@ -49,7 +50,8 @@ class CognitoUserPool {
     }
     _region = userPoolId.split('_')[0];
     _userAgent = customUserAgent;
-    client = new Client(region: _region, endpoint: endpoint, userAgent: _userAgent);
+    client =
+        new Client(region: _region, endpoint: endpoint, userAgent: _userAgent);
 
     if (customClient != null) {
       client = customClient;
@@ -79,13 +81,10 @@ class CognitoUserPool {
 
     final lastAuthUser = await storage.getItem(lastUserKey);
     if (lastAuthUser != null) {
-      return new CognitoUser(
-        lastAuthUser,
-        this,
-        storage: this.storage,
-        clientSecret: _clientSecret,
-        deviceName: _userAgent
-      );
+      return new CognitoUser(lastAuthUser, this,
+          storage: this.storage,
+          clientSecret: _clientSecret,
+          deviceName: _userAgent);
     }
 
     return null;
@@ -117,7 +116,8 @@ class CognitoUserPool {
     };
 
     if (_clientSecret != null) {
-      params['SecretHash'] = CognitoUser.calculateClientSecretHash(username, _clientId, _clientSecret);
+      params['SecretHash'] = CognitoUser.calculateClientSecretHash(
+          username, _clientId, _clientSecret);
     }
 
     final data = await this.client.request('SignUp', params);
@@ -125,7 +125,10 @@ class CognitoUserPool {
       return null;
     }
     return CognitoUserPoolData.fromData(
-      CognitoUser(username, this, storage: storage, clientSecret: _clientSecret, deviceName: _userAgent),
+      CognitoUser(username, this,
+          storage: storage,
+          clientSecret: _clientSecret,
+          deviceName: _userAgent),
       data,
     );
   }

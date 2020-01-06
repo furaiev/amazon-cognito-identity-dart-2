@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 
-import 'attribute_arg.dart';
 import 'authentication_details.dart';
 import 'authentication_helper.dart';
 import 'client.dart';
@@ -53,7 +52,8 @@ class CognitoUser {
     this.deviceName = 'Dart-device',
   }) {
     if (clientSecret != null) {
-      _clientSecretHash = calculateClientSecretHash(username, pool.getClientId(), clientSecret);
+      _clientSecretHash =
+          calculateClientSecretHash(username, pool.getClientId(), clientSecret);
     }
     client = pool.client;
     authenticationFlowType = 'USER_SRP_AUTH';
@@ -657,7 +657,8 @@ class CognitoUser {
   ///
   /// Translated from library `aws-android-sdk-cognitoprovider@2.6.30` file `CognitoSecretHash.java::getSecretHash()`
   ///
-  static String calculateClientSecretHash(String userName, String clientId, String clientSecret) {
+  static String calculateClientSecretHash(
+      String userName, String clientId, String clientSecret) {
     Hmac hmac = new Hmac(sha256, utf8.encode(clientSecret));
     Digest digest = hmac.convert(utf8.encode(userName + clientId));
     hmac.convert(digest.bytes);

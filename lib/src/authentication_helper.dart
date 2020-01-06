@@ -1,6 +1,8 @@
 import 'dart:convert';
+
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
+
 import 'random_string_helper.dart';
 
 final String initN = 'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1' +
