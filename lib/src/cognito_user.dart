@@ -412,11 +412,12 @@ class CognitoUser {
   /// This is used for authenticating the user through the custom authentication flow.
   Future<CognitoUserSession> initiateAuth(
       AuthenticationDetails authDetails) async {
-    final authParameters = authDetails.getAuthParameters();
-    authParameters.add(new AttributeArg(
-      name: 'USERNAME',
-      value: username,
-    ));
+    final authParameters =
+        authDetails.getAuthParameters().fold({}, (value, element) {
+      value[element.name] = element.value;
+      return value;
+    });
+    authParameters['USERNAME'] = username;
 
     final Map<String, dynamic> paramsReq = {
       'AuthFlow': 'CUSTOM_AUTH',
