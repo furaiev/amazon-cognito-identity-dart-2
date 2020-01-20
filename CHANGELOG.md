@@ -1,3 +1,6 @@
+## 0.1.6+1
+- Readme update
+
 ## 0.1.6
 - Added client secret support that is missing since original JS SDK
 - Fixed the bug that made DEVICE_PASSWORD_VERIFIER for remembered device fail
