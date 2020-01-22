@@ -24,8 +24,8 @@ class RandomString {
 
   RandomString({bool secure: true, int seed})
       : _random = (secure
-            ? new Random.secure()
-            : (seed == null ? new Random() : new Random(seed)));
+            ? Random.secure()
+            : (seed == null ? Random() : Random(seed)));
 
   String generate({int length: 1024, List<String> charList: _hexCharList}) {
     List<String> strings = [];

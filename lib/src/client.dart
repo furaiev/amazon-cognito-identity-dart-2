@@ -24,7 +24,7 @@ class Client {
     this.endpoint = endpoint ?? 'https://cognito-idp.$_region.amazonaws.com/';
     this._client = client;
     if (this._client == null) {
-      this._client = new http.Client();
+      this._client = http.Client();
     }
   }
 
@@ -50,12 +50,12 @@ class Client {
       );
     } catch (e) {
       if (e.toString().startsWith('SocketException:')) {
-        throw new CognitoClientException(
+        throw CognitoClientException(
           e.message,
           code: 'NetworkError',
         );
       }
-      throw new CognitoClientException('Unknown Error', code: 'Unknown error');
+      throw CognitoClientException('Unknown Error', code: 'Unknown error');
     }
     var data;
     try {
@@ -72,7 +72,7 @@ class Client {
         }
       }
       if (data == null) {
-        throw new CognitoClientException(
+        throw CognitoClientException(
           'Cognito client request error with unknown message',
           code: errorType,
           name: errorType,
@@ -83,7 +83,7 @@ class Client {
       final String dataCode = data['code'];
       final String code =
           (dataType ?? dataCode ?? errorType).split('#').removeLast();
-      throw new CognitoClientException(
+      throw CognitoClientException(
         data['message'] ?? 'Cognito client request error with unknown message',
         code: code,
         name: code,

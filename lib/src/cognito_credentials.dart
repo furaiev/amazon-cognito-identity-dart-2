@@ -1,8 +1,9 @@
 import 'dart:async';
-import 'cognito_user_pool.dart';
+
 import 'client.dart';
 import 'cognito_client_exceptions.dart';
 import 'cognito_identity_id.dart';
+import 'cognito_user_pool.dart';
 
 class CognitoCredentials {
   String _region;
@@ -24,11 +25,11 @@ class CognitoCredentials {
     _client = pool.client;
   }
 
- /// Get AWS Credentials for authenticated user
+  /// Get AWS Credentials for authenticated user
   Future<void> getAwsCredentials(token, [String authenticator]) async {
     if (expireTime == null ||
-        new DateTime.now().millisecondsSinceEpoch > expireTime - 60000) {
-      final identityId = new CognitoIdentityId(_identityPoolId, _pool);
+        DateTime.now().millisecondsSinceEpoch > expireTime - 60000) {
+      final identityId = CognitoIdentityId(_identityPoolId, _pool);
       final identityIdId = await identityId.getIdentityId(token, authenticator);
 
       authenticator ??= 'cognito-idp.$_region.amazonaws.com/$_userPoolId';
@@ -68,7 +69,7 @@ class CognitoCredentials {
 
   /// Reset AWS Credentials; removes Identity Id from local storage
   Future<void> resetAwsCredentials() async {
-    await new CognitoIdentityId(_identityPoolId, _pool).removeIdentityId();
+    await CognitoIdentityId(_identityPoolId, _pool).removeIdentityId();
     expireTime = null;
     accessKeyId = null;
     secretAccessKey = null;

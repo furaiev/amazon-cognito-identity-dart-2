@@ -1,3 +1,7 @@
+## 0.1.7
+- added authenticator param to getAwsCredentials function to authenticate with third-party authentication method (e.g. Facebook, Google)
+- removed keyword 'new' from the code
+
 ## 0.1.6+1
 - Readme update
 

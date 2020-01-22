@@ -60,7 +60,7 @@ class CognitoUser {
 
     if (this.storage == null) {
       this.storage =
-          (new CognitoStorageHelper(new CognitoMemoryStorage())).getStorage();
+          (CognitoStorageHelper(CognitoMemoryStorage())).getStorage();
     }
   }
 
@@ -71,35 +71,35 @@ class CognitoUser {
 
     if (challengeName == 'SMS_MFA') {
       _session = dataAuthenticate['Session'];
-      throw new CognitoUserMfaRequiredException(
+      throw CognitoUserMfaRequiredException(
           challengeName: challengeName,
           challengeParameters: challengeParameters);
     }
 
     if (challengeName == 'SELECT_MFA_TYPE') {
       _session = dataAuthenticate['Session'];
-      throw new CognitoUserSelectMfaTypeException(
+      throw CognitoUserSelectMfaTypeException(
           challengeName: challengeName,
           challengeParameters: challengeParameters);
     }
 
     if (challengeName == 'MFA_SETUP') {
       _session = dataAuthenticate['Session'];
-      throw new CognitoUserMfaSetupException(
+      throw CognitoUserMfaSetupException(
           challengeName: challengeName,
           challengeParameters: challengeParameters);
     }
 
     if (challengeName == 'SOFTWARE_TOKEN_MFA') {
       _session = dataAuthenticate['Session'];
-      throw new CognitoUserTotpRequiredException(
+      throw CognitoUserTotpRequiredException(
           challengeName: challengeName,
           challengeParameters: challengeParameters);
     }
 
     if (challengeName == 'CUSTOM_CHALLENGE') {
       _session = dataAuthenticate['Session'];
-      throw new CognitoUserCustomChallengeException(
+      throw CognitoUserCustomChallengeException(
           challengeName: challengeName,
           challengeParameters: challengeParameters);
     }
@@ -150,7 +150,7 @@ class CognitoUser {
     await cacheDeviceKeyAndPassword();
 
     if (dataConfirm['UserConfirmationNecessary'] == true) {
-      throw new CognitoUserConfirmationNecessaryException(
+      throw CognitoUserConfirmationNecessaryException(
           signInUserSession: _signInUserSession);
     }
     return _signInUserSession;
@@ -160,7 +160,7 @@ class CognitoUser {
   /// or from  the local storage, or by using a refresh token
   Future<CognitoUserSession> getSession() async {
     if (username == null) {
-      throw new Exception('Username is null. Cannot retrieve a new session');
+      throw Exception('Username is null. Cannot retrieve a new session');
     }
 
     if (_signInUserSession != null && _signInUserSession.isValid()) {
@@ -175,14 +175,14 @@ class CognitoUser {
     final clockDriftKey = '$keyPrefix.clockDrift';
 
     if (await storage.getItem(idTokenKey) != null) {
-      final idToken = new CognitoIdToken(await storage.getItem(idTokenKey));
+      final idToken = CognitoIdToken(await storage.getItem(idTokenKey));
       final accessToken =
-          new CognitoAccessToken(await storage.getItem(accessTokenKey));
+          CognitoAccessToken(await storage.getItem(accessTokenKey));
       final refreshToken =
-          new CognitoRefreshToken(await storage.getItem(refreshTokenKey));
+          CognitoRefreshToken(await storage.getItem(refreshTokenKey));
       final clockDrift = int.parse(await storage.getItem(clockDriftKey)) ?? 0;
 
-      final cachedSession = new CognitoUserSession(
+      final cachedSession = CognitoUserSession(
         idToken,
         accessToken,
         refreshToken: refreshToken,
@@ -195,20 +195,19 @@ class CognitoUser {
       }
 
       if (refreshToken.getToken() == null) {
-        throw new Exception(
-            'Cannot retrieve a new session. Please authenticate.');
+        throw Exception('Cannot retrieve a new session. Please authenticate.');
       }
 
       return refreshSession(refreshToken);
     }
-    throw new Exception(
+    throw Exception(
         'Local storage is missing an ID Token, Please authenticate');
   }
 
   /// This is used to initiate an attribute confirmation request
   Future getAttributeVerificationCode(String attributeName) async {
     if (_signInUserSession == null || !_signInUserSession.isValid()) {
-      throw new Exception('User is not authenticated');
+      throw Exception('User is not authenticated');
     }
 
     final Map<String, String> paramsReq = {
@@ -222,7 +221,7 @@ class CognitoUser {
   /// This is used to confirm an attribute using a confirmation code
   Future<bool> verifyAttribute(attributeName, confirmationCode) async {
     if (_signInUserSession == null || !_signInUserSession.isValid()) {
-      throw new Exception('User is not authenticated');
+      throw Exception('User is not authenticated');
     }
 
     final Map<String, String> paramsReq = {
@@ -323,19 +322,18 @@ class CognitoUser {
 
   /// This is used to build a user session from tokens retrieved in the authentication result
   CognitoUserSession getCognitoUserSession(Map<String, dynamic> authResult) {
-    final idToken = new CognitoIdToken(authResult['IdToken']);
-    final accessToken = new CognitoAccessToken(authResult['AccessToken']);
-    final refreshToken = new CognitoRefreshToken(authResult['RefreshToken']);
+    final idToken = CognitoIdToken(authResult['IdToken']);
+    final accessToken = CognitoAccessToken(authResult['AccessToken']);
+    final refreshToken = CognitoRefreshToken(authResult['RefreshToken']);
 
-    return new CognitoUserSession(idToken, accessToken,
-        refreshToken: refreshToken);
+    return CognitoUserSession(idToken, accessToken, refreshToken: refreshToken);
   }
 
   /// This is used to get a session using device authentication. It is called at the end of user
   /// authentication
   Future<CognitoUserSession> getDeviceResponse() async {
-    final authenticationHelper = new AuthenticationHelper(_deviceGroupKey);
-    final dateHelper = new DateHelper();
+    final authenticationHelper = AuthenticationHelper(_deviceGroupKey);
+    final dateHelper = DateHelper();
 
     final Map<String, String> authParameters = {
       'USERNAME': this.username,
@@ -367,7 +365,7 @@ class CognitoUser {
 
     final dateNow = dateHelper.getNowString();
 
-    final signature = new Hmac(sha256, hkdf);
+    final signature = Hmac(sha256, hkdf);
     final List<int> signatureData = [];
     signatureData
       ..addAll(utf8.encode(_deviceGroupKey))
@@ -436,7 +434,7 @@ class CognitoUser {
     final challengeParameters = data['ChallengeParameters'];
     if (challengeName == 'CUSTOM_CHALLENGE') {
       _session = data['Session'];
-      throw new CognitoUserCustomChallengeException(
+      throw CognitoUserCustomChallengeException(
           challengeParameters: challengeParameters);
     }
 
@@ -454,7 +452,7 @@ class CognitoUser {
     } else if (authenticationFlowType == 'USER_SRP_AUTH') {
       return await _authenticateUserDefaultAuth(authDetails);
     }
-    throw new UnimplementedError('Authentication flow type is not supported.');
+    throw UnimplementedError('Authentication flow type is not supported.');
   }
 
   /// This is used for the user to signOut of the application and clear the cached tokens.
@@ -466,7 +464,7 @@ class CognitoUser {
   /// This is used to globally revoke all tokens issued to a user
   Future<void> globalSignOut() async {
     if (_signInUserSession == null || !_signInUserSession.isValid()) {
-      throw new Exception('User is not authenticated');
+      throw Exception('User is not authenticated');
     }
     final Map<String, String> paramsReq = {
       'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
@@ -482,10 +480,10 @@ class CognitoUser {
       'PASSWORD': authDetails.getPassword(),
     };
     if (authParameters['PASSWORD'] == null) {
-      throw new ArgumentError('PASSWORD parameter is required');
+      throw ArgumentError('PASSWORD parameter is required');
     }
 
-    final authenticationHelper = new AuthenticationHelper(
+    final authenticationHelper = AuthenticationHelper(
       pool.getUserPoolId().split('_')[1],
     );
 
@@ -512,10 +510,10 @@ class CognitoUser {
   Future<CognitoUserSession> _authenticateUserDefaultAuth(
     AuthenticationDetails authDetails,
   ) async {
-    final authenticationHelper = new AuthenticationHelper(
+    final authenticationHelper = AuthenticationHelper(
       pool.getUserPoolId().split('_')[1],
     );
-    final dateHelper = new DateHelper();
+    final dateHelper = DateHelper();
     BigInt serverBValue;
     BigInt salt;
 
@@ -564,7 +562,7 @@ class CognitoUser {
 
     final dateNow = dateHelper.getNowString();
 
-    final signature = new Hmac(sha256, hkdf);
+    final signature = Hmac(sha256, hkdf);
     final List<int> signatureData = [];
     signatureData
       ..addAll(utf8.encode(pool.getUserPoolId().split('_')[1]))
@@ -647,7 +645,7 @@ class CognitoUser {
         });
       }
 
-      throw new CognitoUserNewPasswordRequiredException(
+      throw CognitoUserNewPasswordRequiredException(
           userAttributes: userAttributes,
           requiredAttributes: requiredAttributes);
     }
@@ -659,7 +657,7 @@ class CognitoUser {
   ///
   static String calculateClientSecretHash(
       String userName, String clientId, String clientSecret) {
-    Hmac hmac = new Hmac(sha256, utf8.encode(clientSecret));
+    Hmac hmac = Hmac(sha256, utf8.encode(clientSecret));
     Digest digest = hmac.convert(utf8.encode(userName + clientId));
     hmac.convert(digest.bytes);
     return base64.encode(digest.bytes);
@@ -703,7 +701,7 @@ class CognitoUser {
     };
 
     final authenticationHelper =
-        new AuthenticationHelper(pool.getUserPoolId().split('_')[1]);
+        AuthenticationHelper(pool.getUserPoolId().split('_')[1]);
 
     await getCachedDeviceKeyAndPassword();
     if (_deviceKey != null) {
@@ -812,7 +810,7 @@ class CognitoUser {
     }
 
     final authenticationHelper =
-        new AuthenticationHelper(pool.getUserPoolId().split('_')[1]);
+        AuthenticationHelper(pool.getUserPoolId().split('_')[1]);
     authenticationHelper.generateHashDevice(
         dataAuthenticate['AuthenticationResult']['NewDeviceMetadata']
             ['DeviceGroupKey'],
@@ -843,7 +841,7 @@ class CognitoUser {
         ['DeviceKey'];
     await cacheDeviceKeyAndPassword();
     if (dataConfirm['UserConfirmationNecessary'] == true) {
-      throw new CognitoUserConfirmationNecessaryException(
+      throw CognitoUserConfirmationNecessaryException(
           signInUserSession: _signInUserSession);
     }
 
@@ -854,7 +852,7 @@ class CognitoUser {
   Future<bool> changePassword(
       String oldUserPassword, String newUserPassword) async {
     if (!(_signInUserSession != null && _signInUserSession.isValid())) {
-      throw new Exception('User is not authenticated');
+      throw Exception('User is not authenticated');
     }
 
     final Map<String, String> paramsReq = {
@@ -873,7 +871,7 @@ class CognitoUser {
   /// This is used by authenticated users to enable MFA for him/herself
   Future<bool> enableMfa() async {
     if (_signInUserSession == null || !_signInUserSession.isValid()) {
-      throw new Exception('User is not authenticated');
+      throw Exception('User is not authenticated');
     }
 
     final List<Map<String, String>> mfaOptions = [];
@@ -895,7 +893,7 @@ class CognitoUser {
   /// This is used by an authenticated user to disable MFA for him/herself
   Future<bool> disableMfa() async {
     if (_signInUserSession == null || !_signInUserSession.isValid()) {
-      throw new Exception('User is not authenticated');
+      throw Exception('User is not authenticated');
     }
 
     final List<Map<String, String>> mfaOptions = [];
@@ -1015,7 +1013,7 @@ class CognitoUser {
   /// This is used by authenticated users to get a list of attributes
   Future<List<CognitoUserAttribute>> getUserAttributes() async {
     if (!(_signInUserSession != null && _signInUserSession.isValid())) {
-      throw new Exception('User is not authenticated');
+      throw Exception('User is not authenticated');
     }
 
     final Map<String, dynamic> paramsReq = {
@@ -1029,8 +1027,8 @@ class CognitoUser {
 
     final List<CognitoUserAttribute> attributeList = [];
     userData['UserAttributes'].forEach((attr) {
-      attributeList.add(
-          new CognitoUserAttribute(name: attr['Name'], value: attr['Value']));
+      attributeList
+          .add(CognitoUserAttribute(name: attr['Name'], value: attr['Value']));
     });
     return attributeList;
   }
@@ -1038,7 +1036,7 @@ class CognitoUser {
   /// This is used by authenticated users to change a list of attributes
   updateAttributes(List<CognitoUserAttribute> attributes) async {
     if (_signInUserSession == null || !_signInUserSession.isValid()) {
-      throw new Exception('User is not authenticated');
+      throw Exception('User is not authenticated');
     }
 
     final Map<String, dynamic> paramsReq = {
@@ -1051,7 +1049,7 @@ class CognitoUser {
   /// This is used by an authenticated user to delete a list of attributes
   deleteAttributes(List<String> attributeList) async {
     if (!(_signInUserSession != null && _signInUserSession.isValid())) {
-      throw new Exception('User is not authenticated');
+      throw Exception('User is not authenticated');
     }
 
     final Map<String, dynamic> paramsReq = {
@@ -1064,7 +1062,7 @@ class CognitoUser {
   /// This is used by an authenticated user to delete him/herself
   Future<bool> deleteUser() async {
     if (_signInUserSession == null || !_signInUserSession.isValid()) {
-      throw new Exception('User is not authenticated');
+      throw Exception('User is not authenticated');
     }
 
     final Map<String, dynamic> paramsReq = {

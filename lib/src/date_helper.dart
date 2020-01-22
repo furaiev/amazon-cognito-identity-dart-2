@@ -27,7 +27,7 @@ final List<String> weekNames = [
 class DateHelper {
   /// The current time in "ddd MMM D HH:mm:ss UTC YYYY" format.
   String getNowString() {
-    DateTime now = new DateTime.now().toUtc();
+    DateTime now = DateTime.now().toUtc();
 
     final String weekDay = weekNames[now.weekday];
     final String month = monthNames[now.month];

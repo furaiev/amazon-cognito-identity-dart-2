@@ -44,22 +44,21 @@ class CognitoUserPool {
     _userPoolId = userPoolId;
     _clientId = clientId;
     _clientSecret = clientSecret;
-    RegExp regExp = new RegExp(r'^[\w-]+_.+$');
+    RegExp regExp = RegExp(r'^[\w-]+_.+$');
     if (!regExp.hasMatch(userPoolId)) {
-      throw new ArgumentError('Invalid userPoolId format.');
+      throw ArgumentError('Invalid userPoolId format.');
     }
     _region = userPoolId.split('_')[0];
     _userAgent = customUserAgent;
-    client =
-        new Client(region: _region, endpoint: endpoint, userAgent: _userAgent);
+    client = Client(region: _region, endpoint: endpoint, userAgent: _userAgent);
 
     if (customClient != null) {
       client = customClient;
     }
 
     if (this.storage == null) {
-      this.storage = storage =
-          (new CognitoStorageHelper(new CognitoMemoryStorage())).getStorage();
+      this.storage =
+          storage = (CognitoStorageHelper(CognitoMemoryStorage())).getStorage();
     }
   }
 
@@ -81,7 +80,7 @@ class CognitoUserPool {
 
     final lastAuthUser = await storage.getItem(lastUserKey);
     if (lastAuthUser != null) {
-      return new CognitoUser(lastAuthUser, this,
+      return CognitoUser(lastAuthUser, this,
           storage: this.storage,
           clientSecret: _clientSecret,
           deviceName: _userAgent);

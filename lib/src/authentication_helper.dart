@@ -83,11 +83,11 @@ class AuthenticationHelper {
   List<int> getPasswordAuthenticationKey(
       String username, String password, BigInt serverBValue, BigInt salt) {
     if (serverBValue % N == BigInt.zero) {
-      throw new ArgumentError('B cannot be zero.');
+      throw ArgumentError('B cannot be zero.');
     }
     _uValue = calculateU(_largeAValue, serverBValue);
     if (_uValue == BigInt.zero) {
-      throw new ArgumentError('U cannot be zero.');
+      throw ArgumentError('U cannot be zero.');
     }
 
     final String usernamePassword = '${this.poolName}$username:$password';
@@ -105,7 +105,7 @@ class AuthenticationHelper {
 
   /// helper function to generate a random big integer
   BigInt generateRandomSmallA() {
-    final String hexRandom = new RandomString().generate(length: 128);
+    final String hexRandom = RandomString().generate(length: 128);
 
     final BigInt randomBigInt = BigInt.parse(hexRandom, radix: 16);
 
@@ -116,7 +116,7 @@ class AuthenticationHelper {
 
   /// helper function to generate a random string
   String generateRandomString() {
-    return new RandomString().generate(length: 40);
+    return RandomString().generate(length: 40);
   }
 
   /// Generate salts and compute verifier.
@@ -126,7 +126,7 @@ class AuthenticationHelper {
         '$deviceGroupKey$deviceKey:${this._randomPassword}';
     final String hashedString = this.hash(utf8.encode(combinedString));
 
-    final String hexRandom = new RandomString().generate(length: 16);
+    final String hexRandom = RandomString().generate(length: 16);
 
     _saltToHashDevices = this.padHex(BigInt.parse(hexRandom, radix: 16));
 
@@ -142,7 +142,7 @@ class AuthenticationHelper {
   /// Calculate a hash from a bitArray
   String hash(List<int> buf) {
     final String hashHex = sha256.convert(buf).toString();
-    return (new List(64 - hashHex.length).join('0')) + hashHex;
+    return (List(64 - hashHex.length).join('0')) + hashHex;
   }
 
   /// Calculate a hash from a hex string
@@ -155,7 +155,7 @@ class AuthenticationHelper {
   BigInt calculateA(BigInt a) {
     final A = modPow(this.g, a, N);
     if ((A % this.N) == BigInt.zero) {
-      throw new Exception('Illegal paramater. A mod N cannot be 0.');
+      throw Exception('Illegal paramater. A mod N cannot be 0.');
     }
     return A;
   }
@@ -200,11 +200,11 @@ class AuthenticationHelper {
 
   /// Standard hkdf algorithm
   List<int> computehkdf(List<int> ikm, List<int> salt) {
-    Hmac hmac1 = new Hmac(sha256, salt);
+    Hmac hmac1 = Hmac(sha256, salt);
     Digest prk = hmac1.convert(ikm);
-    List<int> infoBitsUpdate = new List.from(_infoBits)
+    List<int> infoBitsUpdate = List.from(_infoBits)
       ..addAll(utf8.encode(String.fromCharCode(1)));
-    Hmac hmac2 = new Hmac(sha256, prk.bytes);
+    Hmac hmac2 = Hmac(sha256, prk.bytes);
     Digest dig = hmac2.convert(infoBitsUpdate);
     return dig.bytes.getRange(0, 16).toList();
   }

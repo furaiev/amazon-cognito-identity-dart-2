@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'cognito_user_pool.dart';
+
 import 'client.dart';
+import 'cognito_user_pool.dart';
 
 class CognitoIdentityId {
   String identityId;
