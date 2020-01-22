@@ -62,9 +62,6 @@ class CognitoCredentials {
       accessKeyId = data['Credentials']['AccessKeyId'];
       secretAccessKey = data['Credentials']['SecretKey'];
       sessionToken = data['Credentials']['SessionToken'];
-
-      print(accessKeyId);
-
       expireTime = (data['Credentials']['Expiration']).toInt() * 1000;
     }
   }
