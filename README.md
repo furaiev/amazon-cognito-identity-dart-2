@@ -861,3 +861,11 @@ final user = await userPool.getCurrentUser();
 final session = await user.getSession();
 print(session.isValid());
 ```
+
+### get aws credentials with facebook
+```dart
+CognitoCredentials _credential = new CognitoCredentials('ap-southeast-1_xxxxxxxxx', userPool);
+await _credential.getAwsCredentials(accessToken, 'graph.facebook.com')
+print(_credential.sessionToken);
+```
+
