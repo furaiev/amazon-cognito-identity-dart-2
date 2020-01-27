@@ -19,8 +19,6 @@ Need ideas to get started?
 
 Note: When creating the App, the generate client secret box must be unchecked.
 
-Please note that this package is _not_ production ready.
-
 ## Usage
 __Use Case 1.__ Registering a user with the application. One needs to create a CognitoUserPool object by providing a UserPoolId and a ClientId and signing up by using a username, password, attribute list, and validation data.
 
