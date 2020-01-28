@@ -224,23 +224,26 @@ class AuthenticationHelper {
   String toUnsignedHex(String input) {
     String output;
     bool negative = false;
+
     /// Detect negative and remove from string
-    if(input[0] == '-') {
+    if (input[0] == '-') {
       negative = true;
       output = input.substring(1); // remove negative sign
-    }
-    else {
+    } else {
       output = input;
     }
+
     /// Pad string to 32 hex digits (128 bits total)
-    while(output.length < 32) {
+    while (output.length < 32) {
       output = '0' + output;
     }
+
     /// OR in a 1 to the top bit if the original string was negative
-    if(negative) {
+    if (negative) {
       String toReplace = output[0];
       output = output.substring(1);
-      String updatedLeadingDigit = (int.parse(toReplace) | 0x8).toRadixString(16);
+      String updatedLeadingDigit =
+          (int.parse(toReplace) | 0x8).toRadixString(16);
       output = updatedLeadingDigit + output;
     }
     return output;

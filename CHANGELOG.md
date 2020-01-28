@@ -1,3 +1,6 @@
+## 0.1.8
+- fixed salt with a negative sign in front of it
+
 ## 0.1.7
 - added authenticator param to getAwsCredentials function to authenticate with third-party authentication method (e.g. Facebook, Google)
 - removed keyword 'new' from the code
