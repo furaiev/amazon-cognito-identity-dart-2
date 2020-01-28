@@ -16,6 +16,8 @@ class CognitoCredentials {
   String secretAccessKey;
   String sessionToken;
   int expireTime;
+  String userIdentityId;
+
   CognitoCredentials(String identityPoolId, CognitoUserPool pool,
       {String region, String userPoolId}) {
     _pool = pool;
@@ -30,14 +32,14 @@ class CognitoCredentials {
     if (expireTime == null ||
         DateTime.now().millisecondsSinceEpoch > expireTime - 60000) {
       final identityId = CognitoIdentityId(_identityPoolId, _pool);
-      final identityIdId = await identityId.getIdentityId(token, authenticator);
+      userIdentityId = await identityId.getIdentityId(token, authenticator);
 
       authenticator ??= 'cognito-idp.$_region.amazonaws.com/$_userPoolId';
       final Map<String, String> loginParam = {
         authenticator: token,
       };
       final Map<String, dynamic> paramsReq = {
-        'IdentityId': identityIdId,
+        'IdentityId': userIdentityId,
         'Logins': loginParam,
       };
 
