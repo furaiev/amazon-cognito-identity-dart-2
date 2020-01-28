@@ -1,3 +1,7 @@
+## 0.1.9
+- added support for Cognito CUSTOM_AUTH flows with client secrets
+- exposed IdentityId in cognito_credentials to upload to S3 user folder
+
 ## 0.1.8
 - fixed salt with a negative sign in front of it
 
@@ -6,24 +10,24 @@
 - removed keyword 'new' from the code
 
 ## 0.1.6+1
-- Readme update
+- readme update
 
 ## 0.1.6
-- Added client secret support that is missing since original JS SDK
-- Fixed the bug that made DEVICE_PASSWORD_VERIFIER for remembered device fail
-- Fixed a custom authentication flow serialization issue (authParameters is an object, not an array)
+- added client secret support that is missing since original JS SDK
+- fixed the bug that made DEVICE_PASSWORD_VERIFIER for remembered device fail
+- fixed a custom authentication flow serialization issue (authParameters is an object, not an array)
 
 ## 0.1.5+2
-- Fixed wrong behaviour with Get Requests
+- fixed wrong behaviour with Get Requests
 
 ## 0.1.5+1
-- Readme update, code formatting
+- readme update, code formatting
 
 ## 0.1.5
-- Response to the NEW_PASSWORD_REQUIRED challenge
+- response to the NEW_PASSWORD_REQUIRED challenge
 
 ## 0.1.4
-- Sign Up custom validationData reverted to List
+- sign Up custom validationData reverted to List
 
 ## 0.1.3+1
 - fixed link to repo
