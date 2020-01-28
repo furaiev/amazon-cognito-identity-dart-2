@@ -419,6 +419,10 @@ class CognitoUser {
     });
     authParameters['USERNAME'] = username;
 
+    if (_clientSecretHash != null) {
+      authParameters['SECRET_HASH'] = _clientSecretHash;
+    }
+
     final Map<String, dynamic> paramsReq = {
       'AuthFlow': 'CUSTOM_AUTH',
       'ClientId': pool.getClientId(),
@@ -711,6 +715,10 @@ class CognitoUser {
     await getCachedDeviceKeyAndPassword();
     if (_deviceKey != null) {
       challengeResponses['DEVICE_KEY'] = _deviceKey;
+    }
+
+    if (_clientSecretHash != null) {
+      challengeResponses['SECRET_HASH'] = _clientSecretHash;
     }
 
     final Map<String, dynamic> paramsReq = {
