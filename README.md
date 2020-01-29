@@ -822,7 +822,7 @@ void main() async {
 
 Persist user session using custom storage.
 
-[Shared Preferences Plugin](https://pub.dartlang.org/packages/shared_preferences) storage example found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/blob/master/example/lib/main.dart#L72).
+[Shared Preferences Plugin](https://pub.dartlang.org/packages/shared_preferences) storage example found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/blob/master/example/lib/main.dart#L24).
 
 ```dart
 import 'dart:convert';
