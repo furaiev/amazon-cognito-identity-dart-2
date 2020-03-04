@@ -6,33 +6,30 @@ import 'cognito_user_pool.dart';
 class CognitoIdentityId {
   String identityId;
   final String _identityPoolId;
-  final String _userPoolId;
   final CognitoUserPool _pool;
   final Client _client;
   final String _region;
   final String _identityIdKey;
+  final String _authenticator;
+  final String _token;
+  Map<String, String> _loginParam;
 
-  CognitoIdentityId(this._identityPoolId, this._pool)
-      : _userPoolId = _pool.getUserPoolId(),
-        _region = _pool.getRegion(),
+  CognitoIdentityId(this._identityPoolId, this._pool,
+      {String authenticator, String token})
+      : _region = _pool.getRegion(),
         _client = _pool.client,
-        _identityIdKey = 'aws.cognito.identity-id.$_identityPoolId';
-
-  /// Get AWS Identity Id for authenticated user
-  Future<String> getIdentityId(token, [String authenticator]) async {
-    authenticator ??= 'cognito-idp.$_region.amazonaws.com/$_userPoolId';
-    final Map<String, String> loginParam = {
-      authenticator: token,
-    };
-
-    return _getCognitoIdentityId(loginParam);
+        _identityIdKey = 'aws.cognito.identity-id.$_identityPoolId',
+        _token = token,
+        _authenticator = authenticator ??
+            'cognito-idp.${_pool.getRegion()}.amazonaws.com/${_pool.getUserPoolId()}' {
+    if (_token != null && _authenticator != null) {
+      _loginParam = {
+        _authenticator: _token,
+      };
+    }
   }
 
-  Future<String> getGuestIdentityId() async {
-    return _getCognitoIdentityId();
-  }
-
-  Future<String> _getCognitoIdentityId([Map<String, String> loginParam]) async {
+  Future<String> getIdentityId() async {
     String identityId = await _pool.storage.getItem(_identityIdKey);
     if (identityId != null) {
       this.identityId = identityId;
@@ -41,8 +38,8 @@ class CognitoIdentityId {
 
     final Map<String, dynamic> paramsReq = {'IdentityPoolId': _identityPoolId};
 
-    if (loginParam != null) {
-      paramsReq['Logins'] = loginParam;
+    if (_loginParam != null) {
+      paramsReq['Logins'] = _loginParam;
     }
 
     final data = await _client.request('GetId', paramsReq,
