@@ -29,6 +29,8 @@ class CognitoIdentityId {
     }
   }
 
+  Map<String, String> get loginParam => _loginParam;
+
   Future<String> getIdentityId() async {
     String identityId = await _pool.storage.getItem(_identityIdKey);
     if (identityId != null) {
