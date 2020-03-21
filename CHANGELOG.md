@@ -1,3 +1,8 @@
+## 0.1.10
+- cleanup for pedantic v1.9.0 lints
+- fix: correct decoding application/json utf8 response
+- user confirmation error rethrow
+
 ## 0.1.9
 - added support for Cognito CUSTOM_AUTH flows with client secrets
 - exposed IdentityId in cognito_credentials to upload to S3 user folder

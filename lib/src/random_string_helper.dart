@@ -1,6 +1,6 @@
 import 'dart:math';
 
-const List<String> _hexCharList = const [
+const List<String> _hexCharList = [
   '0',
   '1',
   '2',
@@ -22,14 +22,14 @@ const List<String> _hexCharList = const [
 class RandomString {
   final Random _random;
 
-  RandomString({bool secure: true, int seed})
+  RandomString({bool secure = true, int seed})
       : _random = (secure
             ? Random.secure()
             : (seed == null ? Random() : Random(seed)));
 
-  String generate({int length: 1024, List<String> charList: _hexCharList}) {
-    List<String> strings = [];
-    for (int point = 0; point < length; ++point) {
+  String generate({int length = 1024, List<String> charList = _hexCharList}) {
+    final strings = [];
+    for (var point = 0; point < length; ++point) {
       strings.add(charList[_random.nextInt(charList.length - 1)]);
     }
     return strings.join();

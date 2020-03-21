@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 
 Map<String, String> testStorage = {};
@@ -6,23 +7,27 @@ Map<String, String> testStorage = {};
 class TestCustomStorage extends CognitoStorage {
   String prefix;
   TestCustomStorage(this.prefix);
-  setItem(String key, value) async {
+  @override
+  Future<String> setItem(String key, value) async {
     testStorage[prefix + key] = json.encode(value);
     return testStorage[prefix + key];
   }
 
-  getItem(String key) async {
+  @override
+  Future<dynamic> getItem(String key) async {
     if (testStorage[prefix + key] != null) {
       return json.decode(testStorage[prefix + key]);
     }
     return null;
   }
 
-  removeItem(String key) async {
+  @override
+  Future<String> removeItem(String key) async {
     return testStorage.remove(prefix + key);
   }
 
-  clear() async {
+  @override
+  Future<void> clear() async {
     testStorage = {};
   }
 }

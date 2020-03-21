@@ -31,7 +31,7 @@ class AwsSigV4Client {
       this.defaultAcceptType = _default_accept_type}) {
     final parsedUri = Uri.parse(endpoint);
     this.endpoint = '${parsedUri.scheme}://${parsedUri.host}';
-    this.pathComponent = parsedUri.path;
+    pathComponent = parsedUri.path;
   }
 }
 
@@ -63,9 +63,8 @@ class SigV4Request {
   }) {
     this.method = method.toUpperCase();
     this.path = '${awsSigV4Client.pathComponent}$path';
-    if (headers == null) {
-      headers = {};
-    }
+    headers = headers ?? {};
+
     if (headers['Content-Type'] == null && this.method != 'GET') {
       headers['Content-Type'] = awsSigV4Client.defaultContentType;
     }
@@ -80,9 +79,8 @@ class SigV4Request {
     if (body == '') {
       headers.remove('Content-Type');
     }
-    if (datetime == null) {
-      datetime = SigV4.generateDatetime();
-    }
+    datetime = datetime ?? SigV4.generateDatetime();
+
     headers[_x_amz_date] = datetime;
     final endpointUri = Uri.parse(awsSigV4Client.endpoint);
     headers[_host] = endpointUri.host;
@@ -144,8 +142,8 @@ class SigV4 {
   }
 
   static List<int> sign(List<int> key, String message) {
-    Hmac hmac = Hmac(sha256, key);
-    Digest dig = hmac.convert(utf8.encode(message));
+    final hmac = Hmac(sha256, key);
+    final dig = hmac.convert(utf8.encode(message));
     return dig.bytes;
   }
 
@@ -162,13 +160,13 @@ class SigV4 {
       return '';
     }
 
-    final List<String> sortedQueryParams = [];
+    final sortedQueryParams = [];
     queryParams.forEach((key, value) {
       sortedQueryParams.add(key);
     });
     sortedQueryParams.sort();
 
-    final List<String> canonicalQueryStrings = [];
+    final canonicalQueryStrings = [];
     sortedQueryParams.forEach((key) {
       canonicalQueryStrings
           .add('$key=${Uri.encodeComponent(queryParams[key])}');
@@ -178,7 +176,7 @@ class SigV4 {
   }
 
   static String buildCanonicalHeaders(Map<String, String> headers) {
-    final List<String> sortedKeys = [];
+    final sortedKeys = [];
     headers.forEach((property, _) {
       sortedKeys.add(property);
     });
@@ -194,7 +192,7 @@ class SigV4 {
   }
 
   static String buildCanonicalSignedHeaders(Map<String, String> headers) {
-    final List<String> sortedKeys = [];
+    final sortedKeys = [];
     headers.forEach((property, _) {
       sortedKeys.add(property.toLowerCase());
     });
@@ -219,7 +217,7 @@ class SigV4 {
       Map<String, String> queryParams,
       Map<String, String> headers,
       String payload) {
-    List<String> canonicalRequest = [
+    final canonicalRequest = [
       method,
       buildCanonicalUri(path),
       buildCanonicalQueryString(queryParams),

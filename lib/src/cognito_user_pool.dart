@@ -44,7 +44,7 @@ class CognitoUserPool {
     _userPoolId = userPoolId;
     _clientId = clientId;
     _clientSecret = clientSecret;
-    RegExp regExp = RegExp(r'^[\w-]+_.+$');
+    final regExp = RegExp(r'^[\w-]+_.+$');
     if (!regExp.hasMatch(userPoolId)) {
       throw ArgumentError('Invalid userPoolId format.');
     }
@@ -56,10 +56,8 @@ class CognitoUserPool {
       client = customClient;
     }
 
-    if (this.storage == null) {
-      this.storage =
-          storage = (CognitoStorageHelper(CognitoMemoryStorage())).getStorage();
-    }
+    storage =
+        storage ?? (CognitoStorageHelper(CognitoMemoryStorage())).getStorage();
   }
 
   String getUserPoolId() {
@@ -81,7 +79,7 @@ class CognitoUserPool {
     final lastAuthUser = await storage.getItem(lastUserKey);
     if (lastAuthUser != null) {
       return CognitoUser(lastAuthUser, this,
-          storage: this.storage,
+          storage: storage,
           clientSecret: _clientSecret,
           deviceName: _userAgent);
     }
@@ -106,7 +104,7 @@ class CognitoUserPool {
     List<AttributeArg> userAttributes,
     List<AttributeArg> validationData,
   }) async {
-    final Map<String, dynamic> params = {
+    final params = {
       'ClientId': _clientId,
       'Username': username,
       'Password': password,
@@ -119,7 +117,7 @@ class CognitoUserPool {
           username, _clientId, _clientSecret);
     }
 
-    final data = await this.client.request('SignUp', params);
+    final data = await client.request('SignUp', params);
     if (data == null) {
       return null;
     }

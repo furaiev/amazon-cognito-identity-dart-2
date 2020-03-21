@@ -18,24 +18,21 @@ class Client {
     http.Client client,
     String userAgent = 'aws-amplify/0.0.x dart',
   }) {
-    this._region = region;
-    this._service = service;
-    this._userAgent = userAgent;
+    _region = region;
+    _service = service;
+    _userAgent = userAgent;
     this.endpoint = endpoint ?? 'https://cognito-idp.$_region.amazonaws.com/';
-    this._client = client;
-    if (this._client == null) {
-      this._client = http.Client();
-    }
+    _client = client ?? http.Client();
   }
 
   /// Makes requests on AWS API service provider
-  request(String operation, Map<String, dynamic> params,
+  dynamic request(String operation, Map<String, dynamic> params,
       {String endpoint, String service}) async {
     final endpointReq = endpoint ?? this.endpoint;
     final targetService = service ?? _service;
     final body = json.encode(params);
 
-    Map<String, String> headersReq = {
+    final headersReq = {
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': '$targetService.$operation',
       'X-Amz-User-Agent': _userAgent,
@@ -57,15 +54,18 @@ class Client {
       }
       throw CognitoClientException('Unknown Error', code: 'Unknown error');
     }
+
     var data;
+
     try {
-      data = json.decode(response.body);
-    } catch (e) {
+      data = json.decode(utf8.decode(response.bodyBytes));
+    } catch (_) {
       // expect json
     }
+
     if (response.statusCode < 200 || response.statusCode > 299) {
-      String errorType = 'UnknownError';
-      for (String header in response.headers.keys) {
+      var errorType = 'UnknownError';
+      for (final header in response.headers.keys) {
         if (header.toLowerCase() == 'x-amzn-errortype') {
           errorType = response.headers[header].split(':')[0];
           break;
@@ -81,8 +81,7 @@ class Client {
       }
       final String dataType = data['__type'];
       final String dataCode = data['code'];
-      final String code =
-          (dataType ?? dataCode ?? errorType).split('#').removeLast();
+      final code = (dataType ?? dataCode ?? errorType).split('#').removeLast();
       throw CognitoClientException(
         data['message'] ?? 'Cognito client request error with unknown message',
         code: code,

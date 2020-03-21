@@ -6,6 +6,7 @@ class AttributeArg {
 
   const AttributeArg({this.name, this.value});
 
+  @override
   String toString() {
     var attributes = toJson();
     var encoded = json.encode(attributes);

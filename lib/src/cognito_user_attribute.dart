@@ -6,8 +6,8 @@ class CognitoUserAttribute {
 
   CognitoUserAttribute({this.name, this.value});
 
-  getValue() {
-    return this.value;
+  String getValue() {
+    return value;
   }
 
   CognitoUserAttribute setValue(String value) {
@@ -15,8 +15,8 @@ class CognitoUserAttribute {
     return this;
   }
 
-  getName() {
-    return this.name;
+  String getName() {
+    return name;
   }
 
   CognitoUserAttribute setName(String name) {
@@ -24,6 +24,7 @@ class CognitoUserAttribute {
     return this;
   }
 
+  @override
   String toString() {
     var attributes = toJson();
     var encoded = json.encode(attributes);

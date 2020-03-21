@@ -4,24 +4,24 @@ class CognitoJwtToken {
   String jwtToken;
   var payload;
   CognitoJwtToken(String token) {
-    this.jwtToken = token;
-    this.payload = decodePayload();
+    jwtToken = token;
+    payload = decodePayload();
   }
 
   String getJwtToken() {
-    return this.jwtToken;
+    return jwtToken;
   }
 
   int getExpiration() {
-    return this.payload['exp'] ?? 0;
+    return payload['exp'] ?? 0;
   }
 
   int getIssuedAt() {
-    return this.payload['iat'] ?? 0;
+    return payload['iat'] ?? 0;
   }
 
-  decodePayload() {
-    var payload = this.jwtToken.split('.')[1];
+  dynamic decodePayload() {
+    var payload = jwtToken.split('.')[1];
     if (payload.length % 4 > 0) {
       payload =
           payload.padRight(payload.length + (4 - payload.length % 4), '=');

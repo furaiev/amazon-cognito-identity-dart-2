@@ -10,23 +10,27 @@ abstract class CognitoStorage {
 }
 
 class CognitoMemoryStorage extends CognitoStorage {
-  setItem(String key, value) async {
+  @override
+  Future<dynamic> setItem(String key, value) async {
     _dataMemory[key] = value;
     return _dataMemory[key];
   }
 
-  getItem(String key) async {
+  @override
+  Future<dynamic> getItem(String key) async {
     if (_dataMemory[key] != null) {
       return _dataMemory[key];
     }
     return null;
   }
 
-  removeItem(String key) async {
+  @override
+  Future<dynamic> removeItem(String key) async {
     return _dataMemory.remove(key);
   }
 
-  clear() async {
+  @override
+  Future<void> clear() async {
     _dataMemory = {};
   }
 }
@@ -36,6 +40,6 @@ class CognitoStorageHelper<S extends CognitoStorage> {
   CognitoStorageHelper(this.storage);
 
   S getStorage() {
-    return this.storage;
+    return storage;
   }
 }

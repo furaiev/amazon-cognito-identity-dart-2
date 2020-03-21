@@ -17,28 +17,27 @@ class CognitoUserSession {
     this.refreshToken,
     int clockDrift,
   }) {
-    this.clockDrift =
-        clockDrift == null ? this.calculateClockDrift() : clockDrift;
+    this.clockDrift = clockDrift ?? calculateClockDrift();
   }
 
   /// Get the session's Id token
   CognitoIdToken getIdToken() {
-    return this.idToken;
+    return idToken;
   }
 
   /// Get the session's refresh token
   CognitoRefreshToken getRefreshToken() {
-    return this.refreshToken;
+    return refreshToken;
   }
 
   /// Get the session's access token
   CognitoAccessToken getAccessToken() {
-    return this.accessToken;
+    return accessToken;
   }
 
   /// Get the session's clock drift
   int getClockDrift() {
-    return this.clockDrift;
+    return clockDrift;
   }
 
   /// Calculate computer's clock drift
@@ -50,7 +49,7 @@ class CognitoUserSession {
 
   /// Invalidate this tokens. All succeeding calls to isValid() will return false. Use cognitoUser
   /// .getSession() to refresh the cognito session with the cognito server.
-  invalidateToken() {
+  void invalidateToken() {
     _invalidated = true;
   }
 
