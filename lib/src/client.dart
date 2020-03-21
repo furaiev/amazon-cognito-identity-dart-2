@@ -57,12 +57,15 @@ class Client {
       }
       throw CognitoClientException('Unknown Error', code: 'Unknown error');
     }
+
     var data;
+
     try {
-      data = json.decode(response.body);
-    } catch (e) {
+      data = json.decode(utf8.decode(response.bodyBytes));
+    } catch (_) {
       // expect json
     }
+
     if (response.statusCode < 200 || response.statusCode > 299) {
       String errorType = 'UnknownError';
       for (String header in response.headers.keys) {
