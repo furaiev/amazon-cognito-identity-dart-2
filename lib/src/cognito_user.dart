@@ -243,7 +243,7 @@ class CognitoUser {
 
     if (await storage.getItem(lastUserKey) != null) {
       username = await storage.getItem(lastUserKey);
-      final deviceKeyKey = '$keyPrefix.${username}.deviceKey';
+      final deviceKeyKey = '$keyPrefix.$username.deviceKey';
       _deviceKey = await storage.getItem(deviceKeyKey);
       authParameters['DEVICE_KEY'] = _deviceKey;
       if (_clientSecretHash != null) {
@@ -491,7 +491,7 @@ class CognitoUser {
       pool.getUserPoolId().split('_')[1],
     );
 
-    await getCachedDeviceKeyAndPassword();
+    getCachedDeviceKeyAndPassword();
     if (_deviceKey != null) {
       authParameters['DEVICE_KEY'] = _deviceKey;
     }
@@ -523,7 +523,7 @@ class CognitoUser {
     BigInt salt;
 
     final authParameters = {};
-    await getCachedDeviceKeyAndPassword();
+    getCachedDeviceKeyAndPassword();
     if (_deviceKey != null) {
       authParameters['DEVICE_KEY'] = _deviceKey;
     }
@@ -722,7 +722,7 @@ class CognitoUser {
     final authenticationHelper =
         AuthenticationHelper(pool.getUserPoolId().split('_')[1]);
 
-    await getCachedDeviceKeyAndPassword();
+    getCachedDeviceKeyAndPassword();
     if (_deviceKey != null) {
       challengeResponses['DEVICE_KEY'] = _deviceKey;
     }
@@ -800,7 +800,7 @@ class CognitoUser {
       challengeResponses['SOFTWARE_TOKEN_MFA_CODE'] = confirmationCode;
     }
 
-    await getCachedDeviceKeyAndPassword();
+    getCachedDeviceKeyAndPassword();
     if (_deviceKey != null) {
       challengeResponses['DEVICE_KEY'] = _deviceKey;
     }

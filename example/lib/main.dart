@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:amazon_cognito_identity_dart_2/sig_v4.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Setup AWS User Pool Id & Client Id settings here:
 const _awsUserPoolId = 'ap-southeast-1_xxxxxxxxx';
@@ -17,7 +18,7 @@ const _region = 'ap-southeast-1';
 const _endpoint =
     'https://xxxxxxxxxx.execute-api.ap-southeast-1.amazonaws.com/dev';
 
-final userPool = new CognitoUserPool(_awsUserPoolId, _awsClientId);
+final userPool = CognitoUserPool(_awsUserPoolId, _awsClientId);
 
 /// Extend CognitoStorage with Shared Preferences to persist account
 /// login sessions
@@ -38,7 +39,7 @@ class Storage extends CognitoStorage {
 
   @override
   Future setItem(String key, value) async {
-    _prefs.setString(key, json.encode(value));
+    await _prefs.setString(key, json.encode(value));
     return getItem(key);
   }
 
@@ -46,7 +47,7 @@ class Storage extends CognitoStorage {
   Future removeItem(String key) async {
     final item = getItem(key);
     if (item != null) {
-      _prefs.remove(key);
+      await _prefs.remove(key);
       return item;
     }
     return null;
@@ -54,7 +55,7 @@ class Storage extends CognitoStorage {
 
   @override
   Future<void> clear() async {
-    _prefs.clear();
+    await _prefs.clear();
   }
 }
 
@@ -63,7 +64,7 @@ class Counter {
   Counter(this.count);
 
   factory Counter.fromJson(json) {
-    return new Counter(json['count']);
+    return Counter(json['count']);
   }
 }
 
@@ -97,19 +98,19 @@ class CounterService {
   /// Retrieve user's previous count from Lambda + DynamoDB
   Future<Counter> getCounter() async {
     final signedRequest =
-        new SigV4Request(awsSigV4Client, method: 'GET', path: '/counter');
+        SigV4Request(awsSigV4Client, method: 'GET', path: '/counter');
     final response =
         await http.get(signedRequest.url, headers: signedRequest.headers);
-    return new Counter.fromJson(json.decode(response.body));
+    return Counter.fromJson(json.decode(response.body));
   }
 
   /// Increment user's count in DynamoDB
   Future<Counter> incrementCounter() async {
     final signedRequest =
-        new SigV4Request(awsSigV4Client, method: 'PUT', path: '/counter');
+        SigV4Request(awsSigV4Client, method: 'PUT', path: '/counter');
     final response =
         await http.put(signedRequest.url, headers: signedRequest.headers);
-    return new Counter.fromJson(json.decode(response.body));
+    return Counter.fromJson(json.decode(response.body));
   }
 }
 
@@ -123,7 +124,7 @@ class UserService {
   /// Initiate user session from local storage if present
   Future<bool> init() async {
     final prefs = await SharedPreferences.getInstance();
-    final storage = new Storage(prefs);
+    final storage = Storage(prefs);
     _userPool.storage = storage;
 
     _cognitoUser = await _userPool.getCurrentUser();
@@ -146,7 +147,7 @@ class UserService {
     if (attributes == null) {
       return null;
     }
-    final user = new User.fromUserAttributes(attributes);
+    final user = User.fromUserAttributes(attributes);
     user.hasAccess = true;
     return user;
   }
@@ -156,17 +157,16 @@ class UserService {
     if (_cognitoUser == null || _session == null) {
       return null;
     }
-    credentials = new CognitoCredentials(_identityPoolId, _userPool);
+    credentials = CognitoCredentials(_identityPoolId, _userPool);
     await credentials.getAwsCredentials(_session.getIdToken().getJwtToken());
     return credentials;
   }
 
   /// Login user
   Future<User> login(String email, String password) async {
-    _cognitoUser =
-        new CognitoUser(email, _userPool, storage: _userPool.storage);
+    _cognitoUser = CognitoUser(email, _userPool, storage: _userPool.storage);
 
-    final authDetails = new AuthenticationDetails(
+    final authDetails = AuthenticationDetails(
       username: email,
       password: password,
     );
@@ -179,7 +179,7 @@ class UserService {
       if (e.code == 'UserNotConfirmedException') {
         isConfirmed = false;
       } else {
-        throw e;
+        rethrow;
       }
     }
 
@@ -188,7 +188,7 @@ class UserService {
     }
 
     final attributes = await _cognitoUser.getUserAttributes();
-    final user = new User.fromUserAttributes(attributes);
+    final user = User.fromUserAttributes(attributes);
     user.confirmed = isConfirmed;
     user.hasAccess = true;
 
@@ -197,16 +197,14 @@ class UserService {
 
   /// Confirm user's account with confirmation code sent to email
   Future<bool> confirmAccount(String email, String confirmationCode) async {
-    _cognitoUser =
-        new CognitoUser(email, _userPool, storage: _userPool.storage);
+    _cognitoUser = CognitoUser(email, _userPool, storage: _userPool.storage);
 
     return await _cognitoUser.confirmRegistration(confirmationCode);
   }
 
   /// Resend confirmation code to user's email
   Future<void> resendConfirmationCode(String email) async {
-    _cognitoUser =
-        new CognitoUser(email, _userPool, storage: _userPool.storage);
+    _cognitoUser = CognitoUser(email, _userPool, storage: _userPool.storage);
     await _cognitoUser.resendConfirmationCode();
   }
 
@@ -218,16 +216,16 @@ class UserService {
     return _session.isValid();
   }
 
-  /// Sign up new user
+  /// Sign upuser
   Future<User> signUp(String email, String password, String name) async {
     CognitoUserPoolData data;
     final userAttributes = [
-      new AttributeArg(name: 'name', value: name),
+      AttributeArg(name: 'name', value: name),
     ];
     data =
         await _userPool.signUp(email, password, userAttributes: userAttributes);
 
-    final user = new User();
+    final user = User();
     user.email = email;
     user.name = name;
     user.confirmed = data.userConfirmed;
@@ -245,14 +243,14 @@ class UserService {
   }
 }
 
-void main() => runApp(new SecureCounterApp());
+void main() => runApp(SecureCounterApp());
 
 class SecureCounterApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
+    return MaterialApp(
       title: 'Cognito on Flutter',
-      theme: new ThemeData(
+      theme: ThemeData(
         primarySwatch: Colors.orange,
       ),
       home: HomePage(title: 'Cognito on Flutter'),
@@ -266,92 +264,86 @@ class HomePage extends StatefulWidget {
   final String title;
 
   @override
-  _HomePageState createState() => new _HomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
       ),
-      body: new Center(
-        child: new Column(
+      body: Center(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            new Container(
-              padding:
-                  new EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
+            Container(
+              padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
               width: screenSize.width,
-              child: new RaisedButton(
-                child: new Text(
+              child: RaisedButton(
+                child: Text(
                   'Sign Up',
-                  style: new TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
                   Navigator.push(
                     context,
-                    new MaterialPageRoute(
-                        builder: (context) => new SignUpScreen()),
+                    MaterialPageRoute(builder: (context) => SignUpScreen()),
                   );
                 },
                 color: Colors.blue,
               ),
             ),
-            new Container(
-              padding:
-                  new EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
+            Container(
+              padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
               width: screenSize.width,
-              child: new RaisedButton(
-                child: new Text(
+              child: RaisedButton(
+                child: Text(
                   'Confirm Account',
-                  style: new TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
                   Navigator.push(
                     context,
-                    new MaterialPageRoute(
-                        builder: (context) => new ConfirmationScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => ConfirmationScreen()),
                   );
                 },
                 color: Colors.blue,
               ),
             ),
-            new Container(
-              padding:
-                  new EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
+            Container(
+              padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
               width: screenSize.width,
-              child: new RaisedButton(
-                child: new Text(
+              child: RaisedButton(
+                child: Text(
                   'Login',
-                  style: new TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
                   Navigator.push(
                     context,
-                    new MaterialPageRoute(
-                        builder: (context) => new LoginScreen()),
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
                   );
                 },
                 color: Colors.blue,
               ),
             ),
-            new Container(
-              padding:
-                  new EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
+            Container(
+              padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
               width: screenSize.width,
-              child: new RaisedButton(
-                child: new Text(
+              child: RaisedButton(
+                child: Text(
                   'Secure Counter',
-                  style: new TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
                   Navigator.push(
                     context,
-                    new MaterialPageRoute(
-                        builder: (context) => new SecureCounterScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => SecureCounterScreen()),
                   );
                 },
                 color: Colors.blue,
@@ -366,13 +358,13 @@ class _HomePageState extends State<HomePage> {
 
 class SignUpScreen extends StatefulWidget {
   @override
-  _SignUpScreenState createState() => new _SignUpScreenState();
+  _SignUpScreenState createState() => _SignUpScreenState();
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-  User _user = new User();
-  final userService = new UserService(userPool);
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  User _user = User();
+  final userService = UserService(userPool);
 
   void submit(BuildContext context) async {
     _formKey.currentState.save();
@@ -395,9 +387,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       message = 'Unknown error occurred';
     }
 
-    final snackBar = new SnackBar(
-      content: new Text(message),
-      action: new SnackBarAction(
+    final snackBar = SnackBar(
+      content: Text(message),
+      action: SnackBarAction(
         label: 'OK',
         onPressed: () {
           if (signUpSuccess) {
@@ -405,15 +397,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
             if (!_user.confirmed) {
               Navigator.push(
                 context,
-                new MaterialPageRoute(
+                MaterialPageRoute(
                     builder: (context) =>
-                        new ConfirmationScreen(email: _user.email)),
+                        ConfirmationScreen(email: _user.email)),
               );
             }
           }
         },
       ),
-      duration: new Duration(seconds: 30),
+      duration: Duration(seconds: 30),
     );
 
     Scaffold.of(context).showSnackBar(snackBar);
@@ -422,30 +414,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Sign Up'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Sign Up'),
       ),
-      body: new Builder(
+      body: Builder(
         builder: (BuildContext context) {
-          return new Container(
-            child: new Form(
+          return Container(
+            child: Form(
               key: _formKey,
-              child: new ListView(
+              child: ListView(
                 children: <Widget>[
-                  new ListTile(
+                  ListTile(
                     leading: const Icon(Icons.account_box),
-                    title: new TextFormField(
-                      decoration: new InputDecoration(labelText: 'Name'),
+                    title: TextFormField(
+                      decoration: InputDecoration(labelText: 'Name'),
                       onSaved: (String name) {
                         _user.name = name;
                       },
                     ),
                   ),
-                  new ListTile(
+                  ListTile(
                     leading: const Icon(Icons.email),
-                    title: new TextFormField(
-                      decoration: new InputDecoration(
+                    title: TextFormField(
+                      decoration: InputDecoration(
                           hintText: 'example@inspire.my', labelText: 'Email'),
                       keyboardType: TextInputType.emailAddress,
                       onSaved: (String email) {
@@ -453,10 +445,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       },
                     ),
                   ),
-                  new ListTile(
+                  ListTile(
                     leading: const Icon(Icons.lock),
-                    title: new TextFormField(
-                      decoration: new InputDecoration(
+                    title: TextFormField(
+                      decoration: InputDecoration(
                         hintText: 'Password!',
                       ),
                       obscureText: true,
@@ -465,20 +457,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       },
                     ),
                   ),
-                  new Container(
-                    padding: new EdgeInsets.all(20.0),
+                  Container(
+                    padding: EdgeInsets.all(20.0),
                     width: screenSize.width,
-                    child: new RaisedButton(
-                      child: new Text(
+                    child: RaisedButton(
+                      child: Text(
                         'Sign Up',
-                        style: new TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.white),
                       ),
                       onPressed: () {
                         submit(context);
                       },
                       color: Colors.blue,
                     ),
-                    margin: new EdgeInsets.only(
+                    margin: EdgeInsets.only(
                       top: 10.0,
                     ),
                   ),
@@ -498,14 +490,14 @@ class ConfirmationScreen extends StatefulWidget {
   final String email;
 
   @override
-  _ConfirmationScreenState createState() => new _ConfirmationScreenState();
+  _ConfirmationScreenState createState() => _ConfirmationScreenState();
 }
 
 class _ConfirmationScreenState extends State<ConfirmationScreen> {
-  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String confirmationCode;
-  User _user = new User();
-  final _userService = new UserService(userPool);
+  User _user = User();
+  final _userService = UserService(userPool);
 
   _submit(BuildContext context) async {
     _formKey.currentState.save();
@@ -529,22 +521,22 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
       message = 'Unknown error occurred';
     }
 
-    final snackBar = new SnackBar(
-      content: new Text(message),
-      action: new SnackBarAction(
+    final snackBar = SnackBar(
+      content: Text(message),
+      action: SnackBarAction(
         label: 'OK',
         onPressed: () {
           if (accountConfirmed) {
             Navigator.pop(context);
             Navigator.push(
               context,
-              new MaterialPageRoute(
-                  builder: (context) => new LoginScreen(email: _user.email)),
+              MaterialPageRoute(
+                  builder: (context) => LoginScreen(email: _user.email)),
             );
           }
         },
       ),
-      duration: new Duration(seconds: 30),
+      duration: Duration(seconds: 30),
     );
 
     Scaffold.of(context).showSnackBar(snackBar);
@@ -568,13 +560,13 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
       message = 'Unknown error occurred';
     }
 
-    final snackBar = new SnackBar(
-      content: new Text(message),
-      action: new SnackBarAction(
+    final snackBar = SnackBar(
+      content: Text(message),
+      action: SnackBarAction(
         label: 'OK',
         onPressed: () {},
       ),
-      duration: new Duration(seconds: 30),
+      duration: Duration(seconds: 30),
     );
 
     Scaffold.of(context).showSnackBar(snackBar);
@@ -583,21 +575,21 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Confirm Account'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Confirm Account'),
       ),
-      body: new Builder(
-          builder: (BuildContext context) => new Container(
-                child: new Form(
+      body: Builder(
+          builder: (BuildContext context) => Container(
+                child: Form(
                   key: _formKey,
-                  child: new ListView(
+                  child: ListView(
                     children: <Widget>[
-                      new ListTile(
+                      ListTile(
                         leading: const Icon(Icons.email),
-                        title: new TextFormField(
+                        title: TextFormField(
                           initialValue: widget.email,
-                          decoration: new InputDecoration(
+                          decoration: InputDecoration(
                               hintText: 'example@inspire.my',
                               labelText: 'Email'),
                           keyboardType: TextInputType.emailAddress,
@@ -606,38 +598,38 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                           },
                         ),
                       ),
-                      new ListTile(
+                      ListTile(
                         leading: const Icon(Icons.lock),
-                        title: new TextFormField(
-                          decoration: new InputDecoration(
-                              labelText: 'Confirmation Code'),
+                        title: TextFormField(
+                          decoration:
+                              InputDecoration(labelText: 'Confirmation Code'),
                           onSaved: (String code) {
                             confirmationCode = code;
                           },
                         ),
                       ),
-                      new Container(
-                        padding: new EdgeInsets.all(20.0),
+                      Container(
+                        padding: EdgeInsets.all(20.0),
                         width: screenSize.width,
-                        child: new RaisedButton(
-                          child: new Text(
+                        child: RaisedButton(
+                          child: Text(
                             'Submit',
-                            style: new TextStyle(color: Colors.white),
+                            style: TextStyle(color: Colors.white),
                           ),
                           onPressed: () {
                             _submit(context);
                           },
                           color: Colors.blue,
                         ),
-                        margin: new EdgeInsets.only(
+                        margin: EdgeInsets.only(
                           top: 10.0,
                         ),
                       ),
-                      new Center(
-                        child: new InkWell(
-                          child: new Text(
+                      Center(
+                        child: InkWell(
+                          child: Text(
                             'Resend Confirmation Code',
-                            style: new TextStyle(color: Colors.blueAccent),
+                            style: TextStyle(color: Colors.blueAccent),
                           ),
                           onTap: () {
                             _resendConfirmation(context);
@@ -658,13 +650,13 @@ class LoginScreen extends StatefulWidget {
   final String email;
 
   @override
-  _LoginScreenState createState() => new _LoginScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-  final _userService = new UserService(userPool);
-  User _user = new User();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final _userService = UserService(userPool);
+  User _user = User();
   bool _isAuthenticated = false;
 
   Future<UserService> _getValues() async {
@@ -694,25 +686,25 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       message = 'An unknown error occurred';
     }
-    final snackBar = new SnackBar(
-      content: new Text(message),
-      action: new SnackBarAction(
+    final snackBar = SnackBar(
+      content: Text(message),
+      action: SnackBarAction(
         label: 'OK',
         onPressed: () async {
           if (_user.hasAccess) {
             Navigator.pop(context);
             if (!_user.confirmed) {
-              Navigator.push(
+              await Navigator.push(
                 context,
-                new MaterialPageRoute(
+                MaterialPageRoute(
                     builder: (context) =>
-                        new ConfirmationScreen(email: _user.email)),
+                        ConfirmationScreen(email: _user.email)),
               );
             }
           }
         },
       ),
-      duration: new Duration(seconds: 30),
+      duration: Duration(seconds: 30),
     );
 
     Scaffold.of(context).showSnackBar(snackBar);
@@ -720,30 +712,30 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return new FutureBuilder(
+    return FutureBuilder(
         future: _getValues(),
         builder: (context, AsyncSnapshot<UserService> snapshot) {
           if (snapshot.hasData) {
             if (_isAuthenticated) {
-              return new SecureCounterScreen();
+              return SecureCounterScreen();
             }
             final Size screenSize = MediaQuery.of(context).size;
-            return new Scaffold(
-              appBar: new AppBar(
-                title: new Text('Login'),
+            return Scaffold(
+              appBar: AppBar(
+                title: Text('Login'),
               ),
-              body: new Builder(
+              body: Builder(
                 builder: (BuildContext context) {
-                  return new Container(
-                    child: new Form(
+                  return Container(
+                    child: Form(
                       key: _formKey,
-                      child: new ListView(
+                      child: ListView(
                         children: <Widget>[
-                          new ListTile(
+                          ListTile(
                             leading: const Icon(Icons.email),
-                            title: new TextFormField(
+                            title: TextFormField(
                               initialValue: widget.email,
-                              decoration: new InputDecoration(
+                              decoration: InputDecoration(
                                   hintText: 'example@inspire.my',
                                   labelText: 'Email'),
                               keyboardType: TextInputType.emailAddress,
@@ -752,31 +744,31 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                             ),
                           ),
-                          new ListTile(
+                          ListTile(
                             leading: const Icon(Icons.lock),
-                            title: new TextFormField(
+                            title: TextFormField(
                               decoration:
-                                  new InputDecoration(labelText: 'Password'),
+                                  InputDecoration(labelText: 'Password'),
                               obscureText: true,
                               onSaved: (String password) {
                                 _user.password = password;
                               },
                             ),
                           ),
-                          new Container(
-                            padding: new EdgeInsets.all(20.0),
+                          Container(
+                            padding: EdgeInsets.all(20.0),
                             width: screenSize.width,
-                            child: new RaisedButton(
-                              child: new Text(
+                            child: RaisedButton(
+                              child: Text(
                                 'Login',
-                                style: new TextStyle(color: Colors.white),
+                                style: TextStyle(color: Colors.white),
                               ),
                               onPressed: () {
                                 submit(context);
                               },
                               color: Colors.blue,
                             ),
-                            margin: new EdgeInsets.only(
+                            margin: EdgeInsets.only(
                               top: 10.0,
                             ),
                           ),
@@ -788,8 +780,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             );
           }
-          return new Scaffold(
-              appBar: new AppBar(title: new Text('Loading...')));
+          return Scaffold(appBar: AppBar(title: Text('Loading...')));
         });
   }
 }
@@ -798,15 +789,15 @@ class SecureCounterScreen extends StatefulWidget {
   SecureCounterScreen({Key key}) : super(key: key);
 
   @override
-  _SecureCounterScreenState createState() => new _SecureCounterScreenState();
+  _SecureCounterScreenState createState() => _SecureCounterScreenState();
 }
 
 class _SecureCounterScreenState extends State<SecureCounterScreen> {
-  final _userService = new UserService(userPool);
+  final _userService = UserService(userPool);
   CounterService _counterService;
   AwsSigV4Client _awsSigV4Client;
-  User _user = new User();
-  Counter _counter = new Counter(0);
+  User _user = User();
+  Counter _counter = Counter(0);
   bool _isAuthenticated = false;
 
   void _incrementCounter() async {
@@ -826,12 +817,12 @@ class _SecureCounterScreenState extends State<SecureCounterScreen> {
 
         // get session credentials
         final credentials = await _userService.getCredentials();
-        _awsSigV4Client = new AwsSigV4Client(
+        _awsSigV4Client = AwsSigV4Client(
             credentials.accessKeyId, credentials.secretAccessKey, _endpoint,
             region: _region, sessionToken: credentials.sessionToken);
 
         // get previous count
-        _counterService = new CounterService(_awsSigV4Client);
+        _counterService = CounterService(_awsSigV4Client);
         _counter = await _counterService.getCounter();
       }
       return _userService;
@@ -840,46 +831,46 @@ class _SecureCounterScreenState extends State<SecureCounterScreen> {
         await _userService.signOut();
         Navigator.pop(context);
       }
-      throw e;
+      rethrow;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return new FutureBuilder(
+    return FutureBuilder(
         future: _getValues(context),
         builder: (context, AsyncSnapshot<UserService> snapshot) {
           if (snapshot.hasData) {
             if (!_isAuthenticated) {
-              return new LoginScreen();
+              return LoginScreen();
             }
 
-            return new Scaffold(
-              appBar: new AppBar(
-                title: new Text('Secure Counter'),
+            return Scaffold(
+              appBar: AppBar(
+                title: Text('Secure Counter'),
               ),
-              body: new Center(
-                child: new Column(
+              body: Center(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    new Text(
+                    Text(
                       'Welcome ${_user.name}!',
                       style: Theme.of(context).textTheme.display1,
                     ),
-                    new Divider(),
-                    new Text(
+                    Divider(),
+                    Text(
                       'You have pushed the button this many times:',
                     ),
-                    new Text(
+                    Text(
                       '${_counter.count}',
                       style: Theme.of(context).textTheme.display1,
                     ),
-                    new Divider(),
-                    new Center(
-                      child: new InkWell(
-                        child: new Text(
+                    Divider(),
+                    Center(
+                      child: InkWell(
+                        child: Text(
                           'Logout',
-                          style: new TextStyle(color: Colors.blueAccent),
+                          style: TextStyle(color: Colors.blueAccent),
                         ),
                         onTap: () {
                           _userService.signOut();
@@ -890,19 +881,18 @@ class _SecureCounterScreenState extends State<SecureCounterScreen> {
                   ],
                 ),
               ),
-              floatingActionButton: new FloatingActionButton(
+              floatingActionButton: FloatingActionButton(
                 onPressed: () {
                   if (snapshot.hasData) {
                     _incrementCounter();
                   }
                 },
                 tooltip: 'Increment',
-                child: new Icon(Icons.add),
+                child: Icon(Icons.add),
               ),
             );
           }
-          return new Scaffold(
-              appBar: new AppBar(title: new Text('Loading...')));
+          return Scaffold(appBar: AppBar(title: Text('Loading...')));
         });
   }
 }

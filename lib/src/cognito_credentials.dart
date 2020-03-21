@@ -35,7 +35,7 @@ class CognitoCredentials {
 
     final identityId = CognitoIdentityId(_identityPoolId, _pool,
         token: token, authenticator: authenticator);
-    _getAwsCredentials(identityId);
+    await _getAwsCredentials(identityId);
   }
 
   Future<void> getGuestAwsCredentialsId() async {
@@ -51,7 +51,7 @@ class CognitoCredentials {
   Future<void> _getAwsCredentials(CognitoIdentityId identityId) async {
     userIdentityId = await identityId.getIdentityId();
 
-    final Map<String, dynamic> paramsReq = {'IdentityId': userIdentityId};
+    var paramsReq = <String, dynamic>{'IdentityId': userIdentityId};
     if (identityId.loginParam != null) {
       paramsReq['Logins'] = identityId.loginParam;
     }
@@ -70,7 +70,7 @@ class CognitoCredentials {
       }
 
       _retryCount = 0;
-      throw e;
+      rethrow;
     }
 
     _retryCount = 0;

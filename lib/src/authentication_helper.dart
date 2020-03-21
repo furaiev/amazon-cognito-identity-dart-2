@@ -90,7 +90,7 @@ class AuthenticationHelper {
       throw ArgumentError('U cannot be zero.');
     }
 
-    final usernamePassword = '${poolName}$username:$password';
+    final usernamePassword = '$poolName$username:$password';
     final usernamePasswordHash = hash(utf8.encode(usernamePassword));
     final xValue =
         BigInt.parse(hexHash(padHex(salt) + usernamePasswordHash), radix: 16);
@@ -120,7 +120,7 @@ class AuthenticationHelper {
   /// Generate salts and compute verifier.
   void generateHashDevice(String deviceGroupKey, String deviceKey) {
     _randomPassword = generateRandomString();
-    final combinedString = '$deviceGroupKey$deviceKey:${_randomPassword}';
+    final combinedString = '$deviceGroupKey$deviceKey:$_randomPassword';
     final hashedString = hash(utf8.encode(combinedString));
 
     final hexRandom = RandomString().generate(length: 16);

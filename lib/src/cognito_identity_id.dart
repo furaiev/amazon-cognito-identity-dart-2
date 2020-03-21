@@ -38,7 +38,7 @@ class CognitoIdentityId {
       return identityId;
     }
 
-    final Map<String, dynamic> paramsReq = {'IdentityPoolId': _identityPoolId};
+    final paramsReq = <String, dynamic>{'IdentityPoolId': _identityPoolId};
 
     if (_loginParam != null) {
       paramsReq['Logins'] = _loginParam;

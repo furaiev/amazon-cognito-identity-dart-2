@@ -1,3 +1,7 @@
+## 0.1.11
+- added guest auth support
+- code clearing
+
 ## 0.1.10
 - cleanup for pedantic v1.9.0 lints
 - fix: correct decoding application/json utf8 response
