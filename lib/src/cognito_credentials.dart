@@ -35,10 +35,10 @@ class CognitoCredentials {
       userIdentityId = await identityId.getIdentityId(token, authenticator);
 
       authenticator ??= 'cognito-idp.$_region.amazonaws.com/$_userPoolId';
-      final Map<String, String> loginParam = {
+      final loginParam = {
         authenticator: token,
       };
-      final Map<String, dynamic> paramsReq = {
+      final paramsReq = {
         'IdentityId': userIdentityId,
         'Logins': loginParam,
       };
@@ -57,7 +57,7 @@ class CognitoCredentials {
         }
 
         _retryCount = 0;
-        throw e;
+        rethrow;
       }
 
       _retryCount = 0;

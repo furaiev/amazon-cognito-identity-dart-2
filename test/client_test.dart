@@ -1,12 +1,13 @@
-import 'package:test/test.dart';
-import 'package:http/testing.dart';
 import 'dart:async';
-import 'package:http/http.dart' as http;
+
 import 'package:amazon_cognito_identity_dart_2/src/client.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('initiating Client should set default endpoint based on region', () {
-    final client = new Client(
+    final client = Client(
       region: 'ap-southeast-1',
     );
     expect(client.endpoint,
@@ -14,7 +15,7 @@ void main() {
   });
 
   test('initiating Client with endpoint should use endpoint', () {
-    final client = new Client(
+    final client = Client(
       endpoint: 'https://cognito-idp.custom-region.aws.com',
       region: 'ap-southeaset-10',
     );
@@ -23,10 +24,10 @@ void main() {
   });
 
   group('requests', () {
-    final testClient = new MockClient((request) {
+    final testClient = MockClient((request) {
       switch (request.url.path) {
         case '/200':
-          return new Future<http.Response>.value(new http.Response(
+          return Future<http.Response>.value(http.Response(
             '{"it":"works"}',
             200,
             headers: Map<String, String>.from({
@@ -35,20 +36,20 @@ void main() {
           ));
           break;
         case '/400_unknown_error':
-          return new Future.value(new http.Response('', 400));
+          return Future.value(http.Response('', 400));
           break;
         case '/400___type':
-          return new Future.value(new http.Response(
-              '{"__type": "NotAuthorizedException", ' +
-                  '"message": "Logins don\'t match. Please include at least ' +
-                  'one valid login for this identity or identity pool."}',
+          return Future.value(http.Response(
+              '{"__type": "NotAuthorizedException", '
+              '"message": "Logins don\'t match. Please include at least '
+              'one valid login for this identity or identity pool."}',
               400));
           break;
         case '/400_x-amzn-ErrorType':
-          return new Future<http.Response>.value(new http.Response(
-              '{"message":"1 validation error detected: Value null at ' +
-                  '\'InstallS3Bucket\' failed to satisfy constraint: Member' +
-                  ' must not be null"}',
+          return Future<http.Response>.value(http.Response(
+              '{"message":"1 validation error detected: Value null at '
+              '\'InstallS3Bucket\' failed to satisfy constraint: Member'
+              ' must not be null"}',
               400,
               headers: Map<String, String>.from({
                 'x-amzn-RequestId': 'b0e91dc8-3807-11e2-83c6-5912bf8ad066',
@@ -58,15 +59,15 @@ void main() {
                 'Date': 'Mon, 26 Nov 2012 20:27:25 GMT'
               })));
         default:
-          return new Future<http.Response>.value(new http.Response('', 404));
+          return Future<http.Response>.value(http.Response('', 404));
       }
     });
     test('200 OK should return data', () async {
-      final client = new Client(
+      final client = Client(
         region: 'ap-southeast-1',
         client: testClient,
       );
-      final Map<String, dynamic> paramsReq = {
+      final paramsReq = {
         'color': 'Blue',
       };
       final data =
@@ -74,11 +75,11 @@ void main() {
       expect(data['it'], equals('works'));
     });
     test('400 unknown error throws default exception', () async {
-      final client = new Client(
+      final client = Client(
         region: 'ap-southeast-1',
         client: testClient,
       );
-      final Map<String, dynamic> paramsReq = {
+      final paramsReq = {
         'color': 'Green',
       };
       var data;
@@ -89,16 +90,17 @@ void main() {
         expect(e.code, equals('UnknownError'));
         expect(e.name, equals('UnknownError'));
         expect(e.statusCode, equals(400));
-        expect(e.message, equals('Cognito client request error with unknown message'));
+        expect(e.message,
+            equals('Cognito client request error with unknown message'));
       }
       expect(data, isNull);
     });
     test('400 error __type throws exception with correct code', () async {
-      final client = new Client(
+      final client = Client(
         region: 'ap-southeast-1',
         client: testClient,
       );
-      final Map<String, dynamic> paramsReq = {
+      final paramsReq = {
         'color': 'Green',
       };
       var data;
@@ -111,17 +113,17 @@ void main() {
         expect(e.statusCode, equals(400));
         expect(
             e.message,
-            equals('Logins don\'t match. Please include at least ' +
+            equals('Logins don\'t match. Please include at least '
                 'one valid login for this identity or identity pool.'));
       }
       expect(data, isNull);
     });
     test('400 x-amzn-ErrorType throws exception with correct code', () async {
-      final client = new Client(
+      final client = Client(
         region: 'ap-southeast-1',
         client: testClient,
       );
-      final Map<String, dynamic> paramsReq = {
+      final paramsReq = {
         'color': 'Green',
       };
       var data;
@@ -134,8 +136,8 @@ void main() {
         expect(e.statusCode, equals(400));
         expect(
             e.message,
-            equals('1 validation error detected: Value null at ' +
-                '\'InstallS3Bucket\' failed to satisfy constraint: Member' +
+            equals('1 validation error detected: Value null at '
+                '\'InstallS3Bucket\' failed to satisfy constraint: Member'
                 ' must not be null'));
         expect(e.statusCode, 400);
       }

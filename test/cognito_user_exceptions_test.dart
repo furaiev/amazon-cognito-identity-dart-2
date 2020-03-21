@@ -1,27 +1,30 @@
-import 'package:test/test.dart';
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('throw CognitoUserNewPasswordRequiredException generates message', () {
-    final t = () => throw new CognitoUserNewPasswordRequiredException();
+    final t = () => throw CognitoUserNewPasswordRequiredException();
     try {
       t();
     } on CognitoUserNewPasswordRequiredException catch (e) {
-      expect(e.toString(), equals('CognitoUserException: New Password required'));
+      expect(
+          e.toString(), equals('CognitoUserException: New Password required'));
     }
     try {
       t();
     } on CognitoUserException catch (e) {
-      expect(e.toString(), equals('CognitoUserException: New Password required'));
+      expect(
+          e.toString(), equals('CognitoUserException: New Password required'));
     }
     try {
       t();
     } catch (e) {
-      expect(e.toString(), equals('CognitoUserException: New Password required'));
+      expect(
+          e.toString(), equals('CognitoUserException: New Password required'));
     }
   });
   test('throw CognitoUserMfaRequiredException generates message', () {
-    final t = () => throw new CognitoUserMfaRequiredException();
+    final t = () => throw CognitoUserMfaRequiredException();
     try {
       t();
     } on CognitoUserMfaRequiredException catch (e) {
@@ -39,7 +42,7 @@ void main() {
     }
   });
   test('throw CognitoUserSelectMfaTypeException generates message', () {
-    final t = () => throw new CognitoUserSelectMfaTypeException();
+    final t = () => throw CognitoUserSelectMfaTypeException();
     try {
       t();
     } on CognitoUserSelectMfaTypeException catch (e) {
@@ -57,7 +60,7 @@ void main() {
     }
   });
   test('throw CognitoUserMfaSetupException generates message', () {
-    final t = () => throw new CognitoUserMfaSetupException();
+    final t = () => throw CognitoUserMfaSetupException();
     try {
       t();
     } on CognitoUserMfaSetupException catch (e) {
@@ -75,25 +78,28 @@ void main() {
     }
   });
   test('throw CognitoUserTotpRequiredException generates message', () {
-    final t = () => throw new CognitoUserTotpRequiredException();
+    final t = () => throw CognitoUserTotpRequiredException();
     try {
       t();
     } on CognitoUserTotpRequiredException catch (e) {
-      expect(e.toString(), equals('CognitoUserException: "SOFTWARE_TOKEN_MFA"'));
+      expect(
+          e.toString(), equals('CognitoUserException: "SOFTWARE_TOKEN_MFA"'));
     }
     try {
       t();
     } on CognitoUserException catch (e) {
-      expect(e.toString(), equals('CognitoUserException: "SOFTWARE_TOKEN_MFA"'));
+      expect(
+          e.toString(), equals('CognitoUserException: "SOFTWARE_TOKEN_MFA"'));
     }
     try {
       t();
     } catch (e) {
-      expect(e.toString(), equals('CognitoUserException: "SOFTWARE_TOKEN_MFA"'));
+      expect(
+          e.toString(), equals('CognitoUserException: "SOFTWARE_TOKEN_MFA"'));
     }
   });
   test('throw CognitoUserCustomChallengeException generates message', () {
-    final t = () => throw new CognitoUserCustomChallengeException();
+    final t = () => throw CognitoUserCustomChallengeException();
     try {
       t();
     } on CognitoUserCustomChallengeException catch (e) {
@@ -111,21 +117,24 @@ void main() {
     }
   });
   test('throw CognitoUserConfirmationNecessaryException generates message', () {
-    final t = () => throw new CognitoUserConfirmationNecessaryException();
+    final t = () => throw CognitoUserConfirmationNecessaryException();
     try {
       t();
     } on CognitoUserConfirmationNecessaryException catch (e) {
-      expect(e.toString(), equals('CognitoUserException: User Confirmation Necessary'));
+      expect(e.toString(),
+          equals('CognitoUserException: User Confirmation Necessary'));
     }
     try {
       t();
     } on CognitoUserException catch (e) {
-      expect(e.toString(), equals('CognitoUserException: User Confirmation Necessary'));
+      expect(e.toString(),
+          equals('CognitoUserException: User Confirmation Necessary'));
     }
     try {
       t();
     } catch (e) {
-      expect(e.toString(), equals('CognitoUserException: User Confirmation Necessary'));
+      expect(e.toString(),
+          equals('CognitoUserException: User Confirmation Necessary'));
     }
   });
 }

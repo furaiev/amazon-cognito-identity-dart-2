@@ -27,10 +27,10 @@ class CognitoIdentityId {
       return identityId;
     }
     authenticator ??= 'cognito-idp.$_region.amazonaws.com/$_userPoolId';
-    final Map<String, String> loginParam = {
+    final loginParam = {
       authenticator: token,
     };
-    final Map<String, dynamic> paramsReq = {
+    final paramsReq = {
       'IdentityPoolId': _identityPoolId,
       'Logins': loginParam,
     };

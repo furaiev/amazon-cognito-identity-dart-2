@@ -58,10 +58,8 @@ class CognitoUser {
     client = pool.client;
     authenticationFlowType = 'USER_SRP_AUTH';
 
-    if (this.storage == null) {
-      this.storage =
-          (CognitoStorageHelper(CognitoMemoryStorage())).getStorage();
-    }
+    storage =
+        storage ?? (CognitoStorageHelper(CognitoMemoryStorage())).getStorage();
   }
 
   Future<CognitoUserSession> _authenticateUserInternal(
@@ -105,12 +103,12 @@ class CognitoUser {
     }
 
     if (challengeName == 'DEVICE_SRP_AUTH') {
-      await this.getDeviceResponse();
+      await getDeviceResponse();
       return _signInUserSession;
     }
     _signInUserSession =
-        this.getCognitoUserSession(dataAuthenticate['AuthenticationResult']);
-    await this.cacheTokens();
+        getCognitoUserSession(dataAuthenticate['AuthenticationResult']);
+    await cacheTokens();
 
     final newDeviceMetadata =
         dataAuthenticate['AuthenticationResult']['NewDeviceMetadata'];
@@ -125,7 +123,7 @@ class CognitoUser {
           ['DeviceKey'],
     );
 
-    final Map<String, String> deviceSecretVerifierConfig = {
+    final deviceSecretVerifierConfig = {
       'Salt': base64.encode(hex.decode(authenticationHelper.getSaltDevices())),
       'PasswordVerifier':
           base64.encode(hex.decode(authenticationHelper.getVerifierDevices()))
@@ -135,7 +133,7 @@ class CognitoUser {
     _deviceGroupKey = newDeviceMetadata['DeviceGroupKey'];
     _randomPassword = authenticationHelper.getRandomPassword();
 
-    final Map<String, dynamic> paramsConfirmDevice = {
+    final paramsConfirmDevice = {
       'DeviceKey': newDeviceMetadata['DeviceKey'],
       'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
       'DeviceSecretVerifierConfig': deviceSecretVerifierConfig,
@@ -210,7 +208,7 @@ class CognitoUser {
       throw Exception('User is not authenticated');
     }
 
-    final Map<String, String> paramsReq = {
+    final paramsReq = {
       'AttributeName': attributeName,
       'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
     };
@@ -224,7 +222,7 @@ class CognitoUser {
       throw Exception('User is not authenticated');
     }
 
-    final Map<String, String> paramsReq = {
+    final paramsReq = {
       'AttributeName': attributeName,
       'Code': confirmationCode,
       'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
@@ -237,23 +235,23 @@ class CognitoUser {
   /// This uses the refreshToken to retrieve a new session
   Future<CognitoUserSession> refreshSession(
       CognitoRefreshToken refreshToken) async {
-    final Map<String, String> authParameters = {
+    final authParameters = {
       'REFRESH_TOKEN': refreshToken.getToken(),
     };
     final keyPrefix = 'CognitoIdentityServiceProvider.${pool.getClientId()}';
     final lastUserKey = '$keyPrefix.LastAuthUser';
 
     if (await storage.getItem(lastUserKey) != null) {
-      this.username = await storage.getItem(lastUserKey);
-      final deviceKeyKey = '$keyPrefix.${this.username}.deviceKey';
-      _deviceKey = await this.storage.getItem(deviceKeyKey);
+      username = await storage.getItem(lastUserKey);
+      final deviceKeyKey = '$keyPrefix.${username}.deviceKey';
+      _deviceKey = await storage.getItem(deviceKeyKey);
       authParameters['DEVICE_KEY'] = _deviceKey;
       if (_clientSecretHash != null) {
         authParameters['SECRET_HASH'] = _clientSecretHash;
       }
     }
 
-    final Map<String, dynamic> paramsReq = {
+    final paramsReq = {
       'ClientId': pool.getClientId(),
       'AuthFlow': 'REFRESH_TOKEN_AUTH',
       'AuthParameters': authParameters,
@@ -269,7 +267,7 @@ class CognitoUser {
       if (e.code == 'NotAuthorizedException') {
         await clearCachedTokens();
       }
-      throw e;
+      rethrow;
     }
 
     if (authResult != null) {
@@ -277,8 +275,8 @@ class CognitoUser {
       if (authenticationResult['RefreshToken'] == null) {
         authenticationResult['RefreshToken'] = refreshToken.getToken();
       }
-      _signInUserSession = this.getCognitoUserSession(authenticationResult);
-      await this.cacheTokens();
+      _signInUserSession = getCognitoUserSession(authenticationResult);
+      await cacheTokens();
       return _signInUserSession;
     }
     return null;
@@ -301,12 +299,12 @@ class CognitoUser {
     this.authenticationFlowType = authenticationFlowType;
   }
 
-  getCachedDeviceKeyAndPassword() async {
-    final String keyPrefix =
+  void getCachedDeviceKeyAndPassword() async {
+    final keyPrefix =
         'CognitoIdentityServiceProvider.${pool.getClientId()}.$username';
-    final String deviceKeyKey = '$keyPrefix.deviceKey';
-    final String randomPasswordKey = '$keyPrefix.randomPasswordKey';
-    final String deviceGroupKeyKey = '$keyPrefix.deviceGroupKey';
+    final deviceKeyKey = '$keyPrefix.deviceKey';
+    final randomPasswordKey = '$keyPrefix.randomPasswordKey';
+    final deviceGroupKeyKey = '$keyPrefix.deviceGroupKey';
 
     if (await storage.getItem(deviceKeyKey) != null) {
       _deviceKey = await storage.getItem(deviceKeyKey);
@@ -335,9 +333,9 @@ class CognitoUser {
     final authenticationHelper = AuthenticationHelper(_deviceGroupKey);
     final dateHelper = DateHelper();
 
-    final Map<String, String> authParameters = {
-      'USERNAME': this.username,
-      'DEVICE_KEY': this._deviceKey,
+    final authParameters = {
+      'USERNAME': username,
+      'DEVICE_KEY': _deviceKey,
     };
     final aValue = authenticationHelper.getLargeAValue();
     authParameters['SRP_A'] = aValue.toRadixString(16);
@@ -345,7 +343,7 @@ class CognitoUser {
       authParameters['SECRET_HASH'] = _clientSecretHash;
     }
 
-    Map<String, dynamic> params = {
+    final params = {
       'ChallengeName': 'DEVICE_SRP_AUTH',
       'ClientId': pool.getClientId(),
       'ChallengeResponses': authParameters,
@@ -368,7 +366,7 @@ class CognitoUser {
     final dateNow = dateHelper.getNowString();
 
     final signature = Hmac(sha256, hkdf);
-    final List<int> signatureData = [];
+    final signatureData = [];
     signatureData
       ..addAll(utf8.encode(_deviceGroupKey))
       ..addAll(utf8.encode(_deviceKey))
@@ -377,8 +375,8 @@ class CognitoUser {
     final dig = signature.convert(signatureData);
     final signatureString = base64.encode(dig.bytes);
 
-    Map<String, dynamic> challengeResponses = {
-      'USERNAME': this.username,
+    final challengeResponses = {
+      'USERNAME': username,
       'PASSWORD_CLAIM_SECRET_BLOCK': challengeParameters['SECRET_BLOCK'],
       'TIMESTAMP': dateNow,
       'PASSWORD_CLAIM_SIGNATURE': signatureString,
@@ -389,7 +387,7 @@ class CognitoUser {
       challengeResponses['SECRET_HASH'] = _clientSecretHash;
     }
 
-    Map<String, dynamic> paramsResp = {
+    final paramsResp = {
       'ChallengeName': 'DEVICE_PASSWORD_VERIFIER',
       'ClientId': pool.getClientId(),
       'ChallengeResponses': challengeResponses,
@@ -404,8 +402,8 @@ class CognitoUser {
         await client.request('RespondToAuthChallenge', paramsResp);
 
     _signInUserSession =
-        this.getCognitoUserSession(dataAuthenticate['AuthenticationResult']);
-    await this.cacheTokens();
+        getCognitoUserSession(dataAuthenticate['AuthenticationResult']);
+    await cacheTokens();
     return _signInUserSession;
   }
 
@@ -423,7 +421,7 @@ class CognitoUser {
       authParameters['SECRET_HASH'] = _clientSecretHash;
     }
 
-    final Map<String, dynamic> paramsReq = {
+    final paramsReq = {
       'AuthFlow': 'CUSTOM_AUTH',
       'ClientId': pool.getClientId(),
       'AuthParameters': authParameters,
@@ -472,7 +470,7 @@ class CognitoUser {
     if (_signInUserSession == null || !_signInUserSession.isValid()) {
       throw Exception('User is not authenticated');
     }
-    final Map<String, String> paramsReq = {
+    final paramsReq = {
       'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
     };
     await client.request('GlobalSignOut', paramsReq);
@@ -481,8 +479,8 @@ class CognitoUser {
 
   Future<CognitoUserSession> _authenticateUserPlainUsernamePassword(
       AuthenticationDetails authDetails) async {
-    final Map<String, String> authParameters = {
-      'USERNAME': this.username,
+    final authParameters = {
+      'USERNAME': username,
       'PASSWORD': authDetails.getPassword(),
     };
     if (authParameters['PASSWORD'] == null) {
@@ -498,7 +496,7 @@ class CognitoUser {
       authParameters['DEVICE_KEY'] = _deviceKey;
     }
 
-    Map<String, dynamic> paramsReq = {
+    final paramsReq = {
       'AuthFlow': 'USER_PASSWORD_AUTH',
       'ClientId': pool.getClientId(),
       'AuthParameters': authParameters,
@@ -524,7 +522,7 @@ class CognitoUser {
     String saltString;
     BigInt salt;
 
-    Map<String, String> authParameters = {};
+    final authParameters = {};
     await getCachedDeviceKeyAndPassword();
     if (_deviceKey != null) {
       authParameters['DEVICE_KEY'] = _deviceKey;
@@ -542,7 +540,7 @@ class CognitoUser {
       authParameters['SECRET_HASH'] = _clientSecretHash;
     }
 
-    Map<String, dynamic> params = {
+    final params = {
       'AuthFlow': authenticationFlowType,
       'ClientId': pool.getClientId(),
       'AuthParameters': authParameters,
@@ -557,7 +555,7 @@ class CognitoUser {
     try {
       data = await client.request('InitiateAuth', params);
     } on CognitoClientException catch (e) {
-      if(e.name == "UserNotConfirmedException") {
+      if (e.name == 'UserNotConfirmedException') {
         throw CognitoUserConfirmationNecessaryException();
       } else {
         rethrow;
@@ -568,14 +566,14 @@ class CognitoUser {
 
     final challengeParameters = data['ChallengeParameters'];
 
-    this.username = challengeParameters['USER_ID_FOR_SRP'];
+    username = challengeParameters['USER_ID_FOR_SRP'];
     serverBValue = BigInt.parse(challengeParameters['SRP_B'], radix: 16);
     saltString =
         authenticationHelper.toUnsignedHex(challengeParameters['SALT']);
     salt = BigInt.parse(saltString, radix: 16);
 
     var hkdf = authenticationHelper.getPasswordAuthenticationKey(
-      this.username,
+      username,
       authDetails.getPassword(),
       serverBValue,
       salt,
@@ -584,17 +582,17 @@ class CognitoUser {
     final dateNow = dateHelper.getNowString();
 
     final signature = Hmac(sha256, hkdf);
-    final List<int> signatureData = [];
+    final signatureData = [];
     signatureData
       ..addAll(utf8.encode(pool.getUserPoolId().split('_')[1]))
-      ..addAll(utf8.encode(this.username))
+      ..addAll(utf8.encode(username))
       ..addAll(base64.decode(challengeParameters['SECRET_BLOCK']))
       ..addAll(utf8.encode(dateNow));
     final dig = signature.convert(signatureData);
     final signatureString = base64.encode(dig.bytes);
 
-    Map<String, dynamic> challengeResponses = {
-      'USERNAME': this.username,
+    final challengeResponses = {
+      'USERNAME': username,
       'PASSWORD_CLAIM_SECRET_BLOCK': challengeParameters['SECRET_BLOCK'],
       'TIMESTAMP': dateNow,
       'PASSWORD_CLAIM_SIGNATURE': signatureString,
@@ -615,7 +613,7 @@ class CognitoUser {
             await client.request('RespondToAuthChallenge', challenge);
       } on CognitoClientException catch (e) {
         if (e.code == 'ResourceNotFoundException' &&
-            e.message.toLowerCase().indexOf('device') != -1) {
+            e.message.toLowerCase().contains('device')) {
           challengeResponses['DEVICE_KEY'] = null;
           _deviceKey = null;
           _randomPassword = null;
@@ -623,14 +621,14 @@ class CognitoUser {
           await clearCachedDeviceKeyAndPassword();
           return await respondToAuthChallenge(challenge);
         }
-        throw e;
+        rethrow;
       } catch (e) {
-        throw e;
+        rethrow;
       }
       return dataChallenge;
     }
 
-    Map<String, dynamic> jsonReqResp = {
+    final jsonReqResp = {
       'ChallengeName': 'PASSWORD_VERIFIER',
       'ClientId': pool.getClientId(),
       'ChallengeResponses': challengeResponses,
@@ -678,8 +676,8 @@ class CognitoUser {
   ///
   static String calculateClientSecretHash(
       String userName, String clientId, String clientSecret) {
-    Hmac hmac = Hmac(sha256, utf8.encode(clientSecret));
-    Digest digest = hmac.convert(utf8.encode(userName + clientId));
+    final hmac = Hmac(sha256, utf8.encode(clientSecret));
+    final digest = hmac.convert(utf8.encode(userName + clientId));
     hmac.convert(digest.bytes);
     return base64.encode(digest.bytes);
   }
@@ -687,7 +685,7 @@ class CognitoUser {
   /// This is used for a certain user to confirm the registration by using a confirmation code
   Future<bool> confirmRegistration(String confirmationCode,
       [bool forceAliasCreation = false]) async {
-    Map<String, dynamic> params = {
+    final params = {
       'ClientId': pool.getClientId(),
       'ConfirmationCode': confirmationCode,
       'Username': username,
@@ -703,8 +701,8 @@ class CognitoUser {
   }
 
   /// This is used by a user to resend a confirmation code
-  resendConfirmationCode() async {
-    Map<String, dynamic> params = {
+  dynamic resendConfirmationCode() async {
+    final params = {
       'ClientId': pool.getClientId(),
       'Username': username,
     };
@@ -716,8 +714,8 @@ class CognitoUser {
   /// This is used by the user once he has the responses to a custom challenge
   Future<CognitoUserSession> sendCustomChallengeAnswer(
       String answerChallenge) async {
-    final Map<String, String> challengeResponses = {
-      'USERNAME': this.username,
+    final challengeResponses = {
+      'USERNAME': username,
       'ANSWER': answerChallenge,
     };
 
@@ -733,10 +731,10 @@ class CognitoUser {
       challengeResponses['SECRET_HASH'] = _clientSecretHash;
     }
 
-    final Map<String, dynamic> paramsReq = {
+    final paramsReq = {
       'ChallengeName': 'CUSTOM_CHALLENGE',
       'ChallengeResponses': challengeResponses,
-      'ClientId': this.pool.getClientId(),
+      'ClientId': pool.getClientId(),
       'Session': _session,
     };
 
@@ -756,14 +754,14 @@ class CognitoUser {
   /// name and a map value is an attribute value.
   Future<CognitoUserSession> sendNewPasswordRequiredAnswer(String newPassword,
       [Map<String, String> requiredAttributes]) async {
-    final Map<String, String> challengeResponses = {
-      'USERNAME': this.username,
+    final challengeResponses = {
+      'USERNAME': username,
       'NEW_PASSWORD': newPassword,
     };
 
     if (requiredAttributes != null && requiredAttributes.isNotEmpty) {
       requiredAttributes.forEach((key, value) {
-        challengeResponses["userAttributes.$key"] = value;
+        challengeResponses['userAttributes.$key'] = value;
       });
     }
 
@@ -775,10 +773,10 @@ class CognitoUser {
       challengeResponses['DEVICE_KEY'] = _deviceKey;
     }
 
-    final Map<String, dynamic> paramsReq = {
+    final paramsReq = {
       'ChallengeName': 'NEW_PASSWORD_REQUIRED',
       'ChallengeResponses': challengeResponses,
-      'ClientId': this.pool.getClientId(),
+      'ClientId': pool.getClientId(),
       'Session': _session,
     };
 
@@ -794,8 +792,8 @@ class CognitoUser {
   /// This is used by the user once he has an MFA code
   Future<CognitoUserSession> sendMFACode(String confirmationCode,
       [String mfaType = 'SMS_MFA']) async {
-    final Map<String, String> challengeResponses = {
-      'USERNAME': this.username,
+    final challengeResponses = {
+      'USERNAME': username,
       'SMS_MFA_CODE': confirmationCode,
     };
     if (mfaType == 'SOFTWARE_TOKEN_MFA') {
@@ -807,7 +805,7 @@ class CognitoUser {
       challengeResponses['DEVICE_KEY'] = _deviceKey;
     }
 
-    final Map<String, dynamic> paramsReq = {
+    final paramsReq = {
       'ChallengeName': mfaType,
       'ChallengeResponses': challengeResponses,
       'ClientId': pool.getClientId(),
@@ -842,7 +840,7 @@ class CognitoUser {
         dataAuthenticate['AuthenticationResult']['NewDeviceMetadata']
             ['DeviceKey']);
 
-    final Map<String, String> deviceSecretVerifierConfig = {
+    final deviceSecretVerifierConfig = {
       'Salt': base64.encode(hex.decode(authenticationHelper.getSaltDevices())),
       'PasswordVerifier':
           base64.encode(hex.decode(authenticationHelper.getVerifierDevices())),
@@ -853,7 +851,7 @@ class CognitoUser {
         ['NewDeviceMetadata']['DeviceGroupKey'];
     _randomPassword = authenticationHelper.getRandomPassword();
 
-    final Map<String, dynamic> confirmDeviceParamsReq = {
+    final confirmDeviceParamsReq = {
       'DeviceKey': dataAuthenticate['AuthenticationResult']['NewDeviceMetadata']
           ['DeviceKey'],
       'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
@@ -880,7 +878,7 @@ class CognitoUser {
       throw Exception('User is not authenticated');
     }
 
-    final Map<String, String> paramsReq = {
+    final paramsReq = {
       'PreviousPassword': oldUserPassword,
       'ProposedPassword': newUserPassword,
       'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
@@ -899,14 +897,14 @@ class CognitoUser {
       throw Exception('User is not authenticated');
     }
 
-    final List<Map<String, String>> mfaOptions = [];
-    final Map<String, String> mfaEnabled = {
+    final mfaOptions = [];
+    final mfaEnabled = {
       'DeliveryMedium': 'SMS',
       'AttributeName': 'phone_number',
     };
     mfaOptions.add(mfaEnabled);
 
-    final Map<String, dynamic> paramsReq = {
+    final paramsReq = {
       'MFAOptions': mfaOptions,
       'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
     };
@@ -921,9 +919,9 @@ class CognitoUser {
       throw Exception('User is not authenticated');
     }
 
-    final List<Map<String, String>> mfaOptions = [];
+    final mfaOptions = [];
 
-    final Map<String, dynamic> paramsReq = {
+    final paramsReq = {
       'MFAOptions': mfaOptions,
       'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
     };
@@ -934,7 +932,7 @@ class CognitoUser {
 
   /// This is used to initiate a forgot password request
   Future forgotPassword() async {
-    final Map<String, String> paramsReq = {
+    final paramsReq = {
       'ClientId': pool.getClientId(),
       'Username': username,
     };
@@ -951,7 +949,7 @@ class CognitoUser {
   /// This is used to confirm a new password using a confirmation code
   Future<bool> confirmPassword(
       String confirmationCode, String newPassword) async {
-    final Map<String, String> paramsReq = {
+    final paramsReq = {
       'ClientId': pool.getClientId(),
       'Username': username,
       'ConfirmationCode': confirmationCode,
@@ -992,9 +990,9 @@ class CognitoUser {
   /// This is used to clear the session tokens from local storage
   Future<void> clearCachedTokens() async {
     final keyPrefix = 'CognitoIdentityServiceProvider.${pool.getClientId()}';
-    final idTokenKey = '$keyPrefix.${this.username}.idToken';
-    final accessTokenKey = '$keyPrefix.${this.username}.accessToken';
-    final refreshTokenKey = '$keyPrefix.${this.username}.refreshToken';
+    final idTokenKey = '$keyPrefix.${username}.idToken';
+    final accessTokenKey = '$keyPrefix.${username}.accessToken';
+    final refreshTokenKey = '$keyPrefix.${username}.refreshToken';
     final lastUserKey = '$keyPrefix.LastAuthUser';
 
     await Future.wait([
@@ -1041,7 +1039,7 @@ class CognitoUser {
       throw Exception('User is not authenticated');
     }
 
-    final Map<String, dynamic> paramsReq = {
+    final paramsReq = {
       'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
     };
     final userData = await client.request('GetUser', paramsReq);
@@ -1050,7 +1048,7 @@ class CognitoUser {
       return null;
     }
 
-    final List<CognitoUserAttribute> attributeList = [];
+    final attributeList = [];
     userData['UserAttributes'].forEach((attr) {
       attributeList
           .add(CognitoUserAttribute(name: attr['Name'], value: attr['Value']));
@@ -1059,12 +1057,12 @@ class CognitoUser {
   }
 
   /// This is used by authenticated users to change a list of attributes
-  updateAttributes(List<CognitoUserAttribute> attributes) async {
+  void updateAttributes(List<CognitoUserAttribute> attributes) async {
     if (_signInUserSession == null || !_signInUserSession.isValid()) {
       throw Exception('User is not authenticated');
     }
 
-    final Map<String, dynamic> paramsReq = {
+    final paramsReq = {
       'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
       'UserAttributes': attributes,
     };
@@ -1072,12 +1070,12 @@ class CognitoUser {
   }
 
   /// This is used by an authenticated user to delete a list of attributes
-  deleteAttributes(List<String> attributeList) async {
+  void deleteAttributes(List<String> attributeList) async {
     if (!(_signInUserSession != null && _signInUserSession.isValid())) {
       throw Exception('User is not authenticated');
     }
 
-    final Map<String, dynamic> paramsReq = {
+    final paramsReq = {
       'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
       'UserAttributeNames': attributeList,
     };
@@ -1090,7 +1088,7 @@ class CognitoUser {
       throw Exception('User is not authenticated');
     }
 
-    final Map<String, dynamic> paramsReq = {
+    final paramsReq = {
       'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
     };
     await client.request('DeleteUser', paramsReq);

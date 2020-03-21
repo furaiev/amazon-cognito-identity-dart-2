@@ -1,11 +1,11 @@
 import 'package:amazon_cognito_identity_dart_2/src/client.dart';
-import 'package:http/testing.dart';
-import 'package:test/test.dart';
-import 'package:http/http.dart' as http;
+import 'package:amazon_cognito_identity_dart_2/src/cognito_client_exceptions.dart';
 import 'package:amazon_cognito_identity_dart_2/src/cognito_user_pool.dart';
 import 'package:amazon_cognito_identity_dart_2/src/mocks/sign_up.dart'
-    as signUpMock;
-import 'package:amazon_cognito_identity_dart_2/src/cognito_client_exceptions.dart';
+    as sign_up_mock;
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('initiating with invalid userPoolId', () {
@@ -63,8 +63,8 @@ void main() {
   group('signUp', () {
     test('successful confirmed signup', () async {
       final c = Client(
-        client: MockClient((request) =>
-            Future<http.Response>.value(signUpMock.successfulConfirmedSignUp)),
+        client: MockClient((request) => Future<http.Response>.value(
+            sign_up_mock.successfulConfirmedSignUp)),
       );
       final cup = CognitoUserPool(
         'ap-southeast-1_nnnnnnnnn',
@@ -79,7 +79,7 @@ void main() {
     test('successful unconfirmed signup', () async {
       final c = Client(
         client: MockClient((request) => Future<http.Response>.value(
-            signUpMock.successfulUnconfirmedSignUp)),
+            sign_up_mock.successfulUnconfirmedSignUp)),
       );
       final cup = CognitoUserPool(
         'ap-southeast-1_nnnnnnnnn',
@@ -94,7 +94,7 @@ void main() {
     test('unsuccessful', () async {
       final c = Client(
         client: MockClient((request) => Future<http.Response>.value(
-              signUpMock.notAuthorizedException,
+              sign_up_mock.notAuthorizedException,
             )),
       );
       final cup = CognitoUserPool(

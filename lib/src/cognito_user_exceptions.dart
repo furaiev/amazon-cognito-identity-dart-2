@@ -5,16 +5,18 @@ class CognitoUserException implements Exception {
   String challengeName;
   CognitoUserException([this.message]);
 
+  @override
   String toString() {
-    String messageString = '';
+    var messageString = '';
     if (challengeName != null) messageString += ' "$challengeName"';
     if (message != null) messageString += ' $message';
-    if (messageString == '') return "CognitoUserException";
+    if (messageString == '') return 'CognitoUserException';
     return 'CognitoUserException:$messageString';
   }
 }
 
 class CognitoUserNewPasswordRequiredException extends CognitoUserException {
+  @override
   String message;
   dynamic userAttributes;
   List<dynamic> requiredAttributes;
@@ -25,7 +27,9 @@ class CognitoUserNewPasswordRequiredException extends CognitoUserException {
 }
 
 class CognitoUserMfaRequiredException extends CognitoUserException {
+  @override
   String message;
+  @override
   String challengeName;
   dynamic challengeParameters;
   CognitoUserMfaRequiredException(
@@ -33,7 +37,9 @@ class CognitoUserMfaRequiredException extends CognitoUserException {
 }
 
 class CognitoUserSelectMfaTypeException extends CognitoUserException {
+  @override
   String message;
+  @override
   String challengeName;
   dynamic challengeParameters;
   CognitoUserSelectMfaTypeException(
@@ -43,7 +49,9 @@ class CognitoUserSelectMfaTypeException extends CognitoUserException {
 }
 
 class CognitoUserMfaSetupException extends CognitoUserException {
+  @override
   String message;
+  @override
   String challengeName;
   dynamic challengeParameters;
   CognitoUserMfaSetupException(
@@ -53,7 +61,9 @@ class CognitoUserMfaSetupException extends CognitoUserException {
 }
 
 class CognitoUserTotpRequiredException extends CognitoUserException {
+  @override
   String message;
+  @override
   String challengeName;
   dynamic challengeParameters;
   CognitoUserTotpRequiredException(
@@ -63,7 +73,9 @@ class CognitoUserTotpRequiredException extends CognitoUserException {
 }
 
 class CognitoUserCustomChallengeException extends CognitoUserException {
+  @override
   String message;
+  @override
   String challengeName;
   dynamic challengeParameters;
   CognitoUserCustomChallengeException(
@@ -73,6 +85,7 @@ class CognitoUserCustomChallengeException extends CognitoUserException {
 }
 
 class CognitoUserConfirmationNecessaryException extends CognitoUserException {
+  @override
   String message;
   CognitoUserSession signInUserSession;
   CognitoUserConfirmationNecessaryException(

@@ -13,18 +13,18 @@ class AuthenticationDetails {
   });
 
   String getUsername() {
-    return this.username;
+    return username;
   }
 
   String getPassword() {
-    return this.password;
+    return password;
   }
 
   Map<String, String> getValidationData() {
-    return this.validationData;
+    return validationData;
   }
 
   List<AttributeArg> getAuthParameters() {
-    return this.authParameters;
+    return authParameters;
   }
 }
