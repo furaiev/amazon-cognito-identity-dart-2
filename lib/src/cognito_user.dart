@@ -553,7 +553,19 @@ class CognitoUser {
       params['UserContextData'] = getUserContextData();
     }
 
-    final data = await client.request('InitiateAuth', params);
+    var data;
+    try {
+      data = await client.request('InitiateAuth', params);
+    } on CognitoClientException catch (e) {
+      if(e.name == "UserNotConfirmedException") {
+        throw CognitoUserConfirmationNecessaryException();
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      rethrow;
+    }
+
     final challengeParameters = data['ChallengeParameters'];
 
     this.username = challengeParameters['USER_ID_FOR_SRP'];
