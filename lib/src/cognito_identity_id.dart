@@ -5,41 +5,51 @@ import 'cognito_user_pool.dart';
 
 class CognitoIdentityId {
   String identityId;
-  String _identityPoolId;
-  String _userPoolId;
-  CognitoUserPool _pool;
-  Client _client;
-  String _region;
-  CognitoIdentityId(String identityPoolId, CognitoUserPool pool) {
-    _identityPoolId = identityPoolId;
-    _pool = pool;
-    _userPoolId = pool.getUserPoolId();
-    _region = pool.getRegion();
-    _client = pool.client;
+  final String _identityPoolId;
+  final CognitoUserPool _pool;
+  final Client _client;
+  final String _region;
+  final String _identityIdKey;
+  final String _authenticator;
+  final String _token;
+  Map<String, String> _loginParam;
+
+  CognitoIdentityId(this._identityPoolId, this._pool,
+      {String authenticator, String token})
+      : _region = _pool.getRegion(),
+        _client = _pool.client,
+        _identityIdKey = 'aws.cognito.identity-id.$_identityPoolId',
+        _token = token,
+        _authenticator = authenticator ??
+            'cognito-idp.${_pool.getRegion()}.amazonaws.com/${_pool.getUserPoolId()}' {
+    if (_token != null && _authenticator != null) {
+      _loginParam = {
+        _authenticator: _token,
+      };
+    }
   }
 
-  /// Get AWS Identity Id for authenticated user
-  Future<String> getIdentityId(token, [String authenticator]) async {
-    final identityIdKey = 'aws.cognito.identity-id.$_identityPoolId';
-    String identityId = await _pool.storage.getItem(identityIdKey);
+  Map<String, String> get loginParam => _loginParam;
+
+  Future<String> getIdentityId() async {
+    String identityId = await _pool.storage.getItem(_identityIdKey);
     if (identityId != null) {
       this.identityId = identityId;
       return identityId;
     }
-    authenticator ??= 'cognito-idp.$_region.amazonaws.com/$_userPoolId';
-    final loginParam = {
-      authenticator: token,
-    };
-    final paramsReq = {
-      'IdentityPoolId': _identityPoolId,
-      'Logins': loginParam,
-    };
+
+    final Map<String, dynamic> paramsReq = {'IdentityPoolId': _identityPoolId};
+
+    if (_loginParam != null) {
+      paramsReq['Logins'] = _loginParam;
+    }
+
     final data = await _client.request('GetId', paramsReq,
         service: 'AWSCognitoIdentityService',
         endpoint: 'https://cognito-identity.$_region.amazonaws.com/');
 
     this.identityId = data['IdentityId'];
-    await _pool.storage.setItem(identityIdKey, this.identityId);
+    await _pool.storage.setItem(_identityIdKey, this.identityId);
 
     return this.identityId;
   }
