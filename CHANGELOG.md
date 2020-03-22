@@ -1,3 +1,6 @@
+## 0.1.12
+- allowed session to be passed to CognitoUser constructor and added federated sign in example to README
+
 ## 0.1.11
 - added guest auth support
 - code clearing

@@ -994,9 +994,9 @@ class CognitoUser {
   /// This is used to clear the session tokens from local storage
   Future<void> clearCachedTokens() async {
     final keyPrefix = 'CognitoIdentityServiceProvider.${pool.getClientId()}';
-    final idTokenKey = '$keyPrefix.${username}.idToken';
-    final accessTokenKey = '$keyPrefix.${username}.accessToken';
-    final refreshTokenKey = '$keyPrefix.${username}.refreshToken';
+    final idTokenKey = '$keyPrefix.$username.idToken';
+    final accessTokenKey = '$keyPrefix.$username.accessToken';
+    final refreshTokenKey = '$keyPrefix.$username.refreshToken';
     final lastUserKey = '$keyPrefix.LastAuthUser';
 
     await Future.wait([
