@@ -370,6 +370,75 @@ try {
 print(session.getAccessToken().getJwtToken());
 ```
 
+__Use case 19.__ Using this library with Cognito's federated sign in on mobile devices.
+Use flutter_webview (https://pub.dev/packages/webview_flutter) to navigate to Cognito's authorize URL.
+Use flutter_webview's `navigationDelegate` to catch the redirect to `myapp://?code=<AUTH_CODE>`.
+Make a POST request to Cognito's token URL to get your tokens.
+Create the session and user with the tokens.
+
+```dart
+  final Completer<WebViewController> _webViewController = Completer<WebViewController>();
+  Widget getWebView() {
+    var url = "https://${COGNITO_POOL_URL}" +
+      ".amazoncognito.com/oauth2/authorize?identity_provider=Google&redirect_uri=" + 
+      "myapp://&response_type=CODE&client_id=${COGNITO_CLIENT_ID}" +
+      "&scope=email%20openid%20profile%20aws.cognito.signin.user.admin";
+    return
+      WebView(
+        initialUrl: url,
+        userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) ' + 
+            'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36',
+        javascriptMode: JavascriptMode.unrestricted,
+        onWebViewCreated: (WebViewController webViewController) {
+          _webViewController.complete(webViewController);
+        },
+        navigationDelegate: (NavigationRequest request) {
+          if (request.url.startsWith("myapp://?code=")) {
+            String code = request.url.substring("myapp://?code=".length);
+            signUserInWithAuthCode(code);
+            return NavigationDecision.prevent;
+          }
+
+          return NavigationDecision.navigate;
+        },
+        gestureNavigationEnabled: true,
+      );
+  }
+
+  final userPool = new CognitoUserPool(
+    'ap-southeast-1_xxxxxxxxx',
+    'xxxxxxxxxxxxxxxxxxxxxxxxxx'
+  );
+  static Future signUserInWithAuthCode(String authCode) async {
+    String url = "https://${COGNITO_POOL_URL}" +
+        ".amazoncognito.com/oauth2/token?grant_type=authorization_code&client_id=" + 
+        "${COGNITO_CLIENT_ID}&code=" + authCode + "&redirect_uri=myapp://";
+    final response = await http.post(url, body: {}, headers: {'Content-Type': 'application/x-www-form-urlencoded'});
+    if (response.statusCode != 200) {
+      throw Exception("Received bad status code from Cognito for auth code:" + 
+          response.statusCode.toString() + "; body: " + response.body);
+    }
+
+    final tokenData = json.decode(response.body);
+
+    final idToken = new CognitoIdToken(tokenData['id_token']);
+    final accessToken = new CognitoAccessToken(tokenData['access_token']);
+    final refreshToken = new CognitoRefreshToken(tokenData['refresh_token']);
+    final session = new CognitoUserSession(idToken, accessToken, refreshToken: refreshToken);
+    final user = new CognitoUser(email, userPool, signInUserSession: session);
+    final attributes = await user.getUserAttributes();
+    for (CognitoUserAttribute attribute in attributes) { 
+      if (attribute.getName() == "email") {
+        user.username = attribute.getValue();
+        break;
+      }
+    }
+
+    return user;
+  }
+}
+```
+
 
 ## Addtional Features
 

@@ -50,10 +50,14 @@ class CognitoUser {
     clientSecret,
     this.storage,
     this.deviceName = 'Dart-device',
+    signInUserSession,
   }) {
     if (clientSecret != null) {
       _clientSecretHash =
           calculateClientSecretHash(username, pool.getClientId(), clientSecret);
+    }
+    if (signInUserSession != null) {
+      _signInUserSession = signInUserSession;
     }
     client = pool.client;
     authenticationFlowType = 'USER_SRP_AUTH';
