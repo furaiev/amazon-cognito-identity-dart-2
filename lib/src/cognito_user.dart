@@ -586,7 +586,7 @@ class CognitoUser {
     final dateNow = dateHelper.getNowString();
 
     final signature = Hmac(sha256, hkdf);
-    final signatureData = [];
+    final List<int> signatureData = [];
     signatureData
       ..addAll(utf8.encode(pool.getUserPoolId().split('_')[1]))
       ..addAll(utf8.encode(username))
