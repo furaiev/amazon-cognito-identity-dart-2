@@ -1,3 +1,6 @@
+## 0.1.12+1
+- fix: type 'List<dynamic>' is not a subtype of type 'List<int>'
+
 ## 0.1.12
 - allowed session to be passed to CognitoUser constructor and added federated sign in example to README
 
