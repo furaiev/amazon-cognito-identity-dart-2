@@ -425,7 +425,10 @@ Create the session and user with the tokens.
     final accessToken = new CognitoAccessToken(tokenData['access_token']);
     final refreshToken = new CognitoRefreshToken(tokenData['refresh_token']);
     final session = new CognitoUserSession(idToken, accessToken, refreshToken: refreshToken);
-    final user = new CognitoUser(email, userPool, signInUserSession: session);
+    final user = new CognitoUser(null, userPool, signInUserSession: session);
+
+    // NOTE: in order to get the email from the list of user attributes, make sure you select email in the list of
+    // attributes in Cognito and map it to the email field in the identity provider.
     final attributes = await user.getUserAttributes();
     for (CognitoUserAttribute attribute in attributes) { 
       if (attribute.getName() == "email") {
