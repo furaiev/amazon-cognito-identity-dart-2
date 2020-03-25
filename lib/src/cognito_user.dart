@@ -1052,7 +1052,7 @@ class CognitoUser {
       return null;
     }
 
-    final attributeList = [];
+    final attributeList = <CognitoUserAttribute>[];
     userData['UserAttributes'].forEach((attr) {
       attributeList
           .add(CognitoUserAttribute(name: attr['Name'], value: attr['Value']));

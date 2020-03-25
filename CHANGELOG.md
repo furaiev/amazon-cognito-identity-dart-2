@@ -1,3 +1,6 @@
+## 0.1.12+2
+- fix: getUserAttributes strict casting issue
+
 ## 0.1.12+1
 - fix: type 'List<dynamic>' is not a subtype of type 'List<int>'
 
