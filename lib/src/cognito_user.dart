@@ -370,7 +370,7 @@ class CognitoUser {
     final dateNow = dateHelper.getNowString();
 
     final signature = Hmac(sha256, hkdf);
-    final List<int> signatureData = [];
+    final signatureData = <int>[];
     signatureData
       ..addAll(utf8.encode(_deviceGroupKey))
       ..addAll(utf8.encode(_deviceKey))
