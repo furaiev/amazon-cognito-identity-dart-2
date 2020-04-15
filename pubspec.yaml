@@ -1,5 +1,5 @@
 name: amazon_cognito_identity_dart_2
-version: 0.1.12+2
+version: 0.1.12+3
 homepage: https://github.com/furaiev/amazon-cognito-identity-dart-2
 description: Unofficial Amazon Cognito Identity Provider Dart SDK,
   to add user sign-up / sign-in to your mobile and web apps
