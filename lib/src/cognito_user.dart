@@ -934,6 +934,20 @@ class CognitoUser {
     return true;
   }
 
+  /// This is used by an authenticated user to get the MFAOptions
+  Future<List> getMFAOptions() async {
+    if (!(_signInUserSession != null && _signInUserSession.isValid())) {
+      throw Exception('User is not authenticated');
+    }
+
+    final paramsReq = {
+      'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
+    };
+    final userData = await client.request('GetUser', paramsReq);
+
+    return userData['MFAOptions'];
+  }
+
   /// This is used to initiate a forgot password request
   Future forgotPassword() async {
     final paramsReq = {
@@ -1061,7 +1075,7 @@ class CognitoUser {
   }
 
   /// This is used by authenticated users to change a list of attributes
-  void updateAttributes(List<CognitoUserAttribute> attributes) async {
+  Future<bool> updateAttributes(List<CognitoUserAttribute> attributes) async {
     if (_signInUserSession == null || !_signInUserSession.isValid()) {
       throw Exception('User is not authenticated');
     }
@@ -1071,10 +1085,12 @@ class CognitoUser {
       'UserAttributes': attributes,
     };
     await client.request('UpdateUserAttributes', paramsReq);
+
+    return true;
   }
 
   /// This is used by an authenticated user to delete a list of attributes
-  void deleteAttributes(List<String> attributeList) async {
+  Future<bool> deleteAttributes(List<String> attributeList) async {
     if (!(_signInUserSession != null && _signInUserSession.isValid())) {
       throw Exception('User is not authenticated');
     }
@@ -1084,6 +1100,8 @@ class CognitoUser {
       'UserAttributeNames': attributeList,
     };
     await client.request('DeleteUserAttributes', paramsReq);
+
+    return true;
   }
 
   /// This is used by an authenticated user to delete him/herself

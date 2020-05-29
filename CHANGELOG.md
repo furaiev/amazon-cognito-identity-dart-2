@@ -1,3 +1,7 @@
+## 0.1.13
+- changed: CognitoUser.updateAttributes and CognitoUser.deleteAttributes return Future<bool> 
+- added: CognitoUser
+
 ## 0.1.12+3
 - fix: type list<dynamic> is not a subtype of type list<int>
 

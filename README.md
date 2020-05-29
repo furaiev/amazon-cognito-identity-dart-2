@@ -1,7 +1,7 @@
+[![Pub](https://img.shields.io/pub/v/amazon_cognito_identity_dart_2)](https://pub.dev/packages/amazon_cognito_identity_dart_2)
+
 # Amazon Cognito Identity SDK for Dart
 Unofficial Amazon Cognito Identity SDK written in Dart for [Dart](https://www.dartlang.org/).
-
-Dart Packages: [https://pub.dev/packages/amazon_cognito_identity_dart_2](https://pub.dev/packages/amazon_cognito_identity_dart_2)
 
 Based on [amazon-cognito-identity-js](https://github.com/aws/aws-amplify/tree/master/packages/amazon-cognito-identity-js).
 First version was created by Jonsaw [amazon-cognito-identity-dart](https://github.com/jonsaw/amazon-cognito-identity-dart/).
@@ -190,10 +190,12 @@ __Use case 9.__ Enabling MFA for a user on a pool that has an optional MFA setti
 bool mfaEnabled = false;
 try {
   mfaEnabled = await cognitoUser.enableMfa();
+  var mfaOptions = await cognitoManager.cognitoUser.getMFAOptions();
+  print('mfaOptions: $mfaOptions');
 } catch (e) {
   print(e);
 }
-print(mfaEnabled);
+print('mfaEnabled: $mfaEnabled');
 ```
 
 __Use case 10.__ Disabling MFA for a user on a pool that has an optional MFA setting for authenticated users.
