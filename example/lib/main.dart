@@ -855,7 +855,7 @@ class _SecureCounterScreenState extends State<SecureCounterScreen> {
                   children: <Widget>[
                     Text(
                       'Welcome ${_user.name}!',
-                      style: Theme.of(context).textTheme.display1,
+                      style: Theme.of(context).textTheme.headline4,
                     ),
                     Divider(),
                     Text(
@@ -863,7 +863,7 @@ class _SecureCounterScreenState extends State<SecureCounterScreen> {
                     ),
                     Text(
                       '${_counter.count}',
-                      style: Theme.of(context).textTheme.display1,
+                      style: Theme.of(context).textTheme.headline4,
                     ),
                     Divider(),
                     Center(

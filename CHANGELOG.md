@@ -1,6 +1,10 @@
+## 0.1.14
+- added: CognitoUser.getDeviceKey method
+- added documentation for client secret
+
 ## 0.1.13
-- changed: CognitoUser.updateAttributes and CognitoUser.deleteAttributes return Future<bool> 
-- added: CognitoUser
+- changed: CognitoUser.updateAttributes and CognitoUser.deleteAttributes return Future<bool>
+- added: CognitoUser.getMFAOptions method
 
 ## 0.1.12+3
 - fix: type list<dynamic> is not a subtype of type list<int>

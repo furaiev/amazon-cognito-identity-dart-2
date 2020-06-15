@@ -17,6 +17,10 @@ Need ideas to get started?
     - S3 GET Object with Authorization found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/#for-s3-get-object).
 - Follow the tutorial on [Serverless Stack](https://serverless-stack.com/chapters/create-a-cognito-user-pool.html) for best Cognito setup.
 
+- Use Custom Storage found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/#use-custom-storage).
+- Get AWS credentials with facebook found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/#get-aws-credentials-with-facebook).
+- Use client secret found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/#use-client-secret).
+
 ## Usage
 __Use Case 1.__ Registering a user with the application. One needs to create a CognitoUserPool object by providing a UserPoolId and a ClientId and signing up by using a username, password, attribute list, and validation data.
 
@@ -950,7 +954,7 @@ final session = await user.getSession();
 print(session.isValid());
 ```
 
-### get aws credentials with facebook
+### Get AWS credentials with facebook
 ```dart
 CognitoCredentials _credential = new CognitoCredentials('ap-southeast-1_xxxxxxxxx', userPool);
 await _credential.getAwsCredentials(accessToken, 'graph.facebook.com')
