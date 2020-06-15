@@ -17,8 +17,6 @@ Need ideas to get started?
     - S3 GET Object with Authorization found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/#for-s3-get-object).
 - Follow the tutorial on [Serverless Stack](https://serverless-stack.com/chapters/create-a-cognito-user-pool.html) for best Cognito setup.
 
-Note: When creating the App, the generate client secret box must be unchecked.
-
 ## Usage
 __Use Case 1.__ Registering a user with the application. One needs to create a CognitoUserPool object by providing a UserPoolId and a ClientId and signing up by using a username, password, attribute list, and validation data.
 
@@ -382,13 +380,13 @@ Create the session and user with the tokens.
   final Completer<WebViewController> _webViewController = Completer<WebViewController>();
   Widget getWebView() {
     var url = "https://${COGNITO_POOL_URL}" +
-      ".amazoncognito.com/oauth2/authorize?identity_provider=Google&redirect_uri=" + 
+      ".amazoncognito.com/oauth2/authorize?identity_provider=Google&redirect_uri=" +
       "myapp://&response_type=CODE&client_id=${COGNITO_CLIENT_ID}" +
       "&scope=email%20openid%20profile%20aws.cognito.signin.user.admin";
     return
       WebView(
         initialUrl: url,
-        userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) ' + 
+        userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) ' +
             'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36',
         javascriptMode: JavascriptMode.unrestricted,
         onWebViewCreated: (WebViewController webViewController) {
@@ -413,11 +411,11 @@ Create the session and user with the tokens.
   );
   static Future signUserInWithAuthCode(String authCode) async {
     String url = "https://${COGNITO_POOL_URL}" +
-        ".amazoncognito.com/oauth2/token?grant_type=authorization_code&client_id=" + 
+        ".amazoncognito.com/oauth2/token?grant_type=authorization_code&client_id=" +
         "${COGNITO_CLIENT_ID}&code=" + authCode + "&redirect_uri=myapp://";
     final response = await http.post(url, body: {}, headers: {'Content-Type': 'application/x-www-form-urlencoded'});
     if (response.statusCode != 200) {
-      throw Exception("Received bad status code from Cognito for auth code:" + 
+      throw Exception("Received bad status code from Cognito for auth code:" +
           response.statusCode.toString() + "; body: " + response.body);
     }
 
@@ -432,7 +430,7 @@ Create the session and user with the tokens.
     // NOTE: in order to get the email from the list of user attributes, make sure you select email in the list of
     // attributes in Cognito and map it to the email field in the identity provider.
     final attributes = await user.getUserAttributes();
-    for (CognitoUserAttribute attribute in attributes) { 
+    for (CognitoUserAttribute attribute in attributes) {
       if (attribute.getName() == "email") {
         user.username = attribute.getValue();
         break;
@@ -957,4 +955,16 @@ print(session.isValid());
 CognitoCredentials _credential = new CognitoCredentials('ap-southeast-1_xxxxxxxxx', userPool);
 await _credential.getAwsCredentials(accessToken, 'graph.facebook.com')
 print(_credential.sessionToken);
+```
+
+### Use client secret
+
+The original `amazon-cognito-identity-js` which this library is based off, doesn't support client secret. This feature has been added since version `0.1.9`, to use it, simply set your client secret when creating `CognitoUserPool`:
+
+```dart
+final userPool = new CognitoUserPool(
+  'ap-southeast-1_xxxxxxxxx',
+  'xxxxxxxxxxxxxxxxxxxxxxxxxx',
+  clientSecret: 'xxxxxxxxxxxxxxxxxxxxxxx'
+);
 ```
