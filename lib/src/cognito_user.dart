@@ -294,6 +294,18 @@ class CognitoUser {
     return username;
   }
 
+  /// Returns the cached key for this device. Device keys are stored in local storage and are used to track devices.
+  /// Returns `null` if no device key was cached.
+  Future<String> getDeviceKey() async {
+    // Return device key if it has been loaded or updated
+    if (_deviceKey != null) {
+      return _deviceKey;
+    }
+    // Otherwise, load from local storage
+    await getCachedDeviceKeyAndPassword();
+    return _deviceKey;
+  }
+
   String getAuthenticationFlowType() {
     return authenticationFlowType;
   }
