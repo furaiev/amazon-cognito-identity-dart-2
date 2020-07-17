@@ -1,3 +1,7 @@
+## 0.1.15
+- fixed: CognitoUser.getCachedDeviceKeyAndPassword as a Future<void>
+- removed flutter_test dev dependency
+
 ## 0.1.14
 - added: CognitoUser.getDeviceKey method
 - added documentation for client secret
