@@ -1,5 +1,12 @@
 [![Pub](https://img.shields.io/pub/v/amazon_cognito_identity_dart_2)](https://pub.dev/packages/amazon_cognito_identity_dart_2)
 
+
+
+**Official package is available - [Amplify Flutter](https://github.com/aws-amplify/amplify-flutter)  
+This repo will be archived**
+  
+  
+  
 # Amazon Cognito Identity SDK for Dart
 Unofficial Amazon Cognito Identity SDK written in Dart for [Dart](https://www.dartlang.org/).
 
