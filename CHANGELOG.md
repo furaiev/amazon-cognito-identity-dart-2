@@ -1,3 +1,9 @@
+## 0.1.17
+- added: clear the cached clockDriftKey
+
+## 0.1.16
+- added: Using an app client secret with '_authenticateUserPlainUsernamePassword'
+
 ## 0.1.15
 - fixed: CognitoUser.getCachedDeviceKeyAndPassword as a Future<void>
 - removed flutter_test dev dependency
