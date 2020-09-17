@@ -1026,12 +1026,14 @@ class CognitoUser {
     final idTokenKey = '$keyPrefix.$username.idToken';
     final accessTokenKey = '$keyPrefix.$username.accessToken';
     final refreshTokenKey = '$keyPrefix.$username.refreshToken';
+    final clockDriftKey = '$keyPrefix.$username.clockDrift';
     final lastUserKey = '$keyPrefix.LastAuthUser';
 
     await Future.wait([
       storage.removeItem(idTokenKey),
       storage.removeItem(accessTokenKey),
       storage.removeItem(refreshTokenKey),
+      storage.removeItem(clockDriftKey),
       storage.removeItem(lastUserKey),
     ]);
   }
