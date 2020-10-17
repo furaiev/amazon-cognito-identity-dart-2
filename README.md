@@ -2,8 +2,7 @@
 
 
 
-**Official package is available - [Amplify Flutter](https://github.com/aws-amplify/amplify-flutter)  
-This repo will be archived**
+**Official package is available - [Amplify Flutter](https://github.com/aws-amplify/amplify-flutter)**
   
   
   
