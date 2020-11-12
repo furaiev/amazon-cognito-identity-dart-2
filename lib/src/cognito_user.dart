@@ -715,6 +715,10 @@ class CognitoUser {
       params['UserContextData'] = getUserContextData();
     }
 
+    if (_clientSecretHash != null) {
+      params['SecretHash'] = _clientSecretHash;
+    }
+
     await client.request('ConfirmSignUp', params);
     return true;
   }
