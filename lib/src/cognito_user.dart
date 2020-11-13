@@ -729,6 +729,11 @@ class CognitoUser {
       'ClientId': pool.getClientId(),
       'Username': username,
     };
+
+    if (_clientSecretHash != null) {
+      params['SecretHash'] = _clientSecretHash;
+    }
+
     var data = await client.request('ResendConfirmationCode', params);
 
     return data;
