@@ -715,6 +715,10 @@ class CognitoUser {
       params['UserContextData'] = getUserContextData();
     }
 
+    if (_clientSecretHash != null) {
+      params['SecretHash'] = _clientSecretHash;
+    }
+
     await client.request('ConfirmSignUp', params);
     return true;
   }
@@ -725,6 +729,11 @@ class CognitoUser {
       'ClientId': pool.getClientId(),
       'Username': username,
     };
+
+    if (_clientSecretHash != null) {
+      params['SecretHash'] = _clientSecretHash;
+    }
+
     var data = await client.request('ResendConfirmationCode', params);
 
     return data;
