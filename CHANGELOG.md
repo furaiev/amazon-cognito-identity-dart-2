@@ -1,3 +1,6 @@
+## 0.1.18
+- added: SecretHash to ConfirmSignUp/ResendConfirmationCode request parameters
+
 ## 0.1.17
 - added: clear the cached clockDriftKey
 
