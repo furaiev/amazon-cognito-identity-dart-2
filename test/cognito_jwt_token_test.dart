@@ -34,4 +34,20 @@ void main() {
     var jwt = CognitoJwtToken(sampleJwt);
     expect(jwt.getIssuedAt(), greaterThan(0));
   });
+  test('.getSub() returns sub', () {
+    var jwt = CognitoJwtToken(sampleJwt);
+    expect(jwt.getSub(), equals('1c421f0c-7fce-4401-95ec-ec05a0c77449'));
+  });
+  test('.getTokenUse() returns token use', () {
+    var jwt = CognitoJwtToken(sampleJwt);
+    expect(jwt.getTokenUse(), equals('access'));
+  });
+  test('.getAuthTime() returns auth time', () {
+    var jwt = CognitoJwtToken(sampleJwt);
+    expect(jwt.getAuthTime(), equals(1525076969));
+  });
+  test('.getIss() returns issuer', () {
+    var jwt = CognitoJwtToken(sampleJwt);
+    expect(jwt.getIss(), equals('https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_K8gTNb6fO'));
+  });
 }

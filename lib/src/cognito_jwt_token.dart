@@ -12,6 +12,22 @@ class CognitoJwtToken {
     return jwtToken;
   }
 
+  String getSub() {
+    return payload['sub'];
+  }
+
+  String getTokenUse() {
+    return payload['token_use'];
+  }
+
+  int getAuthTime() {
+    return payload['auth_time'] ?? 0;
+  }
+
+  String getIss() {
+    return payload['iss'];
+  }
+
   int getExpiration() {
     return payload['exp'] ?? 0;
   }
