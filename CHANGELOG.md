@@ -1,3 +1,6 @@
+## 0.1.19
+- added: additional getters for CognitoJwtToken
+
 ## 0.1.18
 - added: SecretHash to ConfirmSignUp/ResendConfirmationCode request parameters
 
