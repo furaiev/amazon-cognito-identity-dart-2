@@ -1,3 +1,6 @@
+## Unreleased
+- removed: `getLargeAValue` call on `AuthenticationHelper` initialization
+
 ## 0.1.19
 - added: additional getters for CognitoJwtToken
 

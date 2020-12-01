@@ -46,7 +46,6 @@ class AuthenticationHelper {
       radix: 16,
     );
     _smallAValue = generateRandomSmallA();
-    getLargeAValue();
     _infoBits = utf8.encode('Caldera Derived Key');
   }
 
@@ -85,7 +84,7 @@ class AuthenticationHelper {
     if (serverBValue % N == BigInt.zero) {
       throw ArgumentError('B cannot be zero.');
     }
-    _uValue = calculateU(_largeAValue, serverBValue);
+    _uValue = calculateU(getLargeAValue(), serverBValue);
     if (_uValue == BigInt.zero) {
       throw ArgumentError('U cannot be zero.');
     }
