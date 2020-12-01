@@ -1,4 +1,4 @@
-## Unreleased
+## 0.1.20
 - removed: `getLargeAValue` call on `AuthenticationHelper` initialization
 
 ## 0.1.19
