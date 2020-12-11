@@ -169,7 +169,7 @@ class SigV4 {
     final canonicalQueryStrings = [];
     sortedQueryParams.forEach((key) {
       canonicalQueryStrings.add(
-          '$key=${Uri.encodeQueryComponent(queryParams[key]).replaceAll(new RegExp(r"'"), "%27")}');
+          '$key=${Uri.encodeQueryComponent(queryParams[key]).replaceAll('+', "%20")}');
     });
 
     return canonicalQueryStrings.join('&');
