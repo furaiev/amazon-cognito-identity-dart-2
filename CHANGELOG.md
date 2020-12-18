@@ -1,3 +1,6 @@
+## 0.1.21
+- failed AWS request with specific character
+
 ## 0.1.20
 - removed: `getLargeAValue` call on `AuthenticationHelper` initialization
 
