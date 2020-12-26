@@ -43,6 +43,7 @@ class CognitoUser {
   String deviceName;
   String verifierDevices;
   CognitoStorage storage;
+  String analyticsEndpointId;
 
   CognitoUser(
     this.username,
@@ -51,6 +52,7 @@ class CognitoUser {
     this.storage,
     this.deviceName = 'Dart-device',
     signInUserSession,
+    this.analyticsEndpointId
   }) {
     if (clientSecret != null) {
       _clientSecretHash =
@@ -263,6 +265,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
+    _addAnalyticsMetadataParam(paramsReq);
 
     var authResult;
     try {
@@ -368,6 +371,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       params['UserContextData'] = getUserContextData();
     }
+    _addAnalyticsMetadataParam(params);
 
     final data = await client.request('RespondToAuthChallenge', params);
     final challengeParameters = data['ChallengeParameters'];
@@ -413,6 +417,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsResp['UserContextData'] = getUserContextData();
     }
+    _addAnalyticsMetadataParam(paramsResp);
 
     final dataAuthenticate =
         await client.request('RespondToAuthChallenge', paramsResp);
@@ -447,6 +452,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
+    _addAnalyticsMetadataParam(paramsReq);
 
     final data = await client.request('InitiateAuth', paramsReq);
 
@@ -525,6 +531,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
+    _addAnalyticsMetadataParam(paramsReq);
     final authResult = await client.request('InitiateAuth', paramsReq);
 
     return _authenticateUserInternal(authResult, authenticationHelper);
@@ -569,6 +576,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       params['UserContextData'] = getUserContextData();
     }
+    _addAnalyticsMetadataParam(params);
 
     var data;
     try {
@@ -657,6 +665,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       jsonReqResp['UserContextData'] = getUserContextData();
     }
+    _addAnalyticsMetadataParam(jsonReqResp);
 
     final dataAuthenticate = await respondToAuthChallenge(jsonReqResp);
 
@@ -718,6 +727,7 @@ class CognitoUser {
     if (_clientSecretHash != null) {
       params['SecretHash'] = _clientSecretHash;
     }
+    _addAnalyticsMetadataParam(params);
 
     await client.request('ConfirmSignUp', params);
     return true;
@@ -733,6 +743,7 @@ class CognitoUser {
     if (_clientSecretHash != null) {
       params['SecretHash'] = _clientSecretHash;
     }
+    _addAnalyticsMetadataParam(params);
 
     var data = await client.request('ResendConfirmationCode', params);
 
@@ -769,6 +780,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
+    _addAnalyticsMetadataParam(paramsReq);
 
     final data = await client.request('RespondToAuthChallenge', paramsReq);
 
@@ -811,6 +823,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
+    _addAnalyticsMetadataParam(paramsReq);
 
     final data = await client.request('RespondToAuthChallenge', paramsReq);
 
@@ -842,6 +855,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
+    _addAnalyticsMetadataParam(paramsReq);
 
     final dataAuthenticate =
         await client.request('RespondToAuthChallenge', paramsReq);
@@ -984,6 +998,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
+    _addAnalyticsMetadataParam(paramsReq);
 
     return await client.request('ForgotPassword', paramsReq);
   }
@@ -1003,6 +1018,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
+    _addAnalyticsMetadataParam(paramsReq);
 
     await client.request('ConfirmForgotPassword', paramsReq);
     return true;
@@ -1143,5 +1159,13 @@ class CognitoUser {
     await clearCachedTokens();
 
     return true;
+  }
+
+  void _addAnalyticsMetadataParam(Map<String, Object> paramsReq) {
+    if (analyticsEndpointId != null) {
+      paramsReq['AnalyticsMetadata'] = {
+        'AnalyticsEndpointId': analyticsEndpointId
+      };
+    }
   }
 }
