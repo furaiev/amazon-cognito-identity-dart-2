@@ -1,3 +1,6 @@
+## 0.1.22
+- [Issue #69] Adding support for AnalyticsMetadata request parameter
+
 ## 0.1.21
 - failed AWS request with specific character
 
