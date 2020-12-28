@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:amazon_cognito_identity_dart_2/src/params_decorators.dart';
+
 import 'attribute_arg.dart';
 import 'client.dart';
 import 'cognito_storage.dart';
@@ -30,6 +32,7 @@ class CognitoUserPool {
   Client client;
   CognitoStorage storage;
   String _userAgent;
+  final ParamsDecorator analyticsMetadataParamsDecorator;
 
   CognitoUserPool(
     String userPoolId,
@@ -40,7 +43,10 @@ class CognitoUserPool {
     String customUserAgent,
     this.storage,
     this.advancedSecurityDataCollectionFlag = true,
-  }) {
+    ParamsDecorator analyticsMetadataParamsDecorator,
+    String analyticsEndpointId,
+  }) : analyticsMetadataParamsDecorator = analyticsMetadataParamsDecorator ??
+            AnalyticsMetadataParamsDecorator(analyticsEndpointId) {
     _userPoolId = userPoolId;
     _clientId = clientId;
     _clientSecret = clientSecret;
@@ -116,6 +122,7 @@ class CognitoUserPool {
       params['SecretHash'] = CognitoUser.calculateClientSecretHash(
           username, _clientId, _clientSecret);
     }
+    analyticsMetadataParamsDecorator.call(params);
 
     final data = await client.request('SignUp', params);
     if (data == null) {
