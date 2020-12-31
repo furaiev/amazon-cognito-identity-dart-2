@@ -86,7 +86,8 @@ class CognitoUserPool {
       return CognitoUser(lastAuthUser, this,
           storage: storage,
           clientSecret: _clientSecret,
-          deviceName: _userAgent);
+          deviceName: _userAgent,
+          analyticsMetadataParamsDecorator: _analyticsMetadataParamsDecorator);
     }
 
     return null;
@@ -131,7 +132,8 @@ class CognitoUserPool {
       CognitoUser(username, this,
           storage: storage,
           clientSecret: _clientSecret,
-          deviceName: _userAgent),
+          deviceName: _userAgent,
+          analyticsMetadataParamsDecorator: _analyticsMetadataParamsDecorator),
       data,
     );
   }

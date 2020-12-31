@@ -1,3 +1,6 @@
+## 0.1.23
+- [Issue #69] Propagating analyticsMetadataParamsDecorator to CognitoUser from CognitoUserPool
+
 ## 0.1.22
 - [Issue #69] Adding support for AnalyticsMetadata request parameter
 

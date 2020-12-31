@@ -13,3 +13,4 @@ export 'src/cognito_user_pool.dart';
 export 'src/cognito_user_session.dart';
 export 'src/cognito_user.dart';
 export 'src/cognito_access_token.dart';
+export 'src/params_decorators.dart';
