@@ -507,7 +507,7 @@ class CognitoUser {
       'USERNAME': username,
       'PASSWORD': authDetails.getPassword(),
     };
-    if (_clientSecretHash != "") {
+    if (_clientSecretHash != '') {
       authParameters['SECRET_HASH'] = _clientSecretHash;
     }
     if (authParameters['PASSWORD'] == null) {
