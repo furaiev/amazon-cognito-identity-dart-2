@@ -1,3 +1,6 @@
+## 0.1.24
+- [Issue #69] Adding await in the call to analyticsMetadataParamsDecorator in case some implementations need to include async modifier
+
 ## 0.1.23
 - [Issue #69] Propagating analyticsMetadataParamsDecorator to CognitoUser from CognitoUserPool
 
