@@ -55,7 +55,7 @@ class CognitoUser {
     signInUserSession,
     ParamsDecorator analyticsMetadataParamsDecorator,
   }) : _analyticsMetadataParamsDecorator = analyticsMetadataParamsDecorator ??
-            AnalyticsMetadataParamsDecorator(null) {
+      NoOpsParamsDecorator() {
     if (clientSecret != null) {
       _clientSecretHash =
           calculateClientSecretHash(username, pool.getClientId(), clientSecret);
@@ -267,7 +267,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
-    _analyticsMetadataParamsDecorator.call(paramsReq);
+    await _analyticsMetadataParamsDecorator.call(paramsReq);
 
     var authResult;
     try {
@@ -373,7 +373,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       params['UserContextData'] = getUserContextData();
     }
-    _analyticsMetadataParamsDecorator.call(params);
+    await _analyticsMetadataParamsDecorator.call(params);
 
     final data = await client.request('RespondToAuthChallenge', params);
     final challengeParameters = data['ChallengeParameters'];
@@ -419,7 +419,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsResp['UserContextData'] = getUserContextData();
     }
-    _analyticsMetadataParamsDecorator.call(paramsResp);
+    await _analyticsMetadataParamsDecorator.call(paramsResp);
 
     final dataAuthenticate =
         await client.request('RespondToAuthChallenge', paramsResp);
@@ -454,7 +454,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
-    _analyticsMetadataParamsDecorator.call(paramsReq);
+    await _analyticsMetadataParamsDecorator.call(paramsReq);
 
     final data = await client.request('InitiateAuth', paramsReq);
 
@@ -533,7 +533,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
-    _analyticsMetadataParamsDecorator.call(paramsReq);
+    await _analyticsMetadataParamsDecorator.call(paramsReq);
     final authResult = await client.request('InitiateAuth', paramsReq);
 
     return _authenticateUserInternal(authResult, authenticationHelper);
@@ -578,7 +578,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       params['UserContextData'] = getUserContextData();
     }
-    _analyticsMetadataParamsDecorator.call(params);
+    await _analyticsMetadataParamsDecorator.call(params);
 
     var data;
     try {
@@ -667,7 +667,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       jsonReqResp['UserContextData'] = getUserContextData();
     }
-    _analyticsMetadataParamsDecorator.call(jsonReqResp);
+    await _analyticsMetadataParamsDecorator.call(jsonReqResp);
 
     final dataAuthenticate = await respondToAuthChallenge(jsonReqResp);
 
@@ -729,7 +729,7 @@ class CognitoUser {
     if (_clientSecretHash != null) {
       params['SecretHash'] = _clientSecretHash;
     }
-    _analyticsMetadataParamsDecorator.call(params);
+    await _analyticsMetadataParamsDecorator.call(params);
 
     await client.request('ConfirmSignUp', params);
     return true;
@@ -745,7 +745,7 @@ class CognitoUser {
     if (_clientSecretHash != null) {
       params['SecretHash'] = _clientSecretHash;
     }
-    _analyticsMetadataParamsDecorator.call(params);
+    await _analyticsMetadataParamsDecorator.call(params);
 
     var data = await client.request('ResendConfirmationCode', params);
 
@@ -782,7 +782,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
-    _analyticsMetadataParamsDecorator.call(paramsReq);
+    await _analyticsMetadataParamsDecorator.call(paramsReq);
 
     final data = await client.request('RespondToAuthChallenge', paramsReq);
 
@@ -825,7 +825,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
-    _analyticsMetadataParamsDecorator.call(paramsReq);
+    await _analyticsMetadataParamsDecorator.call(paramsReq);
 
     final data = await client.request('RespondToAuthChallenge', paramsReq);
 
@@ -857,7 +857,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
-    _analyticsMetadataParamsDecorator.call(paramsReq);
+    await _analyticsMetadataParamsDecorator.call(paramsReq);
 
     final dataAuthenticate =
         await client.request('RespondToAuthChallenge', paramsReq);
@@ -1000,7 +1000,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
-    _analyticsMetadataParamsDecorator.call(paramsReq);
+    await _analyticsMetadataParamsDecorator.call(paramsReq);
 
     return await client.request('ForgotPassword', paramsReq);
   }
@@ -1020,7 +1020,7 @@ class CognitoUser {
     if (getUserContextData() != null) {
       paramsReq['UserContextData'] = getUserContextData();
     }
-    _analyticsMetadataParamsDecorator.call(paramsReq);
+    await _analyticsMetadataParamsDecorator.call(paramsReq);
 
     await client.request('ConfirmForgotPassword', paramsReq);
     return true;
