@@ -26,6 +26,8 @@ Need ideas to get started?
 - Use Custom Storage found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/#use-custom-storage).
 - Get AWS credentials with facebook found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/#get-aws-credentials-with-facebook).
 - Use client secret found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/#use-client-secret).
+- [How to use refresh token to keep session valid?](https://github.com/furaiev/amazon-cognito-identity-dart-2/issues/97)
+
 
 ## Usage
 __Use Case 1.__ Registering a user with the application. One needs to create a CognitoUserPool object by providing a UserPoolId and a ClientId and signing up by using a username, password, attribute list, and validation data.
