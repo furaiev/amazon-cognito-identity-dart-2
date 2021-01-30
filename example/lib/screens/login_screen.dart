@@ -135,7 +135,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               onPressed: () {
                                 submit(context);
                               },
-                              // color: Colors.blue,
                             ),
                             margin: EdgeInsets.only(
                               top: 10.0,

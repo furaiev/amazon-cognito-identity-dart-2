@@ -6,12 +6,9 @@ description: Unofficial Amazon Cognito Identity Provider Dart SDK, to add user
   on amazon-cognito-identity-dart
 
 dependencies:
-  flutter:
-    sdk: flutter
   convert: ^2.1.1
   crypto: ^2.0.2+1
   http: ^0.12.1
-  shared_preferences: ^0.5.12+4
 
 dev_dependencies:
   pedantic: 1.9.2

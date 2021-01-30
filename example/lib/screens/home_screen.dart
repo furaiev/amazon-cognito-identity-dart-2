@@ -56,7 +56,6 @@ class _HomePageState extends State<HomePage> {
                         builder: (context) => ConfirmationScreen()),
                   );
                 },
-                // color: Colors.blue,
               ),
             ),
             Container(
@@ -73,7 +72,6 @@ class _HomePageState extends State<HomePage> {
                     MaterialPageRoute(builder: (context) => LoginScreen()),
                   );
                 },
-                // color: Colors.blue,
               ),
             ),
             Container(
@@ -91,7 +89,6 @@ class _HomePageState extends State<HomePage> {
                         builder: (context) => SecureCounterScreen()),
                   );
                 },
-                // color: Colors.blue,
               ),
             ),
           ],

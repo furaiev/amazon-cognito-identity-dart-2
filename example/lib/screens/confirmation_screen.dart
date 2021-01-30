@@ -140,7 +140,6 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                           onPressed: () {
                             _submit(context);
                           },
-                          // color: Colors.blue,
                         ),
                         margin: EdgeInsets.only(
                           top: 10.0,

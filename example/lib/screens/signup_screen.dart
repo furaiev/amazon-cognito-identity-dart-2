@@ -117,7 +117,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       onPressed: () {
                         submit(context);
                       },
-                      // color: Colors.blue,
                     ),
                     margin: EdgeInsets.only(
                       top: 10.0,
