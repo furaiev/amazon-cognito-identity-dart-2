@@ -62,6 +62,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     builder: (context) =>
                         ConfirmationScreen(email: _user.email)),
               );
+            } else {
+              await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SecureCounterScreen()));
             }
           }
         },
@@ -77,8 +82,10 @@ class _LoginScreenState extends State<LoginScreen> {
     return FutureBuilder(
         future: _getValues(),
         builder: (context, AsyncSnapshot<UserService> snapshot) {
+          print('userService hasData ${snapshot.hasData}');
           if (snapshot.hasData) {
             if (_isAuthenticated) {
+              print('isAuthenticated $_isAuthenticated');
               return SecureCounterScreen();
             }
             final Size screenSize = MediaQuery.of(context).size;
