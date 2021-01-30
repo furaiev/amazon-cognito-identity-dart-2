@@ -1,3 +1,11 @@
+## 0.1.24+1
+- [Issue #88] Update example to latest version of Flutter for iOS, Android and Web. Uses AndroidX now which solves this issue
+- [Issue #81] Enable login for Flutter Web by upgrading shared_preferences dependency version
+- Separate example into individual files, for easier re-use / copy and paste
+- Add a lib/secrets.dart file to hold the aws secrets. That file is added to .gitignore
+- Add quick start instructions in readme for compiling example. Does not include how to setup resources in AWS, but that is a pre-requiste the example working.
+- Migrate from depricated RaisedButton to ElevatedButton in example
+
 ## 0.1.24
 - [Issue #69] Adding await in the call to analyticsMetadataParamsDecorator in case some implementations need to include async modifier
 

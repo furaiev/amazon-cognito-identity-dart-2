@@ -29,3 +29,5 @@ coverage/
 
 # Ignore OS logs/store
 .DS_Store
+example/lib/secrets.dart
+example/.flutter-plugins-dependencies

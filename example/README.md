@@ -2,6 +2,35 @@
 
 An example Flutter project for [Amazon Cognito Identity Dart](https://github.com/jonsaw/amazon-cognito-identity-dart).
 
+## Reset to latest version of flutter
+
+```bash
+rm -rf ios; rm -rf android; rm -rf .dart_tool; rm -rf build; rm -rf .packages; rm -rf secure_counter_android.iml; rm -rf secure_counter.iml; rm -rf .flutter-plugins; rm -rf .flutter-plugins-dependencies; rm -rf .metadata; flutter create --org com.example --project-name secure_counter .
+
+cd ios; pod install; cd ..
+
+```
+
+## Create lib/secrets.dart (Do not commit it aka add to .gitignore)
+
+```dart
+// Setup AWS User Pool Id & Client Id settings here:
+import 'package:amazon_cognito_identity_dart_2/cognito.dart';
+
+const AWSUserPoolId = 'us-east-1_**********';
+const AWSClientId = '****************';
+
+const IdentityPoolId = 'us-east-1:************';
+
+// Setup endpoints here:
+const Region = 'us-east-1';
+const Endpoint =
+'https://xxxxxxxxxx.execute-api.ap-southeast-1.amazonaws.com/dev';
+
+final userPool = CognitoUserPool(AWSUserPoolId, AWSClientId);
+
+```
+
 <p align="center">
   <img title="Cognito Dart Demo screenshot" src="https://user-images.githubusercontent.com/1572333/39953217-77967bda-55d9-11e8-940c-90c34f870cb6.png" height="400px">
 </p>
