@@ -54,8 +54,8 @@ class CognitoUser {
     this.deviceName = 'Dart-device',
     signInUserSession,
     ParamsDecorator analyticsMetadataParamsDecorator,
-  }) : _analyticsMetadataParamsDecorator = analyticsMetadataParamsDecorator ??
-      NoOpsParamsDecorator() {
+  }) : _analyticsMetadataParamsDecorator =
+            analyticsMetadataParamsDecorator ?? NoOpsParamsDecorator() {
     if (clientSecret != null) {
       _clientSecretHash =
           calculateClientSecretHash(username, pool.getClientId(), clientSecret);
