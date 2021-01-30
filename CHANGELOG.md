@@ -1,3 +1,6 @@
+## 0.1.24+2
+- [Issue #103] Set confirmed to true when email or phone_number is verified
+
 ## 0.1.24+1
 - [Issue #88] Update example to latest version of Flutter for iOS, Android and Web. Uses AndroidX now which solves this issue
 - [Issue #81] Enable login for Flutter Web by upgrading shared_preferences dependency version
