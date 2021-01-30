@@ -3,10 +3,12 @@ description: Example App for Amazon Cognito Identity SDK for Dart
 environment:
   sdk: ">=2.10.0 <3.0.0"
 version: 1.0.0+1
+publish_to: none
 dependencies:
   flutter:
     sdk: flutter
-  amazon_cognito_identity_dart_2: ^0.1.24
+  amazon_cognito_identity_dart_2: #^0.1.24+2
+    path: ../
   cupertino_icons: ^0.1.0
 
 dependency_overrides:
