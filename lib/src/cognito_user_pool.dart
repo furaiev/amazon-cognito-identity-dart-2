@@ -44,8 +44,8 @@ class CognitoUserPool {
     this.storage,
     this.advancedSecurityDataCollectionFlag = true,
     ParamsDecorator analyticsMetadataParamsDecorator,
-  }) : _analyticsMetadataParamsDecorator = analyticsMetadataParamsDecorator ??
-      NoOpsParamsDecorator() {
+  }) : _analyticsMetadataParamsDecorator =
+            analyticsMetadataParamsDecorator ?? NoOpsParamsDecorator() {
     _userPoolId = userPoolId;
     _clientId = clientId;
     _clientSecret = clientSecret;
@@ -122,9 +122,9 @@ class CognitoUserPool {
       params['SecretHash'] = CognitoUser.calculateClientSecretHash(
           username, _clientId, _clientSecret);
     }
-    await _analyticsMetadataParamsDecorator.call(params);
 
-    final data = await client.request('SignUp', params);
+    final data = await client.request(
+        'SignUp', await _analyticsMetadataParamsDecorator.call(params));
     if (data == null) {
       return null;
     }
