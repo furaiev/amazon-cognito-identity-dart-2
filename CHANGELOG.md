@@ -1,3 +1,6 @@
+## 0.1.25
+- [Issue #69] Solving "type '_InternalLinkedHashMap<String, String>' is not a subtype of type 'String' of 'value'" bug when ParamsDecorator receives a Map<String, String>.
+
 ## 0.1.24+2
 - [Issue #103] Set confirmed to true when email or phone_number is verified
 
