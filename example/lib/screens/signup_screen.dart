@@ -27,6 +27,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     } on CognitoClientException catch (e) {
       if (e.code == 'UsernameExistsException' ||
           e.code == 'InvalidParameterException' ||
+          e.code == 'InvalidPasswordException' ||
           e.code == 'ResourceNotFoundException') {
         message = e.message;
       } else {
