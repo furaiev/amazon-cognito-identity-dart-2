@@ -1,3 +1,6 @@
+## 0.1.25+1
+- Example update: check for InvalidPasswordException in signup screen
+
 ## 0.1.25
 - [Issue #69] Solving "type '_InternalLinkedHashMap<String, String>' is not a subtype of type 'String' of 'value'" bug when ParamsDecorator receives a Map<String, String>.
 
