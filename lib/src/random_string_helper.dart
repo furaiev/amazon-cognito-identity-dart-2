@@ -22,7 +22,7 @@ const List<String> _hexCharList = [
 class RandomString {
   final Random _random;
 
-  RandomString({bool secure = true, int seed})
+  RandomString({bool secure = true, int? seed})
       : _random = (secure
             ? Random.secure()
             : (seed == null ? Random() : Random(seed)));

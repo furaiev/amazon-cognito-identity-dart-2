@@ -1,3 +1,6 @@
+## 1.0.0-nullsafety.0
+- Initial null safety
+
 ## 0.1.25+1
 - Example update: check for InvalidPasswordException in signup screen
 

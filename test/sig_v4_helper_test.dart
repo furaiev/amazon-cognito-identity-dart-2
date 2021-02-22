@@ -176,7 +176,7 @@ void main() {
     expect(
         signedRequest.url, equals('$endpoint/projects/123?color=orange%20red'));
     expect(
-        signedRequest.headers['Authorization'],
+        signedRequest.headers!['Authorization'],
         equals('AWS4-HMAC-SHA256 '
             'Credential=AXXXXXXXXXXXXXXXXXXX/20180515/ap-southeast-1/execute-api/aws4_request, '
             'SignedHeaders=accept;content-type;header-1;header-2;host;x-amz-date, '

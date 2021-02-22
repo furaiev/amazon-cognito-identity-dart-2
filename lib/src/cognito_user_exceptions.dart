@@ -1,8 +1,8 @@
 import 'cognito_user_session.dart';
 
 class CognitoUserException implements Exception {
-  String message;
-  String challengeName;
+  String? message;
+  String? challengeName;
   CognitoUserException([this.message]);
 
   @override
@@ -17,9 +17,9 @@ class CognitoUserException implements Exception {
 
 class CognitoUserNewPasswordRequiredException extends CognitoUserException {
   @override
-  String message;
+  String? message;
   dynamic userAttributes;
-  List<dynamic> requiredAttributes;
+  List<dynamic>? requiredAttributes;
   CognitoUserNewPasswordRequiredException(
       {this.userAttributes,
       this.requiredAttributes,
@@ -28,9 +28,9 @@ class CognitoUserNewPasswordRequiredException extends CognitoUserException {
 
 class CognitoUserMfaRequiredException extends CognitoUserException {
   @override
-  String message;
+  String? message;
   @override
-  String challengeName;
+  String? challengeName;
   dynamic challengeParameters;
   CognitoUserMfaRequiredException(
       {this.challengeName = 'SMS_MFA', this.challengeParameters, this.message});
@@ -38,9 +38,9 @@ class CognitoUserMfaRequiredException extends CognitoUserException {
 
 class CognitoUserSelectMfaTypeException extends CognitoUserException {
   @override
-  String message;
+  String? message;
   @override
-  String challengeName;
+  String? challengeName;
   dynamic challengeParameters;
   CognitoUserSelectMfaTypeException(
       {this.challengeName = 'SELECT_MFA_TYPE',
@@ -50,9 +50,9 @@ class CognitoUserSelectMfaTypeException extends CognitoUserException {
 
 class CognitoUserMfaSetupException extends CognitoUserException {
   @override
-  String message;
+  String? message;
   @override
-  String challengeName;
+  String? challengeName;
   dynamic challengeParameters;
   CognitoUserMfaSetupException(
       {this.challengeName = 'MFA_SETUP',
@@ -62,9 +62,9 @@ class CognitoUserMfaSetupException extends CognitoUserException {
 
 class CognitoUserTotpRequiredException extends CognitoUserException {
   @override
-  String message;
+  String? message;
   @override
-  String challengeName;
+  String? challengeName;
   dynamic challengeParameters;
   CognitoUserTotpRequiredException(
       {this.challengeName = 'SOFTWARE_TOKEN_MFA',
@@ -74,9 +74,9 @@ class CognitoUserTotpRequiredException extends CognitoUserException {
 
 class CognitoUserCustomChallengeException extends CognitoUserException {
   @override
-  String message;
+  String? message;
   @override
-  String challengeName;
+  String? challengeName;
   dynamic challengeParameters;
   CognitoUserCustomChallengeException(
       {this.challengeName = 'CUSTOM_CHALLENGE',
@@ -86,8 +86,8 @@ class CognitoUserCustomChallengeException extends CognitoUserException {
 
 class CognitoUserConfirmationNecessaryException extends CognitoUserException {
   @override
-  String message;
-  CognitoUserSession signInUserSession;
+  String? message;
+  CognitoUserSession? signInUserSession;
   CognitoUserConfirmationNecessaryException(
       {this.signInUserSession, this.message = 'User Confirmation Necessary'});
 }

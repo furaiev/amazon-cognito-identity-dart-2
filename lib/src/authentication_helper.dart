@@ -26,50 +26,50 @@ final String _newPasswordRequiredChallengeUserAttributePrefix =
     'userAttributes.';
 
 class AuthenticationHelper {
-  String poolName;
-  BigInt N;
-  BigInt g;
-  BigInt k;
-  List<int> _infoBits;
-  BigInt _smallAValue;
-  BigInt _largeAValue;
-  String _uHexHash;
-  BigInt _uValue;
-  String _randomPassword;
-  String _saltToHashDevices;
-  String _verifierDevices;
+  String? poolName;
+  BigInt? N;
+  BigInt? g;
+  late BigInt k;
+  late List<int> _infoBits;
+  BigInt? _smallAValue;
+  BigInt? _largeAValue;
+  late String _uHexHash;
+  BigInt? _uValue;
+  String? _randomPassword;
+  String? _saltToHashDevices;
+  String? _verifierDevices;
   AuthenticationHelper(this.poolName) {
     N = BigInt.parse(initN, radix: 16);
     g = BigInt.parse('2', radix: 16);
     k = BigInt.parse(
-      hexHash('00${N.toRadixString(16)}0${g.toRadixString(16)}'),
+      hexHash('00${N!.toRadixString(16)}0${g!.toRadixString(16)}'),
       radix: 16,
     );
     _smallAValue = generateRandomSmallA();
     _infoBits = utf8.encode('Caldera Derived Key');
   }
 
-  BigInt getSmallAValue() {
+  BigInt? getSmallAValue() {
     return _smallAValue;
   }
 
-  BigInt getLargeAValue() {
+  BigInt? getLargeAValue() {
     if (_largeAValue != null) {
       return _largeAValue;
     }
-    _largeAValue = calculateA(_smallAValue);
+    _largeAValue = calculateA(_smallAValue!);
     return _largeAValue;
   }
 
-  String getRandomPassword() {
+  String? getRandomPassword() {
     return _randomPassword;
   }
 
-  String getSaltDevices() {
+  String? getSaltDevices() {
     return _saltToHashDevices;
   }
 
-  String getVerifierDevices() {
+  String? getVerifierDevices() {
     return _verifierDevices;
   }
 
@@ -80,11 +80,11 @@ class AuthenticationHelper {
 
   /// Calculates the final hkdf based on computed S value, and computed U value and the key
   List<int> getPasswordAuthenticationKey(
-      String username, String password, BigInt serverBValue, BigInt salt) {
-    if (serverBValue % N == BigInt.zero) {
+      String? username, String? password, BigInt serverBValue, BigInt salt) {
+    if (serverBValue % N! == BigInt.zero) {
       throw ArgumentError('B cannot be zero.');
     }
-    _uValue = calculateU(getLargeAValue(), serverBValue);
+    _uValue = calculateU(getLargeAValue()!, serverBValue);
     if (_uValue == BigInt.zero) {
       throw ArgumentError('U cannot be zero.');
     }
@@ -96,7 +96,7 @@ class AuthenticationHelper {
 
     final sValue = calculateS(xValue, serverBValue);
     final hkdf =
-        computehkdf(hex.decode(padHex(sValue)), hex.decode(padHex(_uValue)));
+        computehkdf(hex.decode(padHex(sValue)), hex.decode(padHex(_uValue!)));
     return hkdf;
   }
 
@@ -106,7 +106,7 @@ class AuthenticationHelper {
 
     final randomBigInt = BigInt.parse(hexRandom, radix: 16);
 
-    final smallABigInt = randomBigInt % N;
+    final smallABigInt = randomBigInt % N!;
 
     return smallABigInt;
   }
@@ -117,7 +117,7 @@ class AuthenticationHelper {
   }
 
   /// Generate salts and compute verifier.
-  void generateHashDevice(String deviceGroupKey, String deviceKey) {
+  void generateHashDevice(String? deviceGroupKey, String? deviceKey) {
     _randomPassword = generateRandomString();
     final combinedString = '$deviceGroupKey$deviceKey:$_randomPassword';
     final hashedString = hash(utf8.encode(combinedString));
@@ -128,7 +128,7 @@ class AuthenticationHelper {
 
     final verifierDevicesNotPadded = modPow(
       g,
-      BigInt.parse(hexHash(_saltToHashDevices + hashedString), radix: 16),
+      BigInt.parse(hexHash(_saltToHashDevices! + hashedString), radix: 16),
       N,
     );
 
@@ -138,7 +138,8 @@ class AuthenticationHelper {
   /// Calculate a hash from a bitArray
   String hash(List<int> buf) {
     final hashHex = sha256.convert(buf).toString();
-    return (List(64 - hashHex.length).join('0')) + hashHex;
+    return (List.filled(64 - hashHex.length, null, growable: false).join('0')) +
+        hashHex;
   }
 
   /// Calculate a hash from a hex string
@@ -150,7 +151,7 @@ class AuthenticationHelper {
   /// with the generated random number a
   BigInt calculateA(BigInt a) {
     final A = modPow(g, a, N);
-    if ((A % N) == BigInt.zero) {
+    if ((A % N!) == BigInt.zero) {
       throw Exception('Illegal paramater. A mod N cannot be 0.');
     }
     return A;
@@ -168,28 +169,28 @@ class AuthenticationHelper {
     final intValue2 = serverBValue - (k * gModPowXN);
     final result = modPow(
       intValue2,
-      _smallAValue + (_uValue * xValue),
+      _smallAValue! + (_uValue! * xValue),
       N,
     );
-    return result % N;
+    return result % N!;
   }
 
   /// Temporary workaround to BigInt.modPow's bug
   /// Based on https://github.com/dart-lang/googleapis_auth/blob/master/lib/src/crypto/rsa.dart
-  BigInt modPow(BigInt b, BigInt e, BigInt m) {
+  BigInt modPow(BigInt? b, BigInt e, BigInt? m) {
     if (e < BigInt.one) {
       return BigInt.one;
     }
-    if (b < BigInt.zero || b > m) {
-      b = b % m;
+    if (b! < BigInt.zero || b > m!) {
+      b = b % m!;
     }
     var r = BigInt.one;
     while (e > BigInt.zero) {
       if ((e & BigInt.one) > BigInt.zero) {
-        r = (r * b) % m;
+        r = (r * b!) % m;
       }
       e >>= 1;
-      b = (b * b) % m;
+      b = (b! * b) % m;
     }
     return r;
   }

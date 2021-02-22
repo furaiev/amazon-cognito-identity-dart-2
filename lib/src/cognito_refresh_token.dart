@@ -1,10 +1,10 @@
 class CognitoRefreshToken {
-  String token;
-  CognitoRefreshToken([String refreshToken = '']) {
+  String? token;
+  CognitoRefreshToken([String? refreshToken = '']) {
     token = refreshToken;
   }
 
-  String getToken() {
+  String? getToken() {
     return token;
   }
 }

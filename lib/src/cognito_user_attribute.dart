@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 class CognitoUserAttribute {
-  String name;
-  String value;
+  String? name;
+  String? value;
 
   CognitoUserAttribute({this.name, this.value});
 
-  String getValue() {
+  String? getValue() {
     return value;
   }
 
@@ -15,7 +15,7 @@ class CognitoUserAttribute {
     return this;
   }
 
-  String getName() {
+  String? getName() {
     return name;
   }
 
@@ -31,7 +31,7 @@ class CognitoUserAttribute {
     return encoded.toString();
   }
 
-  Map<String, String> toJson() {
+  Map<String, String?> toJson() {
     return {
       'Name': name,
       'Value': value,

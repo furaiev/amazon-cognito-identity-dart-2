@@ -8,7 +8,7 @@ class TestCustomStorage extends CognitoStorage {
   String prefix;
   TestCustomStorage(this.prefix);
   @override
-  Future<String> setItem(String key, value) async {
+  Future<String?> setItem(String key, value) async {
     testStorage[prefix + key] = json.encode(value);
     return testStorage[prefix + key];
   }
@@ -16,13 +16,13 @@ class TestCustomStorage extends CognitoStorage {
   @override
   Future<dynamic> getItem(String key) async {
     if (testStorage[prefix + key] != null) {
-      return json.decode(testStorage[prefix + key]);
+      return json.decode(testStorage[prefix + key]!);
     }
     return null;
   }
 
   @override
-  Future<String> removeItem(String key) async {
+  Future<String?> removeItem(String key) async {
     return testStorage.remove(prefix + key);
   }
 
