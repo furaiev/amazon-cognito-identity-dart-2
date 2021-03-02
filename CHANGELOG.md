@@ -1,3 +1,6 @@
+## 0.1.25+2
+- Added optional validationData parameter for `sendCustomChallengeAnswer`
+
 ## 0.1.25+1
 - Example update: check for InvalidPasswordException in signup screen
 
