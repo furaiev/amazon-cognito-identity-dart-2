@@ -752,8 +752,8 @@ class CognitoUser {
   }
 
   /// This is used by the user once he has the responses to a custom challenge
-  Future<CognitoUserSession> sendCustomChallengeAnswer(
-      String answerChallenge) async {
+  Future<CognitoUserSession> sendCustomChallengeAnswer(String answerChallenge,
+      [Map<String, String> validationData]) async {
     final challengeResponses = {
       'USERNAME': username,
       'ANSWER': answerChallenge,
@@ -775,6 +775,7 @@ class CognitoUser {
       'ChallengeName': 'CUSTOM_CHALLENGE',
       'ChallengeResponses': challengeResponses,
       'ClientId': pool.getClientId(),
+      'ClientMetadata': validationData,
       'Session': _session,
     };
 
