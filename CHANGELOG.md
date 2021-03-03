@@ -1,5 +1,12 @@
+## 1.0.0-nullsafety.1
+- Added optional validationData parameter for `sendCustomChallengeAnswer`
+- Fixed: http.post
+
 ## 1.0.0-nullsafety.0
 - Initial null safety
+
+## 0.1.25+2
+- Added optional validationData parameter for `sendCustomChallengeAnswer`
 
 ## 0.1.25+1
 - Example update: check for InvalidPasswordException in signup screen

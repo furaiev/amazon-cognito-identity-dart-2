@@ -42,7 +42,7 @@ class Client {
     http.Response response;
     try {
       response = await _client.post(
-        Uri(path: endpointReq),
+        Uri(path: endpointReq!),
         headers: headersReq,
         body: body,
       );
