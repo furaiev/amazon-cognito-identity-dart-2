@@ -1,3 +1,6 @@
+## 1.0.0-nullsafety.2
+- Fixed: http.post Uri argument
+
 ## 1.0.0-nullsafety.1
 - Added optional validationData parameter for `sendCustomChallengeAnswer`
 - Fixed: http.post

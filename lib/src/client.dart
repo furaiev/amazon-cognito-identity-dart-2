@@ -9,7 +9,7 @@ class Client {
   String? _service;
   String _userAgent = 'aws-amplify/0.0.x dart';
   String? _region;
-  String? endpoint;
+  late String endpoint;
   late http.Client _client;
 
   Client({
@@ -42,7 +42,7 @@ class Client {
     http.Response response;
     try {
       response = await _client.post(
-        Uri(path: endpointReq!),
+        Uri.parse(endpointReq),
         headers: headersReq,
         body: body,
       );
