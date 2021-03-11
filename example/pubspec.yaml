@@ -9,10 +9,8 @@ dependencies:
     sdk: flutter
   amazon_cognito_identity_dart_2: #^0.1.24+2
     path: ../
-  cupertino_icons: ^0.1.0
-
-dependency_overrides:
-  shared_preferences: ^0.5.12+4
+  cupertino_icons: 
+  shared_preferences:
 
 dev_dependencies:
   flutter_test:
