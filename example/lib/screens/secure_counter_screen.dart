@@ -8,7 +8,7 @@ import 'package:secure_counter/user.dart';
 import 'package:secure_counter/user_service.dart';
 
 class SecureCounterScreen extends StatefulWidget {
-  SecureCounterScreen({Key key}) : super(key: key);
+  SecureCounterScreen({Key? key}) : super(key: key);
 
   @override
   _SecureCounterScreenState createState() => _SecureCounterScreenState();
@@ -16,9 +16,9 @@ class SecureCounterScreen extends StatefulWidget {
 
 class _SecureCounterScreenState extends State<SecureCounterScreen> {
   final _userService = UserService(userPool);
-  CounterService _counterService;
-  AwsSigV4Client _awsSigV4Client;
-  User _user = User();
+  late CounterService _counterService;
+  late AwsSigV4Client _awsSigV4Client;
+  User? _user = User();
   Counter _counter = Counter(0);
   bool _isAuthenticated = false;
 
@@ -39,13 +39,23 @@ class _SecureCounterScreenState extends State<SecureCounterScreen> {
 
         // get session credentials
         final credentials = await _userService.getCredentials();
-        _awsSigV4Client = AwsSigV4Client(
-            credentials.accessKeyId, credentials.secretAccessKey, Endpoint,
-            region: Region, sessionToken: credentials.sessionToken);
+        if (credentials != null && credentials.accessKeyId != null && credentials.secretAccessKey != null) {
+          _awsSigV4Client = AwsSigV4Client(
+            credentials.accessKeyId!,
+            credentials.secretAccessKey!,
+            apiEndpoint,
+            region: awsRegion,
+            sessionToken: credentials.sessionToken,
+          );
 
-        // get previous count
-        _counterService = CounterService(_awsSigV4Client);
-        _counter = await _counterService.getCounter();
+          // get previous count
+          _counterService = CounterService(_awsSigV4Client);
+          try {
+            _counter = await _counterService.getCounter();
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+          }
+        }
       }
       return _userService;
     } on CognitoClientException catch (e) {
@@ -76,7 +86,7 @@ class _SecureCounterScreenState extends State<SecureCounterScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text(
-                      'Welcome ${_user.name}!',
+                      'Welcome ${_user?.name}!',
                       style: Theme.of(context).textTheme.headline4,
                     ),
                     Divider(),
@@ -90,14 +100,14 @@ class _SecureCounterScreenState extends State<SecureCounterScreen> {
                     Divider(),
                     Center(
                       child: InkWell(
-                        child: Text(
-                          'Logout',
-                          style: TextStyle(color: Colors.blueAccent),
-                        ),
                         onTap: () {
                           _userService.signOut();
                           Navigator.pop(context);
                         },
+                        child: Text(
+                          'Logout',
+                          style: TextStyle(color: Colors.blueAccent),
+                        ),
                       ),
                     ),
                   ],

@@ -1,9 +1,9 @@
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 
 class User {
-  String email;
-  String name;
-  String password;
+  String? email;
+  String? name;
+  String? password;
   bool confirmed = false;
   bool hasAccess = false;
 
@@ -17,8 +17,8 @@ class User {
         user.email = attribute.getValue();
       } else if (attribute.getName() == 'name') {
         user.name = attribute.getValue();
-      } else if (attribute.getName().toLowerCase().contains('verified')) {
-        if (attribute.getValue().toLowerCase() == 'true') {
+      } else if (attribute.getName() != null && attribute.getName()!.toLowerCase().contains('verified')) {
+        if (attribute.getValue() != null && attribute.getValue()!.toLowerCase() == 'true') {
           user.confirmed = true;
         }
       }

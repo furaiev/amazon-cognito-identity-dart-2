@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:amazon_cognito_identity_dart_2/sig_v4.dart';
 import 'package:flutter/material.dart';
@@ -22,15 +23,43 @@ class CounterService {
   /// Retrieve user's previous count from Lambda + DynamoDB
   Future<Counter> getCounter() async {
     final signedRequest = SigV4Request(awsSigV4Client, method: 'GET', path: '/counter');
-    final response = await http.get(Uri.parse(signedRequest.url), headers: signedRequest.headers);
-    return Counter.fromJson(json.decode(response.body));
+    final url = signedRequest.url;
+
+    Map<String, String>? headers;
+    if (signedRequest.headers != null) {
+      headers = Map.from(signedRequest.headers!);
+    }
+
+    if (url != null) {
+      final response = await http.get(Uri.parse(url), headers: headers);
+
+      if (response.statusCode != 200 || json.decode(response.body)['count'] == null) {
+        throw HttpException('Cannot get counter, statusCode: ${response.statusCode}, body: ${response.body}');
+      }
+
+      return Counter.fromJson(json.decode(response.body));
+    } else {
+      return Counter(-1);
+    }
   }
 
   /// Increment user's count in DynamoDB
   Future<Counter> incrementCounter() async {
     final signedRequest = SigV4Request(awsSigV4Client, method: 'PUT', path: '/counter');
-    final response = await http.put(Uri.parse(signedRequest.url), headers: signedRequest.headers);
-    return Counter.fromJson(json.decode(response.body));
+    final url = signedRequest.url;
+    Map<String, String>? headers;
+    if (signedRequest.headers != null) {
+      headers = Map.from(signedRequest.headers!);
+    }
+    if (url != null) {
+      final response = await http.put(Uri.parse(url), headers: headers);
+      if (response.statusCode != 200 || json.decode(response.body)['count'] == null) {
+        throw HttpException('Cannot get counter, statusCode: ${response.statusCode}, body: ${response.body}');
+      }
+      return Counter.fromJson(json.decode(response.body));
+    } else {
+      return Counter(-1);
+    }
   }
 }
 

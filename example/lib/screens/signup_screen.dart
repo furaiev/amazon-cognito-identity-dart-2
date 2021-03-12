@@ -16,25 +16,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final userService = UserService(userPool);
 
   void submit(BuildContext context) async {
-    _formKey.currentState.save();
+    _formKey.currentState?.save();
 
     String message;
-    bool signUpSuccess = false;
-    try {
-      _user = await userService.signUp(_user.email, _user.password, _user.name);
-      signUpSuccess = true;
-      message = 'User sign up successful!';
-    } on CognitoClientException catch (e) {
-      if (e.code == 'UsernameExistsException' ||
-          e.code == 'InvalidParameterException' ||
-          e.code == 'InvalidPasswordException' ||
-          e.code == 'ResourceNotFoundException') {
-        message = e.message;
-      } else {
-        message = 'Unknown client error occurred';
+    var signUpSuccess = false;
+    if (_user.email != null && _user.password != null && _user.name != null) {
+      try {
+        _user = await userService.signUp(_user.email!, _user.password!, _user.name!);
+        signUpSuccess = true;
+        message = 'User sign up successful!';
+      } on CognitoClientException catch (e) {
+        if (e.code == 'UsernameExistsException' ||
+            e.code == 'InvalidParameterException' ||
+            e.code == 'InvalidPasswordException' ||
+            e.code == 'ResourceNotFoundException') {
+          message = e.message ?? e.code ?? e.toString();
+        } else {
+          message = 'Unknown client error occurred';
+        }
+      } catch (e) {
+        message = 'Unknown error occurred';
       }
-    } catch (e) {
-      message = 'Unknown error occurred';
+    } else {
+      message = 'Missing required attributes on user';
     }
 
     final snackBar = SnackBar(
@@ -47,9 +51,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             if (!_user.confirmed) {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        ConfirmationScreen(email: _user.email)),
+                MaterialPageRoute(builder: (context) => ConfirmationScreen(email: _user.email!)),
               );
             }
           }
@@ -58,12 +60,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       duration: Duration(seconds: 30),
     );
 
-    Scaffold.of(context).showSnackBar(snackBar);
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
+    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: Text('Sign Up'),
@@ -79,20 +81,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     leading: const Icon(Icons.account_box),
                     title: TextFormField(
                       decoration: InputDecoration(labelText: 'Name'),
-                      onSaved: (String name) {
-                        _user.name = name;
-                      },
+                      onSaved: (n) => _user.name = n,
                     ),
                   ),
                   ListTile(
                     leading: const Icon(Icons.email),
                     title: TextFormField(
-                      decoration: InputDecoration(
-                          hintText: 'example@inspire.my', labelText: 'Email'),
+                      decoration: InputDecoration(hintText: 'example@inspire.my', labelText: 'Email'),
                       keyboardType: TextInputType.emailAddress,
-                      onSaved: (String email) {
-                        _user.email = email;
-                      },
+                      onSaved: (n) => _user.email = n,
                     ),
                   ),
                   ListTile(
@@ -102,25 +99,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         hintText: 'Password!',
                       ),
                       obscureText: true,
-                      onSaved: (String password) {
-                        _user.password = password;
-                      },
+                      onSaved: (n) => _user.password = n,
                     ),
                   ),
                   Container(
                     padding: EdgeInsets.all(20.0),
                     width: screenSize.width,
+                    margin: EdgeInsets.only(
+                      top: 10.0,
+                    ),
                     child: ElevatedButton(
+                      onPressed: () {
+                        submit(context);
+                      },
                       child: Text(
                         'Sign Up',
                         style: TextStyle(color: Colors.white),
                       ),
-                      onPressed: () {
-                        submit(context);
-                      },
-                    ),
-                    margin: EdgeInsets.only(
-                      top: 10.0,
                     ),
                   ),
                 ],
