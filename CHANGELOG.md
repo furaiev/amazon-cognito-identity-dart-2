@@ -1,3 +1,8 @@
+## 1.0.0-nullsafety.3
+- Fixed: example
+- Fixed: Retrieving data from Storage as `FutureOr<String?>` breaks clients
+- Define `shared_preferences` as actual dependency, remove private file `.flutter-plugins-dependencies` and change code to work with latest `http`
+
 ## 1.0.0-nullsafety.2
 - Fixed: http.post Uri argument
 
