@@ -70,6 +70,8 @@ class CognitoUser {
         storage ?? (CognitoStorageHelper(CognitoMemoryStorage())).getStorage();
   }
 
+  String get keyPrefix => 'CognitoIdentityServiceProvider.${pool.getClientId()}.$username';
+
   Future<CognitoUserSession> _authenticateUserInternal(
       dataAuthenticate, AuthenticationHelper authenticationHelper) async {
     final String challengeName = dataAuthenticate['ChallengeName'];
@@ -173,8 +175,6 @@ class CognitoUser {
       return _signInUserSession;
     }
 
-    final keyPrefix =
-        'CognitoIdentityServiceProvider.${pool.getClientId()}.$username';
     final idTokenKey = '$keyPrefix.idToken';
     final accessTokenKey = '$keyPrefix.accessToken';
     final refreshTokenKey = '$keyPrefix.refreshToken';
@@ -246,12 +246,11 @@ class CognitoUser {
     final authParameters = {
       'REFRESH_TOKEN': refreshToken.getToken(),
     };
-    final keyPrefix = 'CognitoIdentityServiceProvider.${pool.getClientId()}';
     final lastUserKey = '$keyPrefix.LastAuthUser';
 
     if (await storage.getItem(lastUserKey) != null) {
       username = await storage.getItem(lastUserKey);
-      final deviceKeyKey = '$keyPrefix.$username.deviceKey';
+      final deviceKeyKey = '$keyPrefix.deviceKey';
       _deviceKey = await storage.getItem(deviceKeyKey);
       authParameters['DEVICE_KEY'] = _deviceKey;
       if (_clientSecretHash != null) {
@@ -321,8 +320,6 @@ class CognitoUser {
   }
 
   Future<void> getCachedDeviceKeyAndPassword() async {
-    final keyPrefix =
-        'CognitoIdentityServiceProvider.${pool.getClientId()}.$username';
     final deviceKeyKey = '$keyPrefix.deviceKey';
     final randomPasswordKey = '$keyPrefix.randomPasswordKey';
     final deviceGroupKeyKey = '$keyPrefix.deviceGroupKey';
@@ -594,14 +591,14 @@ class CognitoUser {
 
     final challengeParameters = data['ChallengeParameters'];
 
-    username = challengeParameters['USER_ID_FOR_SRP'];
+    String srp_username = challengeParameters['USER_ID_FOR_SRP'];
     serverBValue = BigInt.parse(challengeParameters['SRP_B'], radix: 16);
     saltString =
         authenticationHelper.toUnsignedHex(challengeParameters['SALT']);
     salt = BigInt.parse(saltString, radix: 16);
 
     var hkdf = authenticationHelper.getPasswordAuthenticationKey(
-      username,
+      srp_username,
       authDetails.getPassword(),
       serverBValue,
       salt,
@@ -613,14 +610,14 @@ class CognitoUser {
     final signatureData = <int>[];
     signatureData
       ..addAll(utf8.encode(pool.getUserPoolId().split('_')[1]))
-      ..addAll(utf8.encode(username))
+      ..addAll(utf8.encode(srp_username))
       ..addAll(base64.decode(challengeParameters['SECRET_BLOCK']))
       ..addAll(utf8.encode(dateNow));
     final dig = signature.convert(signatureData);
     final signatureString = base64.encode(dig.bytes);
 
     final challengeResponses = {
-      'USERNAME': username,
+      'USERNAME': srp_username,
       'PASSWORD_CLAIM_SECRET_BLOCK': challengeParameters['SECRET_BLOCK'],
       'TIMESTAMP': dateNow,
       'PASSWORD_CLAIM_SIGNATURE': signatureString,
@@ -1027,11 +1024,10 @@ class CognitoUser {
 
   /// This is used to save the session tokens to local storage
   Future<void> cacheTokens() async {
-    final keyPrefix = 'CognitoIdentityServiceProvider.${pool.getClientId()}';
-    final idTokenKey = '$keyPrefix.$username.idToken';
-    final accessTokenKey = '$keyPrefix.$username.accessToken';
-    final refreshTokenKey = '$keyPrefix.$username.refreshToken';
-    final clockDriftKey = '$keyPrefix.$username.clockDrift';
+    final idTokenKey = '$keyPrefix.idToken';
+    final accessTokenKey = '$keyPrefix.accessToken';
+    final refreshTokenKey = '$keyPrefix.refreshToken';
+    final clockDriftKey = '$keyPrefix.clockDrift';
     final lastUserKey = '$keyPrefix.LastAuthUser';
 
     await Future.wait([
@@ -1048,11 +1044,10 @@ class CognitoUser {
 
   /// This is used to clear the session tokens from local storage
   Future<void> clearCachedTokens() async {
-    final keyPrefix = 'CognitoIdentityServiceProvider.${pool.getClientId()}';
-    final idTokenKey = '$keyPrefix.$username.idToken';
-    final accessTokenKey = '$keyPrefix.$username.accessToken';
-    final refreshTokenKey = '$keyPrefix.$username.refreshToken';
-    final clockDriftKey = '$keyPrefix.$username.clockDrift';
+    final idTokenKey = '$keyPrefix.idToken';
+    final accessTokenKey = '$keyPrefix.accessToken';
+    final refreshTokenKey = '$keyPrefix.refreshToken';
+    final clockDriftKey = '$keyPrefix.clockDrift';
     final lastUserKey = '$keyPrefix.LastAuthUser';
 
     await Future.wait([
@@ -1066,8 +1061,6 @@ class CognitoUser {
 
   /// This is used to cache the device key and device group and device password
   Future<void> cacheDeviceKeyAndPassword() async {
-    final keyPrefix =
-        'CognitoIdentityServiceProvider.${pool.getClientId()}.$username';
     final deviceKeyKey = '$keyPrefix.deviceKey';
     final randomPasswordKey = '$keyPrefix.randomPasswordKey';
     final deviceGroupKeyKey = '$keyPrefix.deviceGroupKey';
@@ -1081,8 +1074,6 @@ class CognitoUser {
 
   /// This is used to clear the device key info from local storage
   Future<void> clearCachedDeviceKeyAndPassword() async {
-    final keyPrefix =
-        'CognitoIdentityServiceProvider.${pool.getClientId()}.$username';
     final deviceKeyKey = '$keyPrefix.deviceKey';
     final randomPasswordKey = '$keyPrefix.randomPasswordKey';
     final deviceGroupKeyKey = '$keyPrefix.deviceGroupKey';
