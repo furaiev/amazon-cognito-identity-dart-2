@@ -11,13 +11,11 @@ class Storage extends CognitoStorage {
 
   @override
   Future getItem(String key) async {
-    String item;
-    try {
-      item = json.decode(_prefs.getString(key));
-    } catch (e) {
-      return null;
+    var item = _prefs.getString(key);
+    if (item != null) {
+      return json.decode(item);
     }
-    return item;
+    return null;
   }
 
   @override
@@ -28,7 +26,7 @@ class Storage extends CognitoStorage {
 
   @override
   Future removeItem(String key) async {
-    final item = getItem(key);
+    final item = await getItem(key);
     if (item != null) {
       await _prefs.remove(key);
       return item;
@@ -41,3 +39,32 @@ class Storage extends CognitoStorage {
     await _prefs.clear();
   }
 }
+
+class MemoryStorage extends CognitoStorage {
+  @override
+  Future<dynamic> setItem(String key, value) async {
+    _dataMemory[key] = value;
+    return _dataMemory[key];
+  }
+
+  @override
+  Future<dynamic> getItem(String key) async {
+    var item = _dataMemory[key];
+    if (item != null) {
+      return item;
+    }
+    return null;
+  }
+
+  @override
+  Future<dynamic> removeItem(String key) async {
+    return _dataMemory.remove(key);
+  }
+
+  @override
+  Future<void> clear() async {
+    _dataMemory = {};
+  }
+}
+
+Map<String, dynamic> _dataMemory = {};

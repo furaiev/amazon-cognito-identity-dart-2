@@ -7,9 +7,9 @@ import 'package:secure_counter/user.dart';
 import 'package:secure_counter/user_service.dart';
 
 class LoginScreen extends StatefulWidget {
-  LoginScreen({Key key, this.email}) : super(key: key);
+  LoginScreen({Key? key, this.email}) : super(key: key);
 
-  final String email;
+  final String? email;
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -27,26 +27,35 @@ class _LoginScreenState extends State<LoginScreen> {
     return _userService;
   }
 
-  submit(BuildContext context) async {
-    _formKey.currentState.save();
+  void submit(BuildContext context) async {
+    _formKey.currentState?.save();
     String message;
-    try {
-      _user = await _userService.login(_user.email, _user.password);
-      message = 'User sucessfully logged in!';
-      if (!_user.confirmed) {
-        message = 'Please confirm user account';
+    if (_user.email != null && _user.password != null) {
+      try {
+        var u = await _userService.login(_user.email!, _user.password!);
+        if (u == null) {
+          message = 'Could not login user';
+        } else {
+          _user = u;
+          message = 'User sucessfully logged in!';
+          if (!_user.confirmed) {
+            message = 'Please confirm user account';
+          }
+        }
+      } on CognitoClientException catch (e) {
+        if (e.code == 'InvalidParameterException' ||
+            e.code == 'NotAuthorizedException' ||
+            e.code == 'UserNotFoundException' ||
+            e.code == 'ResourceNotFoundException') {
+          message = e.message ?? e.code ?? e.toString();
+        } else {
+          message = 'An unknown client error occured';
+        }
+      } catch (e) {
+        message = 'An unknown error occurred';
       }
-    } on CognitoClientException catch (e) {
-      if (e.code == 'InvalidParameterException' ||
-          e.code == 'NotAuthorizedException' ||
-          e.code == 'UserNotFoundException' ||
-          e.code == 'ResourceNotFoundException') {
-        message = e.message;
-      } else {
-        message = 'An unknown client error occured';
-      }
-    } catch (e) {
-      message = 'An unknown error occurred';
+    } else {
+      message = 'Missing required attributes on user';
     }
     final snackBar = SnackBar(
       content: Text(message),
@@ -58,15 +67,10 @@ class _LoginScreenState extends State<LoginScreen> {
             if (!_user.confirmed) {
               await Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        ConfirmationScreen(email: _user.email)),
+                MaterialPageRoute(builder: (context) => ConfirmationScreen(email: _user.email ?? 'no email found')),
               );
             } else {
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => SecureCounterScreen()));
+              await Navigator.push(context, MaterialPageRoute(builder: (context) => SecureCounterScreen()));
             }
           }
         },
@@ -74,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
       duration: Duration(seconds: 30),
     );
 
-    Scaffold.of(context).showSnackBar(snackBar);
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
@@ -82,13 +86,11 @@ class _LoginScreenState extends State<LoginScreen> {
     return FutureBuilder(
         future: _getValues(),
         builder: (context, AsyncSnapshot<UserService> snapshot) {
-          print('userService hasData ${snapshot.hasData}');
           if (snapshot.hasData) {
             if (_isAuthenticated) {
-              print('isAuthenticated $_isAuthenticated');
               return SecureCounterScreen();
             }
-            final Size screenSize = MediaQuery.of(context).size;
+            final screenSize = MediaQuery.of(context).size;
             return Scaffold(
               appBar: AppBar(
                 title: Text('Login'),
@@ -104,40 +106,31 @@ class _LoginScreenState extends State<LoginScreen> {
                             leading: const Icon(Icons.email),
                             title: TextFormField(
                               initialValue: widget.email,
-                              decoration: InputDecoration(
-                                  hintText: 'example@inspire.my',
-                                  labelText: 'Email'),
+                              decoration: InputDecoration(hintText: 'example@inspire.my', labelText: 'Email'),
                               keyboardType: TextInputType.emailAddress,
-                              onSaved: (String email) {
-                                _user.email = email;
-                              },
+                              onSaved: (n) => _user.email = n,
                             ),
                           ),
                           ListTile(
                             leading: const Icon(Icons.lock),
                             title: TextFormField(
-                              decoration:
-                                  InputDecoration(labelText: 'Password'),
+                              decoration: InputDecoration(labelText: 'Password'),
                               obscureText: true,
-                              onSaved: (String password) {
-                                _user.password = password;
-                              },
+                              onSaved: (n) => _user.password = n,
                             ),
                           ),
                           Container(
                             padding: EdgeInsets.all(20.0),
                             width: screenSize.width,
+                            margin: EdgeInsets.only(
+                              top: 10.0,
+                            ),
                             child: ElevatedButton(
+                              onPressed: () => submit(context),
                               child: Text(
                                 'Login',
                                 style: TextStyle(color: Colors.white),
                               ),
-                              onPressed: () {
-                                submit(context);
-                              },
-                            ),
-                            margin: EdgeInsets.only(
-                              top: 10.0,
                             ),
                           ),
                         ],

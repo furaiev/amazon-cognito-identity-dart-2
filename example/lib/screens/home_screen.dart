@@ -5,9 +5,9 @@ import 'package:secure_counter/screens/secure_counter_screen.dart';
 import 'package:secure_counter/screens/signup_screen.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key, this.title}) : super(key: key);
+  HomePage({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -16,10 +16,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
+    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title ?? ''),
       ),
       body: Center(
         child: Column(
@@ -29,66 +29,64 @@ class _HomePageState extends State<HomePage> {
               padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
               width: screenSize.width,
               child: ElevatedButton(
-                child: Text(
-                  'Sign Up',
-                  style: TextStyle(color: Colors.white),
-                ),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => SignUpScreen()),
                   );
                 },
+                child: Text(
+                  'Sign Up',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
             Container(
               padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
               width: screenSize.width,
               child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ConfirmationScreen()),
+                  );
+                },
                 child: Text(
                   'Confirm Account',
                   style: TextStyle(color: Colors.white),
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ConfirmationScreen()),
-                  );
-                },
               ),
             ),
             Container(
               padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
               width: screenSize.width,
               child: ElevatedButton(
-                child: Text(
-                  'Login',
-                  style: TextStyle(color: Colors.white),
-                ),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => LoginScreen()),
                   );
                 },
+                child: Text(
+                  'Login',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
             Container(
               padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
               width: screenSize.width,
               child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SecureCounterScreen()),
+                  );
+                },
                 child: Text(
                   'Secure Counter',
                   style: TextStyle(color: Colors.white),
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => SecureCounterScreen()),
-                  );
-                },
               ),
             ),
           ],

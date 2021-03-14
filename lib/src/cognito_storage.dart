@@ -18,10 +18,7 @@ class CognitoMemoryStorage extends CognitoStorage {
 
   @override
   Future<dynamic> getItem(String key) async {
-    if (_dataMemory[key] != null) {
-      return _dataMemory[key];
-    }
-    return null;
+    return _dataMemory[key];
   }
 
   @override
