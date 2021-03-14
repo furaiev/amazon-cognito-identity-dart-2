@@ -1,3 +1,7 @@
+## 0.1.25+3
+- Fixed: a storage key issue
+- Defined a local variable `srp_username`, in order to not override `user` value
+
 ## 0.1.25+2
 - Added optional validationData parameter for `sendCustomChallengeAnswer`
 
