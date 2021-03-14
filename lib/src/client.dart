@@ -41,7 +41,7 @@ class Client {
     http.Response response;
     try {
       response = await _client.post(
-        Uri.parse(endpointReq),
+        endpointReq,
         headers: headersReq,
         body: body,
       );
