@@ -15,6 +15,7 @@ cd ios; pod install; cd ..
 
 ```dart
 // Store this file as lib/secrets.dart
+// Generate your own file using https://github.com/pal/simple-counter-server
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 
 const cognitoUserPoolId = 'us-east-1_XXXXXXX';
@@ -31,7 +32,7 @@ final userPool = CognitoUserPool(cognitoUserPoolId, cognitoClientId);
   <img title="Cognito Dart Demo screenshot" src="https://user-images.githubusercontent.com/1572333/39953217-77967bda-55d9-11e8-940c-90c34f870cb6.png" height="400px">
 </p>
 
-See [Example Secure Counter Server](https://github.com/jonsaw/example-secure-counter-server) for sample API implementation.
+For a sample implementation of a secure server using Cognito, see [Simple Counter server in Javascript](https://github.com/pal/simple-counter-server) or [Secure Counter Server in Go](https://github.com/jonsaw/example-secure-counter-server).
 
 ### Sign Up
 
