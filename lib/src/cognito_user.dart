@@ -70,7 +70,8 @@ class CognitoUser {
         storage ?? (CognitoStorageHelper(CognitoMemoryStorage())).getStorage();
   }
 
-  String get keyPrefix => 'CognitoIdentityServiceProvider.${pool.getClientId()}.$username';
+  String get poolKeyPrefix => 'CognitoIdentityServiceProvider.${pool.getClientId()}';
+  String get keyPrefix => '$poolKeyPrefix.$username';
 
   Future<CognitoUserSession> _authenticateUserInternal(
       dataAuthenticate, AuthenticationHelper authenticationHelper) async {
@@ -246,7 +247,7 @@ class CognitoUser {
     final authParameters = {
       'REFRESH_TOKEN': refreshToken.getToken(),
     };
-    final lastUserKey = '$keyPrefix.LastAuthUser';
+    final lastUserKey = '$poolKeyPrefix.LastAuthUser';
 
     if (await storage.getItem(lastUserKey) != null) {
       username = await storage.getItem(lastUserKey);
@@ -1028,7 +1029,7 @@ class CognitoUser {
     final accessTokenKey = '$keyPrefix.accessToken';
     final refreshTokenKey = '$keyPrefix.refreshToken';
     final clockDriftKey = '$keyPrefix.clockDrift';
-    final lastUserKey = '$keyPrefix.LastAuthUser';
+    final lastUserKey = '$poolKeyPrefix.LastAuthUser';
 
     await Future.wait([
       storage.setItem(
@@ -1048,7 +1049,7 @@ class CognitoUser {
     final accessTokenKey = '$keyPrefix.accessToken';
     final refreshTokenKey = '$keyPrefix.refreshToken';
     final clockDriftKey = '$keyPrefix.clockDrift';
-    final lastUserKey = '$keyPrefix.LastAuthUser';
+    final lastUserKey = '$poolKeyPrefix.LastAuthUser';
 
     await Future.wait([
       storage.removeItem(idTokenKey),
