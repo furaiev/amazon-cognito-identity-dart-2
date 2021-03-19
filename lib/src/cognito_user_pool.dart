@@ -65,6 +65,8 @@ class CognitoUserPool {
         storage ?? (CognitoStorageHelper(CognitoMemoryStorage())).getStorage();
   }
 
+  String get lastUserKey => 'CognitoIdentityServiceProvider.$_clientId.LastAuthUser';
+
   String getUserPoolId() {
     return _userPoolId;
   }
@@ -78,9 +80,6 @@ class CognitoUserPool {
   }
 
   Future<CognitoUser> getCurrentUser() async {
-    final lastUserKey =
-        'CognitoIdentityServiceProvider.$_clientId.LastAuthUser';
-
     final lastAuthUser = await storage.getItem(lastUserKey);
     if (lastAuthUser != null) {
       return CognitoUser(lastAuthUser, this,

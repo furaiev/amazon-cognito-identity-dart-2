@@ -66,8 +66,12 @@ class CognitoUser {
     client = pool.client;
     authenticationFlowType = 'USER_SRP_AUTH';
 
+    if (storage == null) {
+      storage = pool.storage;
+    }
     storage =
         storage ?? (CognitoStorageHelper(CognitoMemoryStorage())).getStorage();
+    pool.storage = storage;
   }
 
   String get keyPrefix => 'CognitoIdentityServiceProvider.${pool.getClientId()}.$username';
@@ -246,10 +250,9 @@ class CognitoUser {
     final authParameters = {
       'REFRESH_TOKEN': refreshToken.getToken(),
     };
-    final lastUserKey = '$keyPrefix.LastAuthUser';
 
-    if (await storage.getItem(lastUserKey) != null) {
-      username = await storage.getItem(lastUserKey);
+    if (await storage.getItem(pool.lastUserKey) != null) {
+      username = await storage.getItem(pool.lastUserKey);
       final deviceKeyKey = '$keyPrefix.deviceKey';
       _deviceKey = await storage.getItem(deviceKeyKey);
       authParameters['DEVICE_KEY'] = _deviceKey;
@@ -1028,7 +1031,6 @@ class CognitoUser {
     final accessTokenKey = '$keyPrefix.accessToken';
     final refreshTokenKey = '$keyPrefix.refreshToken';
     final clockDriftKey = '$keyPrefix.clockDrift';
-    final lastUserKey = '$keyPrefix.LastAuthUser';
 
     await Future.wait([
       storage.setItem(
@@ -1038,7 +1040,7 @@ class CognitoUser {
       storage.setItem(
           refreshTokenKey, _signInUserSession.getRefreshToken().getToken()),
       storage.setItem(clockDriftKey, '${_signInUserSession.getClockDrift()}'),
-      storage.setItem(lastUserKey, username),
+      storage.setItem(pool.lastUserKey, username),
     ]);
   }
 
@@ -1048,14 +1050,13 @@ class CognitoUser {
     final accessTokenKey = '$keyPrefix.accessToken';
     final refreshTokenKey = '$keyPrefix.refreshToken';
     final clockDriftKey = '$keyPrefix.clockDrift';
-    final lastUserKey = '$keyPrefix.LastAuthUser';
 
     await Future.wait([
       storage.removeItem(idTokenKey),
       storage.removeItem(accessTokenKey),
       storage.removeItem(refreshTokenKey),
       storage.removeItem(clockDriftKey),
-      storage.removeItem(lastUserKey),
+      storage.removeItem(pool.lastUserKey),
     ]);
   }
 
