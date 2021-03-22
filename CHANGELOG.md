@@ -1,3 +1,7 @@
+## 0.1.25+4
+- Fixed: a storage key issue
+- Fixed: broken lastAuthUser lookup in CognitoUser
+
 ## 0.1.25+3
 - Fixed: a storage key issue
 - Defined a local variable `srp_username`, in order to not override `user` value
