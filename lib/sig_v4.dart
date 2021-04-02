@@ -14,12 +14,12 @@ const _default_content_type = 'application/json';
 const _default_accept_type = 'application/json';
 
 class AwsSigV4Client {
-  String endpoint;
-  String pathComponent;
+  late String endpoint;
+  late String pathComponent;
   String region;
   String accessKey;
   String secretKey;
-  String sessionToken;
+  String? sessionToken;
   String serviceName;
   String defaultContentType;
   String defaultAcceptType;
@@ -36,34 +36,34 @@ class AwsSigV4Client {
 }
 
 class SigV4Request {
-  String method;
-  String path;
-  Map<String, String> queryParams;
+  late String method;
+  late String path;
+  Map<String, String>? queryParams;
   Map<String, String> headers;
-  String authorizationHeader;
-  String url;
-  String body;
+  String? authorizationHeader;
+  late String url;
+  late String body;
   AwsSigV4Client awsSigV4Client;
-  String canonicalRequest;
-  String hashedCanonicalRequest;
-  String credentialScope;
-  String stringToSign;
-  String datetime;
-  List<int> signingKey;
-  String signature;
+  String? canonicalRequest;
+  String? hashedCanonicalRequest;
+  String? credentialScope;
+  String? stringToSign;
+  late String datetime;
+  List<int>? signingKey;
+  String? signature;
+
   SigV4Request(
     this.awsSigV4Client, {
-    String method,
-    String path,
-    this.datetime,
+    required String method,
+    String? path,
+    String? datetime,
     this.queryParams,
-    this.headers,
-    this.authorizationHeader,
+    Map<String, String> headers = const {},
+    String? authorizationHeader,
     dynamic body,
-  }) {
+  }) : headers = headers {
     this.method = method.toUpperCase();
     this.path = '${awsSigV4Client.pathComponent}$path';
-    headers = headers ?? {};
 
     if (headers['Content-Type'] == null && this.method != 'GET') {
       headers['Content-Type'] = awsSigV4Client.defaultContentType;
@@ -88,7 +88,7 @@ class SigV4Request {
     headers[_authorization] =
         authorizationHeader ?? _generateAuthorization(datetime);
     if (awsSigV4Client.sessionToken != null) {
-      headers[_x_amz_security_token] = awsSigV4Client.sessionToken;
+      headers[_x_amz_security_token] = awsSigV4Client.sessionToken!;
     }
     headers.remove(_host);
 
@@ -98,7 +98,7 @@ class SigV4Request {
   String _generateUrl() {
     var url = '${awsSigV4Client.endpoint}$path';
     if (queryParams != null) {
-      final queryString = SigV4.buildCanonicalQueryString(queryParams);
+      final queryString = SigV4.buildCanonicalQueryString(queryParams!);
       if (queryString != '') {
         url += '?$queryString';
       }
@@ -109,16 +109,16 @@ class SigV4Request {
   String _generateAuthorization(String datetime) {
     canonicalRequest =
         SigV4.buildCanonicalRequest(method, path, queryParams, headers, body);
-    hashedCanonicalRequest = SigV4.hashCanonicalRequest(canonicalRequest);
+    hashedCanonicalRequest = SigV4.hashCanonicalRequest(canonicalRequest!);
     credentialScope = SigV4.buildCredentialScope(
         datetime, awsSigV4Client.region, awsSigV4Client.serviceName);
     stringToSign = SigV4.buildStringToSign(
-        datetime, credentialScope, hashedCanonicalRequest);
+        datetime, credentialScope!, hashedCanonicalRequest!);
     signingKey = SigV4.calculateSigningKey(awsSigV4Client.secretKey, datetime,
         awsSigV4Client.region, awsSigV4Client.serviceName);
-    signature = SigV4.calculateSignature(signingKey, stringToSign);
+    signature = SigV4.calculateSignature(signingKey!, stringToSign!);
     return SigV4.buildAuthorizationHeader(
-        awsSigV4Client.accessKey, credentialScope, headers, signature);
+        awsSigV4Client.accessKey, credentialScope!, headers, signature!);
   }
 }
 
@@ -155,7 +155,7 @@ class SigV4 {
     return Uri.encodeFull(uri);
   }
 
-  static String buildCanonicalQueryString(Map<String, String> queryParams) {
+  static String buildCanonicalQueryString(Map<String, String>? queryParams) {
     if (queryParams == null) {
       return '';
     }
@@ -169,7 +169,7 @@ class SigV4 {
     final canonicalQueryStrings = [];
     sortedQueryParams.forEach((key) {
       canonicalQueryStrings.add(
-          '$key=${Uri.encodeQueryComponent(queryParams[key]).replaceAll('+', "%20")}');
+          '$key=${Uri.encodeQueryComponent(queryParams[key]!).replaceAll('+', "%20")}');
     });
 
     return canonicalQueryStrings.join('&');
@@ -214,7 +214,7 @@ class SigV4 {
   static String buildCanonicalRequest(
       String method,
       String path,
-      Map<String, String> queryParams,
+      Map<String, String>? queryParams,
       Map<String, String> headers,
       String payload) {
     final canonicalRequest = [

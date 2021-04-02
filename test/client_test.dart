@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:amazon_cognito_identity_dart_2/src/client.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -34,17 +35,14 @@ void main() {
               'Content-Type': 'application/json',
             }),
           ));
-          break;
         case '/400_unknown_error':
           return Future.value(http.Response('', 400));
-          break;
         case '/400___type':
           return Future.value(http.Response(
               '{"__type": "NotAuthorizedException", '
               '"message": "Logins don\'t match. Please include at least '
               'one valid login for this identity or identity pool."}',
               400));
-          break;
         case '/400_x-amzn-ErrorType':
           return Future<http.Response>.value(http.Response(
               '{"message":"1 validation error detected: Value null at '
@@ -86,7 +84,7 @@ void main() {
       try {
         data = await client.request('TestOperation', paramsReq,
             endpoint: '/400_unknown_error');
-      } catch (e) {
+      } on CognitoClientException catch (e) {
         expect(e.code, equals('UnknownError'));
         expect(e.name, equals('UnknownError'));
         expect(e.statusCode, equals(400));
@@ -107,7 +105,7 @@ void main() {
       try {
         data = await client.request('TestOperation', paramsReq,
             endpoint: '/400___type');
-      } catch (e) {
+      } on CognitoClientException catch (e) {
         expect(e.code, equals('NotAuthorizedException'));
         expect(e.name, equals('NotAuthorizedException'));
         expect(e.statusCode, equals(400));
@@ -130,7 +128,7 @@ void main() {
       try {
         data = await client.request('TestOperation', paramsReq,
             endpoint: '/400_x-amzn-ErrorType');
-      } catch (e) {
+      } on CognitoClientException catch (e) {
         expect(e.code, equals('ValidationException'));
         expect(e.name, equals('ValidationException'));
         expect(e.statusCode, equals(400));

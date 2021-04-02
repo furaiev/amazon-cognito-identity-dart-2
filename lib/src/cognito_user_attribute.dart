@@ -4,7 +4,7 @@ class CognitoUserAttribute {
   String name;
   String value;
 
-  CognitoUserAttribute({this.name, this.value});
+  CognitoUserAttribute({required this.name, required this.value});
 
   String getValue() {
     return value;

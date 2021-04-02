@@ -20,8 +20,8 @@ import 'cognito_user_session.dart';
 import 'date_helper.dart';
 
 class CognitoUserAuthResult {
-  String challengeName;
-  String session;
+  String? challengeName;
+  String? session;
   dynamic authenticationResult;
   CognitoUserAuthResult({
     this.challengeName,
@@ -31,31 +31,32 @@ class CognitoUserAuthResult {
 }
 
 class CognitoUser {
-  String _deviceKey;
-  String _randomPassword;
-  String _deviceGroupKey;
-  String _session;
-  CognitoUserSession _signInUserSession;
+  String? _deviceKey;
+  String? _randomPassword;
+  String? _deviceGroupKey;
+  late String _session;
+  CognitoUserSession? _signInUserSession;
   String username;
-  String _clientSecretHash;
+  String? _clientSecretHash;
   CognitoUserPool pool;
-  Client client;
-  String authenticationFlowType;
+  late Client client;
+  late String authenticationFlowType;
   String deviceName;
-  String verifierDevices;
-  CognitoStorage storage;
+  String? verifierDevices;
+  late CognitoStorage storage;
   final ParamsDecorator _analyticsMetadataParamsDecorator;
 
   CognitoUser(
     this.username,
     this.pool, {
     clientSecret,
-    this.storage,
-    this.deviceName = 'Dart-device',
+    CognitoStorage? storage,
+    String? deviceName,
     signInUserSession,
-    ParamsDecorator analyticsMetadataParamsDecorator,
-  }) : _analyticsMetadataParamsDecorator =
-            analyticsMetadataParamsDecorator ?? NoOpsParamsDecorator() {
+    ParamsDecorator? analyticsMetadataParamsDecorator,
+  })  : _analyticsMetadataParamsDecorator =
+            analyticsMetadataParamsDecorator ?? NoOpsParamsDecorator(),
+        deviceName = deviceName ?? 'Dart-device' {
     if (clientSecret != null) {
       _clientSecretHash =
           calculateClientSecretHash(username, pool.getClientId(), clientSecret);
@@ -66,15 +67,12 @@ class CognitoUser {
     client = pool.client;
     authenticationFlowType = 'USER_SRP_AUTH';
 
-    if (storage == null) {
-      storage = pool.storage;
-    }
-    storage =
-        storage ?? (CognitoStorageHelper(CognitoMemoryStorage())).getStorage();
+    storage ??= pool.storage;
     pool.storage = storage;
   }
 
-  String get keyPrefix => 'CognitoIdentityServiceProvider.${pool.getClientId()}.$username';
+  String get keyPrefix =>
+      'CognitoIdentityServiceProvider.${pool.getClientId()}.$username';
 
   Future<CognitoUserSession> _authenticateUserInternal(
       dataAuthenticate, AuthenticationHelper authenticationHelper) async {
@@ -118,7 +116,7 @@ class CognitoUser {
 
     if (challengeName == 'DEVICE_SRP_AUTH') {
       await getDeviceResponse();
-      return _signInUserSession;
+      return _signInUserSession!;
     }
     _signInUserSession =
         getCognitoUserSession(dataAuthenticate['AuthenticationResult']);
@@ -127,7 +125,7 @@ class CognitoUser {
     final newDeviceMetadata =
         dataAuthenticate['AuthenticationResult']['NewDeviceMetadata'];
     if (newDeviceMetadata == null) {
-      return _signInUserSession;
+      return _signInUserSession!;
     }
 
     authenticationHelper.generateHashDevice(
@@ -140,7 +138,7 @@ class CognitoUser {
     final deviceSecretVerifierConfig = {
       'Salt': base64.encode(hex.decode(authenticationHelper.getSaltDevices())),
       'PasswordVerifier':
-          base64.encode(hex.decode(authenticationHelper.getVerifierDevices()))
+          base64.encode(hex.decode(authenticationHelper.getVerifierDevices()!))
     };
 
     verifierDevices = deviceSecretVerifierConfig['PasswordVerifier'];
@@ -149,7 +147,7 @@ class CognitoUser {
 
     final paramsConfirmDevice = {
       'DeviceKey': newDeviceMetadata['DeviceKey'],
-      'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
+      'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
       'DeviceSecretVerifierConfig': deviceSecretVerifierConfig,
       'DeviceName': deviceName,
     };
@@ -165,17 +163,13 @@ class CognitoUser {
       throw CognitoUserConfirmationNecessaryException(
           signInUserSession: _signInUserSession);
     }
-    return _signInUserSession;
+    return _signInUserSession!;
   }
 
   /// This is used to get a session, either from the session object
   /// or from  the local storage, or by using a refresh token
-  Future<CognitoUserSession> getSession() async {
-    if (username == null) {
-      throw Exception('Username is null. Cannot retrieve a new session');
-    }
-
-    if (_signInUserSession != null && _signInUserSession.isValid()) {
+  Future<CognitoUserSession?> getSession() async {
+    if (_signInUserSession != null && _signInUserSession!.isValid()) {
       return _signInUserSession;
     }
 
@@ -190,7 +184,7 @@ class CognitoUser {
           CognitoAccessToken(await storage.getItem(accessTokenKey));
       final refreshToken =
           CognitoRefreshToken(await storage.getItem(refreshTokenKey));
-      final clockDrift = int.parse(await storage.getItem(clockDriftKey)) ?? 0;
+      final clockDrift = int.parse(await storage.getItem(clockDriftKey));
 
       final cachedSession = CognitoUserSession(
         idToken,
@@ -201,7 +195,7 @@ class CognitoUser {
 
       if (cachedSession.isValid()) {
         _signInUserSession = cachedSession;
-        return _signInUserSession;
+        return _signInUserSession!;
       }
 
       if (refreshToken.getToken() == null) {
@@ -216,13 +210,13 @@ class CognitoUser {
 
   /// This is used to initiate an attribute confirmation request
   Future getAttributeVerificationCode(String attributeName) async {
-    if (_signInUserSession == null || !_signInUserSession.isValid()) {
+    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
       throw Exception('User is not authenticated');
     }
 
     final paramsReq = {
       'AttributeName': attributeName,
-      'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
+      'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
     };
 
     return await client.request('GetUserAttributeVerificationCode', paramsReq);
@@ -230,14 +224,14 @@ class CognitoUser {
 
   /// This is used to confirm an attribute using a confirmation code
   Future<bool> verifyAttribute(attributeName, confirmationCode) async {
-    if (_signInUserSession == null || !_signInUserSession.isValid()) {
+    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
       throw Exception('User is not authenticated');
     }
 
     final paramsReq = {
       'AttributeName': attributeName,
       'Code': confirmationCode,
-      'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
+      'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
     };
     await client.request('VerifyUserAttribute', paramsReq);
 
@@ -245,7 +239,7 @@ class CognitoUser {
   }
 
   /// This uses the refreshToken to retrieve a new session
-  Future<CognitoUserSession> refreshSession(
+  Future<CognitoUserSession?> refreshSession(
       CognitoRefreshToken refreshToken) async {
     final authParameters = {
       'REFRESH_TOKEN': refreshToken.getToken(),
@@ -255,9 +249,9 @@ class CognitoUser {
       username = await storage.getItem(pool.lastUserKey);
       final deviceKeyKey = '$keyPrefix.deviceKey';
       _deviceKey = await storage.getItem(deviceKeyKey);
-      authParameters['DEVICE_KEY'] = _deviceKey;
+      authParameters['DEVICE_KEY'] = _deviceKey!;
       if (_clientSecretHash != null) {
-        authParameters['SECRET_HASH'] = _clientSecretHash;
+        authParameters['SECRET_HASH'] = _clientSecretHash!;
       }
     }
 
@@ -267,7 +261,7 @@ class CognitoUser {
       'AuthParameters': authParameters,
     };
     if (getUserContextData() != null) {
-      paramsReq['UserContextData'] = getUserContextData();
+      paramsReq['UserContextData'] = getUserContextData()!;
     }
 
     var authResult;
@@ -288,12 +282,12 @@ class CognitoUser {
       }
       _signInUserSession = getCognitoUserSession(authenticationResult);
       await cacheTokens();
-      return _signInUserSession;
+      return _signInUserSession!;
     }
     return null;
   }
 
-  CognitoUserSession getSignInUserSession() {
+  CognitoUserSession? getSignInUserSession() {
     return _signInUserSession;
   }
 
@@ -306,11 +300,11 @@ class CognitoUser {
   Future<String> getDeviceKey() async {
     // Return device key if it has been loaded or updated
     if (_deviceKey != null) {
-      return _deviceKey;
+      return _deviceKey!;
     }
     // Otherwise, load from local storage
     await getCachedDeviceKeyAndPassword();
-    return _deviceKey;
+    return _deviceKey!;
   }
 
   String getAuthenticationFlowType() {
@@ -335,7 +329,7 @@ class CognitoUser {
   }
 
   /// This returns the user context data for advanced security feature.
-  String getUserContextData() {
+  String? getUserContextData() {
     return pool.getUserContextData(username);
   }
 
@@ -351,7 +345,7 @@ class CognitoUser {
   /// This is used to get a session using device authentication. It is called at the end of user
   /// authentication
   Future<CognitoUserSession> getDeviceResponse() async {
-    final authenticationHelper = AuthenticationHelper(_deviceGroupKey);
+    final authenticationHelper = AuthenticationHelper(_deviceGroupKey!);
     final dateHelper = DateHelper();
 
     final authParameters = {
@@ -371,7 +365,7 @@ class CognitoUser {
     };
 
     if (getUserContextData() != null) {
-      params['UserContextData'] = getUserContextData();
+      params['UserContextData'] = getUserContextData()!;
     }
 
     final data = await client.request('RespondToAuthChallenge',
@@ -383,15 +377,15 @@ class CognitoUser {
     final salt = BigInt.parse(saltString, radix: 16);
 
     final hkdf = authenticationHelper.getPasswordAuthenticationKey(
-        _deviceKey, _randomPassword, serverBValue, salt);
+        _deviceKey!, _randomPassword!, serverBValue, salt);
 
     final dateNow = dateHelper.getNowString();
 
     final signature = Hmac(sha256, hkdf);
     final signatureData = <int>[];
     signatureData
-      ..addAll(utf8.encode(_deviceGroupKey))
-      ..addAll(utf8.encode(_deviceKey))
+      ..addAll(utf8.encode(_deviceGroupKey!))
+      ..addAll(utf8.encode(_deviceKey!))
       ..addAll(base64.decode(challengeParameters['SECRET_BLOCK']))
       ..addAll(utf8.encode(dateNow));
     final dig = signature.convert(signatureData);
@@ -409,7 +403,8 @@ class CognitoUser {
       challengeResponses['SECRET_HASH'] = _clientSecretHash;
     }
 
-    final paramsResp = {
+    // ignore: omit_local_variable_types
+    final Map<String, Object> paramsResp = {
       'ChallengeName': 'DEVICE_PASSWORD_VERIFIER',
       'ClientId': pool.getClientId(),
       'ChallengeResponses': challengeResponses,
@@ -417,7 +412,7 @@ class CognitoUser {
     };
 
     if (getUserContextData() != null) {
-      paramsResp['UserContextData'] = getUserContextData();
+      paramsResp['UserContextData'] = getUserContextData()!;
     }
 
     final dataAuthenticate = await client.request('RespondToAuthChallenge',
@@ -426,13 +421,14 @@ class CognitoUser {
     _signInUserSession =
         getCognitoUserSession(dataAuthenticate['AuthenticationResult']);
     await cacheTokens();
-    return _signInUserSession;
+    return _signInUserSession!;
   }
 
   /// This is used for authenticating the user through the custom authentication flow.
   Future<CognitoUserSession> initiateAuth(
       AuthenticationDetails authDetails) async {
-    final authParameters =
+    // ignore: omit_local_variable_types
+    final Map<String, dynamic> authParameters =
         authDetails.getAuthParameters().fold({}, (value, element) {
       value[element.name] = element.value;
       return value;
@@ -440,7 +436,7 @@ class CognitoUser {
     authParameters['USERNAME'] = username;
 
     if (_clientSecretHash != null) {
-      authParameters['SECRET_HASH'] = _clientSecretHash;
+      authParameters['SECRET_HASH'] = _clientSecretHash!;
     }
 
     final paramsReq = {
@@ -451,7 +447,7 @@ class CognitoUser {
     };
 
     if (getUserContextData() != null) {
-      paramsReq['UserContextData'] = getUserContextData();
+      paramsReq['UserContextData'] = getUserContextData()!;
     }
 
     final data = await client.request('InitiateAuth',
@@ -468,7 +464,7 @@ class CognitoUser {
     _signInUserSession = getCognitoUserSession(data['AuthenticationResult']);
     await cacheTokens();
 
-    return _signInUserSession;
+    return _signInUserSession!;
   }
 
   /// This is used for authenticating the user.
@@ -490,11 +486,11 @@ class CognitoUser {
 
   /// This is used to globally revoke all tokens issued to a user
   Future<void> globalSignOut() async {
-    if (_signInUserSession == null || !_signInUserSession.isValid()) {
+    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
       throw Exception('User is not authenticated');
     }
     final paramsReq = {
-      'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
+      'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
     };
     await client.request('GlobalSignOut', paramsReq);
     await clearCachedTokens();
@@ -507,7 +503,7 @@ class CognitoUser {
       'PASSWORD': authDetails.getPassword(),
     };
     if (_clientSecretHash != '') {
-      authParameters['SECRET_HASH'] = _clientSecretHash;
+      authParameters['SECRET_HASH'] = _clientSecretHash!;
     }
     if (authParameters['PASSWORD'] == null) {
       throw ArgumentError('PASSWORD parameter is required');
@@ -519,7 +515,7 @@ class CognitoUser {
 
     await getCachedDeviceKeyAndPassword();
     if (_deviceKey != null) {
-      authParameters['DEVICE_KEY'] = _deviceKey;
+      authParameters['DEVICE_KEY'] = _deviceKey!;
     }
 
     final paramsReq = {
@@ -530,7 +526,7 @@ class CognitoUser {
     };
 
     if (getUserContextData() != null) {
-      paramsReq['UserContextData'] = getUserContextData();
+      paramsReq['UserContextData'] = getUserContextData()!;
     }
     final authResult = await client.request('InitiateAuth',
         await _analyticsMetadataParamsDecorator.call(paramsReq));
@@ -575,7 +571,7 @@ class CognitoUser {
     };
 
     if (getUserContextData() != null) {
-      params['UserContextData'] = getUserContextData();
+      params['UserContextData'] = getUserContextData()!;
     }
 
     var data;
@@ -656,7 +652,7 @@ class CognitoUser {
       return dataChallenge;
     }
 
-    final jsonReqResp = {
+    final jsonReqResp = <String, Object>{
       'ChallengeName': 'PASSWORD_VERIFIER',
       'ClientId': pool.getClientId(),
       'ChallengeResponses': challengeResponses,
@@ -664,7 +660,7 @@ class CognitoUser {
     };
 
     if (getUserContextData() != null) {
-      jsonReqResp['UserContextData'] = getUserContextData();
+      jsonReqResp['UserContextData'] = getUserContextData()!;
     }
 
     final dataAuthenticate = await respondToAuthChallenge(
@@ -722,11 +718,11 @@ class CognitoUser {
     };
 
     if (getUserContextData() != null) {
-      params['UserContextData'] = getUserContextData();
+      params['UserContextData'] = getUserContextData()!;
     }
 
     if (_clientSecretHash != null) {
-      params['SecretHash'] = _clientSecretHash;
+      params['SecretHash'] = _clientSecretHash!;
     }
 
     await client.request(
@@ -742,7 +738,7 @@ class CognitoUser {
     };
 
     if (_clientSecretHash != null) {
-      params['SecretHash'] = _clientSecretHash;
+      params['SecretHash'] = _clientSecretHash!;
     }
 
     var data = await client.request('ResendConfirmationCode',
@@ -753,7 +749,7 @@ class CognitoUser {
 
   /// This is used by the user once he has the responses to a custom challenge
   Future<CognitoUserSession> sendCustomChallengeAnswer(String answerChallenge,
-      [Map<String, String> validationData]) async {
+      [Map<String, String> validationData = const {}]) async {
     final challengeResponses = {
       'USERNAME': username,
       'ANSWER': answerChallenge,
@@ -764,11 +760,11 @@ class CognitoUser {
 
     await getCachedDeviceKeyAndPassword();
     if (_deviceKey != null) {
-      challengeResponses['DEVICE_KEY'] = _deviceKey;
+      challengeResponses['DEVICE_KEY'] = _deviceKey!;
     }
 
     if (_clientSecretHash != null) {
-      challengeResponses['SECRET_HASH'] = _clientSecretHash;
+      challengeResponses['SECRET_HASH'] = _clientSecretHash!;
     }
 
     final paramsReq = {
@@ -780,7 +776,7 @@ class CognitoUser {
     };
 
     if (getUserContextData() != null) {
-      paramsReq['UserContextData'] = getUserContextData();
+      paramsReq['UserContextData'] = getUserContextData()!;
     }
 
     final data = await client.request('RespondToAuthChallenge',
@@ -795,7 +791,7 @@ class CognitoUser {
   /// Attributes can be send in the *requiredAttributes* map where a map key is an attribute
   /// name and a map value is an attribute value.
   Future<CognitoUserSession> sendNewPasswordRequiredAnswer(String newPassword,
-      [Map<String, String> requiredAttributes]) async {
+      [Map<String, String>? requiredAttributes]) async {
     final challengeResponses = {
       'USERNAME': username,
       'NEW_PASSWORD': newPassword,
@@ -812,7 +808,7 @@ class CognitoUser {
 
     await getCachedDeviceKeyAndPassword();
     if (_deviceKey != null) {
-      challengeResponses['DEVICE_KEY'] = _deviceKey;
+      challengeResponses['DEVICE_KEY'] = _deviceKey!;
     }
 
     final paramsReq = {
@@ -823,7 +819,7 @@ class CognitoUser {
     };
 
     if (getUserContextData() != null) {
-      paramsReq['UserContextData'] = getUserContextData();
+      paramsReq['UserContextData'] = getUserContextData()!;
     }
 
     final data = await client.request('RespondToAuthChallenge',
@@ -845,7 +841,7 @@ class CognitoUser {
 
     await getCachedDeviceKeyAndPassword();
     if (_deviceKey != null) {
-      challengeResponses['DEVICE_KEY'] = _deviceKey;
+      challengeResponses['DEVICE_KEY'] = _deviceKey!;
     }
 
     final paramsReq = {
@@ -855,7 +851,7 @@ class CognitoUser {
       'Session': _session,
     };
     if (getUserContextData() != null) {
-      paramsReq['UserContextData'] = getUserContextData();
+      paramsReq['UserContextData'] = getUserContextData()!;
     }
 
     final dataAuthenticate = await client.request('RespondToAuthChallenge',
@@ -872,7 +868,7 @@ class CognitoUser {
     await cacheTokens();
 
     if (dataAuthenticate['AuthenticationResult']['NewDeviceMetadata'] == null) {
-      return _signInUserSession;
+      return _signInUserSession!;
     }
 
     final authenticationHelper =
@@ -886,7 +882,7 @@ class CognitoUser {
     final deviceSecretVerifierConfig = {
       'Salt': base64.encode(hex.decode(authenticationHelper.getSaltDevices())),
       'PasswordVerifier':
-          base64.encode(hex.decode(authenticationHelper.getVerifierDevices())),
+          base64.encode(hex.decode(authenticationHelper.getVerifierDevices()!)),
     };
 
     verifierDevices = deviceSecretVerifierConfig['PasswordVerifier'];
@@ -897,7 +893,7 @@ class CognitoUser {
     final confirmDeviceParamsReq = {
       'DeviceKey': dataAuthenticate['AuthenticationResult']['NewDeviceMetadata']
           ['DeviceKey'],
-      'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
+      'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
       'DeviceSecretVerifierConfig': deviceSecretVerifierConfig,
       'DeviceName': deviceName,
     };
@@ -911,23 +907,23 @@ class CognitoUser {
           signInUserSession: _signInUserSession);
     }
 
-    return _signInUserSession;
+    return _signInUserSession!;
   }
 
   /// This is used by an authenticated user to change the current password
   Future<bool> changePassword(
       String oldUserPassword, String newUserPassword) async {
-    if (!(_signInUserSession != null && _signInUserSession.isValid())) {
+    if (!(_signInUserSession != null && _signInUserSession!.isValid())) {
       throw Exception('User is not authenticated');
     }
 
     final paramsReq = {
       'PreviousPassword': oldUserPassword,
       'ProposedPassword': newUserPassword,
-      'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
+      'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
     };
     if (_clientSecretHash != null) {
-      paramsReq['SecretHash'] = _clientSecretHash;
+      paramsReq['SecretHash'] = _clientSecretHash!;
     }
     await client.request('ChangePassword', paramsReq);
 
@@ -936,7 +932,7 @@ class CognitoUser {
 
   /// This is used by authenticated users to enable MFA for him/herself
   Future<bool> enableMfa() async {
-    if (_signInUserSession == null || !_signInUserSession.isValid()) {
+    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
       throw Exception('User is not authenticated');
     }
 
@@ -949,7 +945,7 @@ class CognitoUser {
 
     final paramsReq = {
       'MFAOptions': mfaOptions,
-      'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
+      'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
     };
 
     await client.request('SetUserSettings', paramsReq);
@@ -958,7 +954,7 @@ class CognitoUser {
 
   /// This is used by an authenticated user to disable MFA for him/herself
   Future<bool> disableMfa() async {
-    if (_signInUserSession == null || !_signInUserSession.isValid()) {
+    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
       throw Exception('User is not authenticated');
     }
 
@@ -966,7 +962,7 @@ class CognitoUser {
 
     final paramsReq = {
       'MFAOptions': mfaOptions,
-      'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
+      'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
     };
 
     await client.request('SetUserSettings', paramsReq);
@@ -975,12 +971,12 @@ class CognitoUser {
 
   /// This is used by an authenticated user to get the MFAOptions
   Future<List> getMFAOptions() async {
-    if (!(_signInUserSession != null && _signInUserSession.isValid())) {
+    if (!(_signInUserSession != null && _signInUserSession!.isValid())) {
       throw Exception('User is not authenticated');
     }
 
     final paramsReq = {
-      'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
+      'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
     };
     final userData = await client.request('GetUser', paramsReq);
 
@@ -994,10 +990,10 @@ class CognitoUser {
       'Username': username,
     };
     if (_clientSecretHash != null) {
-      paramsReq['SecretHash'] = _clientSecretHash;
+      paramsReq['SecretHash'] = _clientSecretHash!;
     }
     if (getUserContextData() != null) {
-      paramsReq['UserContextData'] = getUserContextData();
+      paramsReq['UserContextData'] = getUserContextData()!;
     }
 
     return await client.request('ForgotPassword',
@@ -1014,10 +1010,10 @@ class CognitoUser {
       'Password': newPassword,
     };
     if (_clientSecretHash != null) {
-      paramsReq['SecretHash'] = _clientSecretHash;
+      paramsReq['SecretHash'] = _clientSecretHash!;
     }
     if (getUserContextData() != null) {
-      paramsReq['UserContextData'] = getUserContextData();
+      paramsReq['UserContextData'] = getUserContextData()!;
     }
 
     await client.request('ConfirmForgotPassword',
@@ -1034,12 +1030,12 @@ class CognitoUser {
 
     await Future.wait([
       storage.setItem(
-          idTokenKey, _signInUserSession.getIdToken().getJwtToken()),
+          idTokenKey, _signInUserSession!.getIdToken().getJwtToken()),
       storage.setItem(
-          accessTokenKey, _signInUserSession.getAccessToken().getJwtToken()),
+          accessTokenKey, _signInUserSession!.getAccessToken().getJwtToken()),
       storage.setItem(
-          refreshTokenKey, _signInUserSession.getRefreshToken().getToken()),
-      storage.setItem(clockDriftKey, '${_signInUserSession.getClockDrift()}'),
+          refreshTokenKey, _signInUserSession!.getRefreshToken().getToken()),
+      storage.setItem(clockDriftKey, '${_signInUserSession!.getClockDrift()}'),
       storage.setItem(pool.lastUserKey, username),
     ]);
   }
@@ -1087,13 +1083,13 @@ class CognitoUser {
   }
 
   /// This is used by authenticated users to get a list of attributes
-  Future<List<CognitoUserAttribute>> getUserAttributes() async {
-    if (!(_signInUserSession != null && _signInUserSession.isValid())) {
+  Future<List<CognitoUserAttribute>?> getUserAttributes() async {
+    if (!(_signInUserSession != null && _signInUserSession!.isValid())) {
       throw Exception('User is not authenticated');
     }
 
     final paramsReq = {
-      'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
+      'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
     };
     final userData = await client.request('GetUser', paramsReq);
 
@@ -1111,12 +1107,12 @@ class CognitoUser {
 
   /// This is used by authenticated users to change a list of attributes
   Future<bool> updateAttributes(List<CognitoUserAttribute> attributes) async {
-    if (_signInUserSession == null || !_signInUserSession.isValid()) {
+    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
       throw Exception('User is not authenticated');
     }
 
     final paramsReq = {
-      'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
+      'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
       'UserAttributes': attributes,
     };
     await client.request('UpdateUserAttributes', paramsReq);
@@ -1126,12 +1122,12 @@ class CognitoUser {
 
   /// This is used by an authenticated user to delete a list of attributes
   Future<bool> deleteAttributes(List<String> attributeList) async {
-    if (!(_signInUserSession != null && _signInUserSession.isValid())) {
+    if (!(_signInUserSession != null && _signInUserSession!.isValid())) {
       throw Exception('User is not authenticated');
     }
 
     final paramsReq = {
-      'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
+      'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
       'UserAttributeNames': attributeList,
     };
     await client.request('DeleteUserAttributes', paramsReq);
@@ -1141,12 +1137,12 @@ class CognitoUser {
 
   /// This is used by an authenticated user to delete him/herself
   Future<bool> deleteUser() async {
-    if (_signInUserSession == null || !_signInUserSession.isValid()) {
+    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
       throw Exception('User is not authenticated');
     }
 
     final paramsReq = {
-      'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
+      'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
     };
     await client.request('DeleteUser', paramsReq);
     await clearCachedTokens();

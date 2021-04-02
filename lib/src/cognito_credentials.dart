@@ -12,24 +12,24 @@ class CognitoCredentials {
   final Client _client;
 
   int _retryCount = 0;
-  String accessKeyId;
-  String secretAccessKey;
-  String sessionToken;
-  int expireTime;
-  String userIdentityId;
+  String? accessKeyId;
+  String? secretAccessKey;
+  String? sessionToken;
+  int? expireTime;
+  String? userIdentityId;
 
   CognitoCredentials(
     this._identityPoolId,
     this._pool, {
-    String region,
-    String userPoolId,
+    String? region,
+    String? userPoolId,
   })  : _region = region ?? _pool.getRegion(),
         _client = _pool.client;
 
   /// Get AWS Credentials for authenticated user
-  Future<void> getAwsCredentials(token, [String authenticator]) async {
+  Future<void> getAwsCredentials(token, [String? authenticator]) async {
     if (!(expireTime == null ||
-        DateTime.now().millisecondsSinceEpoch > expireTime - 60000)) {
+        DateTime.now().millisecondsSinceEpoch > expireTime! - 60000)) {
       return;
     }
 
@@ -40,7 +40,7 @@ class CognitoCredentials {
 
   Future<void> getGuestAwsCredentialsId() async {
     if (!(expireTime == null ||
-        DateTime.now().millisecondsSinceEpoch > expireTime - 60000)) {
+        DateTime.now().millisecondsSinceEpoch > expireTime! - 60000)) {
       return;
     }
 

@@ -4,7 +4,10 @@ class AttributeArg {
   final String name;
   final String value;
 
-  const AttributeArg({this.name, this.value});
+  const AttributeArg({
+    required this.name,
+    required this.value,
+  });
 
   @override
   String toString() {

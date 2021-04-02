@@ -6,10 +6,10 @@ class AuthenticationDetails {
   Map<String, String> validationData;
   List<AttributeArg> authParameters;
   AuthenticationDetails({
-    this.username,
-    this.password,
-    this.validationData,
-    this.authParameters,
+    required this.username,
+    required this.password,
+    required this.validationData,
+    required this.authParameters,
   });
 
   String getUsername() {

@@ -71,7 +71,7 @@ void main() {
         'nnnnnnnnnnnnnnnnnnnnnnnnnn',
         customClient: c,
       );
-      final data = await cup.signUp('username', 'password');
+      final data = (await cup.signUp('username', 'password'))!;
       expect(data.userConfirmed, equals(true));
       expect(data.userSub, equals('XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'));
     });
@@ -86,7 +86,7 @@ void main() {
         'nnnnnnnnnnnnnnnnnnnnnnnnnn',
         customClient: c,
       );
-      final data = await cup.signUp('username', 'password');
+      final data = (await cup.signUp('username', 'password'))!;
       expect(data.userConfirmed, equals(false));
       expect(data.userSub, equals('XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'));
     });

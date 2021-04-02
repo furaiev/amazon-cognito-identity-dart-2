@@ -8,7 +8,7 @@ import 'user.dart';
 import 'secrets.dart';
 
 class UserService {
-  CognitoUserPool _userPool;
+  final CognitoUserPool _userPool;
   CognitoUser _cognitoUser;
   CognitoUserSession _session;
   UserService(this._userPool);

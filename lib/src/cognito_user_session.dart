@@ -5,17 +5,17 @@ import 'cognito_id_token.dart';
 import 'cognito_refresh_token.dart';
 
 class CognitoUserSession {
-  CognitoIdToken idToken;
-  CognitoRefreshToken refreshToken;
-  CognitoAccessToken accessToken;
-  int clockDrift;
+  final CognitoIdToken idToken;
+  final CognitoRefreshToken refreshToken;
+  final CognitoAccessToken accessToken;
+  late int clockDrift;
   bool _invalidated = false;
 
   CognitoUserSession(
     this.idToken,
     this.accessToken, {
-    this.refreshToken,
-    int clockDrift,
+    required this.refreshToken,
+    int? clockDrift,
   }) {
     this.clockDrift = clockDrift ?? calculateClockDrift();
   }

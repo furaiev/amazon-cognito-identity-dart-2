@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return _userService;
   }
 
-  submit(BuildContext context) async {
+  Future<void> submit(BuildContext context) async {
     _formKey.currentState.save();
     String message;
     try {
@@ -88,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
               print('isAuthenticated $_isAuthenticated');
               return SecureCounterScreen();
             }
-            final Size screenSize = MediaQuery.of(context).size;
+            final screenSize = MediaQuery.of(context).size;
             return Scaffold(
               appBar: AppBar(
                 title: Text('Login'),

@@ -1,11 +1,11 @@
 class CognitoClientException implements Exception {
-  int statusCode;
-  String code;
-  String name;
-  String message;
+  final String message;
+  final int? statusCode;
+  final String code;
+  final String? name;
   CognitoClientException(
     this.message, {
-    this.code,
+    required this.code,
     this.statusCode,
     this.name,
   });

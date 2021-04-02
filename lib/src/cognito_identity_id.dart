@@ -4,19 +4,22 @@ import 'client.dart';
 import 'cognito_user_pool.dart';
 
 class CognitoIdentityId {
-  String identityId;
+  late String identityId;
   final String _identityPoolId;
   final CognitoUserPool _pool;
   final Client _client;
   final String _region;
   final String _identityIdKey;
-  final String _authenticator;
-  final String _token;
-  Map<String, String> _loginParam;
+  final String? _authenticator;
+  final String? _token;
+  Map<String, String>? _loginParam;
 
-  CognitoIdentityId(this._identityPoolId, this._pool,
-      {String authenticator, String token})
-      : _region = _pool.getRegion(),
+  CognitoIdentityId(
+    this._identityPoolId,
+    this._pool, {
+    String? authenticator,
+    String? token,
+  })  : _region = _pool.getRegion(),
         _client = _pool.client,
         _identityIdKey = 'aws.cognito.identity-id.$_identityPoolId',
         _token = token,
@@ -24,15 +27,15 @@ class CognitoIdentityId {
             'cognito-idp.${_pool.getRegion()}.amazonaws.com/${_pool.getUserPoolId()}' {
     if (_token != null && _authenticator != null) {
       _loginParam = {
-        _authenticator: _token,
+        _authenticator!: _token!,
       };
     }
   }
 
-  Map<String, String> get loginParam => _loginParam;
+  Map<String, String>? get loginParam => _loginParam;
 
   Future<String> getIdentityId() async {
-    String identityId = await _pool.storage.getItem(_identityIdKey);
+    String? identityId = await _pool.storage.getItem(_identityIdKey);
     if (identityId != null) {
       this.identityId = identityId;
       return identityId;

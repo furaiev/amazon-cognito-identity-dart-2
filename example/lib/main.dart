@@ -23,8 +23,8 @@ class CounterService {
   Future<Counter> getCounter() async {
     final signedRequest =
         SigV4Request(awsSigV4Client, method: 'GET', path: '/counter');
-    final response =
-        await http.get(signedRequest.url, headers: signedRequest.headers);
+    final response = await http.get(Uri.parse(signedRequest.url),
+        headers: signedRequest.headers);
     return Counter.fromJson(json.decode(response.body));
   }
 
@@ -32,8 +32,8 @@ class CounterService {
   Future<Counter> incrementCounter() async {
     final signedRequest =
         SigV4Request(awsSigV4Client, method: 'PUT', path: '/counter');
-    final response =
-        await http.put(signedRequest.url, headers: signedRequest.headers);
+    final response = await http.put(Uri.parse(signedRequest.url),
+        headers: signedRequest.headers);
     return Counter.fromJson(json.decode(response.body));
   }
 }

@@ -26,27 +26,26 @@ final String _newPasswordRequiredChallengeUserAttributePrefix =
     'userAttributes.';
 
 class AuthenticationHelper {
-  String poolName;
-  BigInt N;
-  BigInt g;
-  BigInt k;
-  List<int> _infoBits;
-  BigInt _smallAValue;
-  BigInt _largeAValue;
-  String _uHexHash;
-  BigInt _uValue;
-  String _randomPassword;
-  String _saltToHashDevices;
-  String _verifierDevices;
-  AuthenticationHelper(this.poolName) {
-    N = BigInt.parse(initN, radix: 16);
-    g = BigInt.parse('2', radix: 16);
+  final String poolName;
+  static final BigInt N = BigInt.parse(initN, radix: 16);
+  static final BigInt g = BigInt.parse('2', radix: 16);
+  late final BigInt k;
+  late final BigInt _smallAValue;
+  final List<int> _infoBits;
+  BigInt? _largeAValue;
+  String? _uHexHash;
+  BigInt? _uValue;
+  String? _randomPassword;
+  late String _saltToHashDevices;
+  String? _verifierDevices;
+
+  AuthenticationHelper(this.poolName)
+      : _infoBits = utf8.encode('Caldera Derived Key') {
     k = BigInt.parse(
       hexHash('00${N.toRadixString(16)}0${g.toRadixString(16)}'),
       radix: 16,
     );
     _smallAValue = generateRandomSmallA();
-    _infoBits = utf8.encode('Caldera Derived Key');
   }
 
   BigInt getSmallAValue() {
@@ -55,13 +54,13 @@ class AuthenticationHelper {
 
   BigInt getLargeAValue() {
     if (_largeAValue != null) {
-      return _largeAValue;
+      return _largeAValue!;
     }
     _largeAValue = calculateA(_smallAValue);
-    return _largeAValue;
+    return _largeAValue!;
   }
 
-  String getRandomPassword() {
+  String? getRandomPassword() {
     return _randomPassword;
   }
 
@@ -69,7 +68,7 @@ class AuthenticationHelper {
     return _saltToHashDevices;
   }
 
-  String getVerifierDevices() {
+  String? getVerifierDevices() {
     return _verifierDevices;
   }
 
@@ -96,7 +95,7 @@ class AuthenticationHelper {
 
     final sValue = calculateS(xValue, serverBValue);
     final hkdf =
-        computehkdf(hex.decode(padHex(sValue)), hex.decode(padHex(_uValue)));
+        computehkdf(hex.decode(padHex(sValue)), hex.decode(padHex(_uValue!)));
     return hkdf;
   }
 
@@ -138,7 +137,8 @@ class AuthenticationHelper {
   /// Calculate a hash from a bitArray
   String hash(List<int> buf) {
     final hashHex = sha256.convert(buf).toString();
-    return (List(64 - hashHex.length).join('0')) + hashHex;
+    return (List.filled(64 - hashHex.length, null, growable: false).join('0')) +
+        hashHex;
   }
 
   /// Calculate a hash from a hex string
@@ -159,16 +159,17 @@ class AuthenticationHelper {
   /// Calculate the client's value U which is the hash of A and B
   BigInt calculateU(BigInt a, BigInt b) {
     _uHexHash = hexHash(padHex(a) + padHex(b));
-    return BigInt.parse(_uHexHash, radix: 16);
+    return BigInt.parse(_uHexHash!, radix: 16);
   }
 
   /// Calculates the S value used in getPasswordAuthenticationKey
   BigInt calculateS(BigInt xValue, BigInt serverBValue) {
     final gModPowXN = modPow(g, xValue, N);
     final intValue2 = serverBValue - (k * gModPowXN);
+    _uValue ??= calculateU(getLargeAValue(), serverBValue);
     final result = modPow(
       intValue2,
-      _smallAValue + (_uValue * xValue),
+      _smallAValue + (_uValue! * xValue),
       N,
     );
     return result % N;

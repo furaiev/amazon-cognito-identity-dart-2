@@ -19,7 +19,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _formKey.currentState.save();
 
     String message;
-    bool signUpSuccess = false;
+    var signUpSuccess = false;
     try {
       _user = await userService.signUp(_user.email, _user.password, _user.name);
       signUpSuccess = true;
@@ -63,7 +63,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
+    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: Text('Sign Up'),

@@ -1,10 +1,9 @@
 import 'dart:convert';
 
 class CognitoJwtToken {
-  String jwtToken;
-  var payload;
-  CognitoJwtToken(String token) {
-    jwtToken = token;
+  final String jwtToken;
+  dynamic payload;
+  CognitoJwtToken(String token) : jwtToken = token {
     payload = decodePayload();
   }
 
@@ -37,7 +36,7 @@ class CognitoJwtToken {
   }
 
   dynamic decodePayload() {
-    var payload = jwtToken.split('.')[1];
+    dynamic payload = jwtToken.split('.')[1];
     if (payload.length % 4 > 0) {
       payload =
           payload.padRight(payload.length + (4 - payload.length % 4), '=');
