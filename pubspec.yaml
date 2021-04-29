@@ -6,7 +6,7 @@ description: Unofficial Amazon Cognito Identity Provider Dart SDK, to add user
   on amazon-cognito-identity-dart
 
 dependencies:
-  convert: ^2.1.1
+  convert: ^3.0.0
   crypto: ^2.0.2+1
   http: ^0.12.1
 
