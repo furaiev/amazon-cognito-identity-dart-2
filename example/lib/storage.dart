@@ -11,11 +11,18 @@ class Storage extends CognitoStorage {
 
   @override
   Future getItem(String key) async {
-    var item = _prefs.getString(key);
-    if (item != null) {
+    try {
+      var item = _prefs.getString(key);
+      if (item == null) {
+        return null;
+      }
+
       return json.decode(item);
+    } on Object catch (e) {
+      print(e);
+
+      return null;
     }
-    return null;
   }
 
   @override

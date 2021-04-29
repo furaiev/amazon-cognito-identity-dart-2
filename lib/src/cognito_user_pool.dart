@@ -24,13 +24,13 @@ class CognitoUserPoolData {
 }
 
 class CognitoUserPool {
-  String? _userPoolId;
+  late String _userPoolId;
   String? _clientId;
   String? _clientSecret;
   String? _region;
   bool advancedSecurityDataCollectionFlag;
   Client? client;
-  CognitoStorage? storage;
+  late final CognitoStorage storage;
   String? _userAgent;
   final ParamsDecorator _analyticsMetadataParamsDecorator;
 
@@ -41,7 +41,7 @@ class CognitoUserPool {
     String? endpoint,
     Client? customClient,
     String? customUserAgent,
-    this.storage,
+    CognitoStorage? storage,
     this.advancedSecurityDataCollectionFlag = true,
     ParamsDecorator? analyticsMetadataParamsDecorator,
   }) : _analyticsMetadataParamsDecorator =
@@ -61,11 +61,14 @@ class CognitoUserPool {
       client = customClient;
     }
 
-    storage =
+    this.storage =
         storage ?? (CognitoStorageHelper(CognitoMemoryStorage())).getStorage();
   }
 
-  String? getUserPoolId() {
+  String get lastUserKey =>
+      'CognitoIdentityServiceProvider.$_clientId.LastAuthUser';
+
+  String getUserPoolId() {
     return _userPoolId;
   }
 
@@ -78,10 +81,7 @@ class CognitoUserPool {
   }
 
   Future<CognitoUser?> getCurrentUser() async {
-    final lastUserKey =
-        'CognitoIdentityServiceProvider.$_clientId.LastAuthUser';
-
-    final lastAuthUser = await storage!.getItem(lastUserKey);
+    final lastAuthUser = await storage.getItem(lastUserKey);
     if (lastAuthUser != null) {
       return CognitoUser(lastAuthUser, this,
           storage: storage,

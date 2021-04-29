@@ -3,9 +3,9 @@
 
 
 **Official package is available - [Amplify Flutter](https://github.com/aws-amplify/amplify-flutter)**
-  
-  
-  
+
+
+
 # Amazon Cognito Identity SDK for Dart
 Unofficial Amazon Cognito Identity SDK written in Dart for [Dart](https://www.dartlang.org/).
 
@@ -35,13 +35,13 @@ __Use Case 1.__ Registering a user with the application. One needs to create a C
 ```dart
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 
-final userPool = new CognitoUserPool(
+final userPool = CognitoUserPool(
   'ap-southeast-1_xxxxxxxxx',
   'xxxxxxxxxxxxxxxxxxxxxxxxxx',
 );
 final userAttributes = [
-  new AttributeArg(name: 'first_name', value: 'Jimmy'),
-  new AttributeArg(name: 'last_name', value: 'Wong'),
+  AttributeArg(name: 'first_name', value: 'Jimmy'),
+  AttributeArg(name: 'last_name', value: 'Wong'),
 ];
 
 var data;
@@ -61,12 +61,12 @@ __Use case 2.__ Confirming a registered, unauthenticated user using a confirmati
 ```dart
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 
-final userPool = new CognitoUserPool(
+final userPool = CognitoUserPool(
   'ap-southeast-1_xxxxxxxxx',
   'xxxxxxxxxxxxxxxxxxxxxxxxxx',
 );
 
-final cognitoUser = new CognitoUser('email@inspire.my', userPool);
+final cognitoUser = CognitoUser('email@inspire.my', userPool);
 
 bool registrationConfirmed = false;
 try {
@@ -82,11 +82,11 @@ __Use case 3.__ Resending a confirmation code via SMS/email for confirming regis
 ```dart
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 
-final userPool = new CognitoUserPool(
+final userPool = CognitoUserPool(
   'ap-southeast-1_xxxxxxxxx',
   'xxxxxxxxxxxxxxxxxxxxxxxxxx',
 );
-final cognitoUser = new CognitoUser('email@inspire.my', userPool);
+final cognitoUser = CognitoUser('email@inspire.my', userPool);
 final String status;
 try {
   status = await cognitoUser.resendConfirmationCode();
@@ -100,12 +100,12 @@ __Use case 4.__ Authenticating a user and establishing a user session with the A
 ```dart
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 
-final userPool = new CognitoUserPool(
+final userPool = CognitoUserPool(
   'ap-southeast-1_xxxxxxxxx',
   'xxxxxxxxxxxxxxxxxxxxxxxxxx',
 );
-final cognitoUser = new CognitoUser('email@inspire.my', userPool);
-final authDetails = new AuthenticationDetails(
+final cognitoUser = CognitoUser('email@inspire.my', userPool);
+final authDetails = AuthenticationDetails(
   username: 'email@inspire.my',
   password: 'Password001',
 );
@@ -185,7 +185,7 @@ __Use case 8.__ Update user attributes for authenticated users.
 
 ```dart
 final List<CognitoUserAttribute> attributes = [];
-attributes.add(new CognitoUserAttribute(name: 'nickname', value: 'joe'));
+attributes.add(CognitoUserAttribute(name: 'nickname', value: 'joe'));
 
 try {
   await cognitoUser.updateAttributes(attributes);
@@ -240,11 +240,11 @@ __Use case 12.__ Starting and completing a forgot password flow for an unauthent
 ```dart
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 
-final userPool = new CognitoUserPool(
+final userPool = CognitoUserPool(
   'ap-southeast-1_xxxxxxxxx',
   'xxxxxxxxxxxxxxxxxxxxxxxxxx',
 );
-final cognitoUser = new CognitoUser('email@inspire.my', userPool);
+final cognitoUser = CognitoUser('email@inspire.my', userPool);
 
 var data;
 try {
@@ -302,16 +302,16 @@ Map<String, String> validationData = {
 __Use case 17.__ Manually set Authorization header (e.g. JWT token)
 
 ```dart
-signedRequest = new SigV4Request(
+signedRequest = SigV4Request(
   awsSigV4Client,
   method: Method.post,
   authorizationHeader: session.idToken.jwtToken, // <---- custom authorizationHeader
   path: '/path',
-  headers: new Map<String, String>.from({
+  headers: Map<String, String>.from({
     CONTENT_TYPE: APPLICATION_GRAPHQL,
     ACCEPT: APPLICATION_JSON,
   }),
-  body: new Map<String, String>.from(
+  body: Map<String, String>.from(
     {
       QUERY: query,
     },
@@ -327,12 +327,12 @@ Moreover the Cognito User Pool service can send a list of required attributes th
 ```dart
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 
-final userPool = new CognitoUserPool(
+final userPool = CognitoUserPool(
   'ap-southeast-1_xxxxxxxxx',
   'xxxxxxxxxxxxxxxxxxxxxxxxxx'
 );
-final cognitoUser = new CognitoUser('email@inspire.my', userPool);
-final authDetails = new AuthenticationDetails(
+final cognitoUser = CognitoUser('email@inspire.my', userPool);
+final authDetails = AuthenticationDetails(
   username: 'email@inspire.my',
   password: 'Password001!',
 );
@@ -417,7 +417,7 @@ Create the session and user with the tokens.
       );
   }
 
-  final userPool = new CognitoUserPool(
+  final userPool = CognitoUserPool(
     'ap-southeast-1_xxxxxxxxx',
     'xxxxxxxxxxxxxxxxxxxxxxxxxx'
   );
@@ -433,11 +433,11 @@ Create the session and user with the tokens.
 
     final tokenData = json.decode(response.body);
 
-    final idToken = new CognitoIdToken(tokenData['id_token']);
-    final accessToken = new CognitoAccessToken(tokenData['access_token']);
-    final refreshToken = new CognitoRefreshToken(tokenData['refresh_token']);
-    final session = new CognitoUserSession(idToken, accessToken, refreshToken: refreshToken);
-    final user = new CognitoUser(null, userPool, signInUserSession: session);
+    final idToken = CognitoIdToken(tokenData['id_token']);
+    final accessToken = CognitoAccessToken(tokenData['access_token']);
+    final refreshToken = CognitoRefreshToken(tokenData['refresh_token']);
+    final session = CognitoUserSession(idToken, accessToken, refreshToken: refreshToken);
+    final user = CognitoUser(null, userPool, signInUserSession: session);
 
     // NOTE: in order to get the email from the list of user attributes, make sure you select email in the list of
     // attributes in Cognito and map it to the email field in the identity provider.
@@ -464,18 +464,18 @@ Get a authenticated user's AWS Credentials. Use with other signing processes lik
 ```dart
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 
-final userPool = new CognitoUserPool(
+final userPool = CognitoUserPool(
   'ap-southeast-1_xxxxxxxxx',
   'xxxxxxxxxxxxxxxxxxxxxxxxxx',
 );
-final cognitoUser = new CognitoUser('email@inspire.my', userPool);
-final authDetails = new AuthenticationDetails(
+final cognitoUser = CognitoUser('email@inspire.my', userPool);
+final authDetails = AuthenticationDetails(
     username: 'email@inspire.my',
     password: 'Password001',
 );
 final session = await cognitoUser.authenticateUser(authDetails);
 
-final credentials = new CognitoCredentials(
+final credentials = CognitoCredentials(
     'ap-southeast-1:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', userPool);
 await credentials.getAwsCredentials(session.getIdToken().getJwtToken());
 print(credentials.accessKeyId);
@@ -813,14 +813,14 @@ import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:amazon_cognito_identity_dart_2/sig_v4.dart';
 
 void main() async {
-  final credentials = new CognitoCredentials(
+  final credentials = CognitoCredentials(
       'ap-southeast-1:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', userPool);
   await credentials.getAwsCredentials(session.getIdToken().getJwtToken());
 
   const endpoint =
       'https://xxxxxxxxxxxxxxxxxxxxxxxxxx.appsync-api.ap-southeast-1.amazonaws.com';
 
-  final awsSigV4Client = new AwsSigV4Client(
+  final awsSigV4Client = AwsSigV4Client(
       credentials.accessKeyId, credentials.secretAccessKey, endpoint,
       serviceName: 'appsync',
       sessionToken: credentials.sessionToken,
@@ -839,11 +839,11 @@ void main() async {
     }
   }''';
 
-  final signedRequest = new SigV4Request(awsSigV4Client,
+  final signedRequest = SigV4Request(awsSigV4Client,
       method: 'POST', path: '/graphql',
-      headers: new Map<String, String>.from(
+      headers: Map<String, String>.from(
           {'Content-Type': 'application/graphql; charset=utf-8'}),
-      body: new Map<String, String>.from({
+      body: Map<String, String>.from({
           'operationName': 'GetEvent',
           'query': query}));
 
@@ -869,24 +869,24 @@ import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:amazon_cognito_identity_dart_2/sig_v4.dart';
 
 void main() async {
-  final credentials = new CognitoCredentials(
+  final credentials = CognitoCredentials(
       'ap-southeast-1:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', userPool);
   await credentials.getAwsCredentials(session.getIdToken().getJwtToken());
 
   const endpoint =
       'https://xxxx.execute-api.ap-southeast-1.amazonaws.com/dev';
-  final awsSigV4Client = new AwsSigV4Client(
+  final awsSigV4Client = AwsSigV4Client(
       credentials.accessKeyId, credentials.secretAccessKey, endpoint,
       sessionToken: credentials.sessionToken,
       region: 'ap-southeast-1');
 
-  final signedRequest = new SigV4Request(awsSigV4Client,
+  final signedRequest = SigV4Request(awsSigV4Client,
       method: 'POST',
       path: '/projects',
-      headers: new Map<String, String>.from(
+      headers: Map<String, String>.from(
           {'header-1': 'one', 'header-2': 'two'}),
-      queryParams: new Map<String, String>.from({'tracking': 'x123'}),
-      body: new Map<String, dynamic>.from({'color': 'blue'}));
+      queryParams: Map<String, String>.from({'tracking': 'x123'}),
+      body: Map<String, dynamic>.from({'color': 'blue'}));
 
   http.Response response;
   try {
@@ -943,16 +943,16 @@ class CustomStorage extends CognitoStorage {
   }
 }
 
-final customStore = new CustomStorage('custom:');
+final customStore = CustomStorage('custom:');
 
-final userPool = new CognitoUserPool(
+final userPool = CognitoUserPool(
   'ap-southeast-1_xxxxxxxxx',
   'xxxxxxxxxxxxxxxxxxxxxxxxxx',
   storage: customStore,
 );
-final cognitoUser = new CognitoUser(
+final cognitoUser = CognitoUser(
   'email@inspire.my', userPool, storage: customStore);
-final authDetails = new AuthenticationDetails(
+final authDetails = AuthenticationDetails(
   username: 'email@inspire.my', password: 'Password001');
 await cognitoUser.authenticateUser(authDetails);
 
@@ -964,7 +964,7 @@ print(session.isValid());
 
 ### Get AWS credentials with facebook
 ```dart
-CognitoCredentials _credential = new CognitoCredentials('ap-southeast-1_xxxxxxxxx', userPool);
+CognitoCredentials _credential = CognitoCredentials('ap-southeast-1_xxxxxxxxx', userPool);
 await _credential.getAwsCredentials(accessToken, 'graph.facebook.com')
 print(_credential.sessionToken);
 ```
@@ -974,7 +974,7 @@ print(_credential.sessionToken);
 The original `amazon-cognito-identity-js` which this library is based off, doesn't support client secret. This feature has been added since version `0.1.9`, to use it, simply set your client secret when creating `CognitoUserPool`:
 
 ```dart
-final userPool = new CognitoUserPool(
+final userPool = CognitoUserPool(
   'ap-southeast-1_xxxxxxxxx',
   'xxxxxxxxxxxxxxxxxxxxxxxxxx',
   clientSecret: 'xxxxxxxxxxxxxxxxxxxxxxx'

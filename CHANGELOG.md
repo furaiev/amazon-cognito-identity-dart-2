@@ -1,3 +1,14 @@
+## 1.0.0
+- Nullsafety branch is merged with latest non-nullsafety changes
+
+## 0.1.25+4
+- Fixed: a storage key issue
+- Fixed: broken lastAuthUser lookup in CognitoUser
+
+## 0.1.25+3
+- Fixed: a storage key issue
+- Defined a local variable `srp_username`, in order to not override `user` value
+
 ## 1.0.0-nullsafety.3
 - Fixed: example
 - Fixed: Retrieving data from Storage as `FutureOr<String?>` breaks clients
