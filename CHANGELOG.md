@@ -1,3 +1,6 @@
+## 1.0.1
+- Storage initialization fixes
+
 ## 1.0.0
 - Nullsafety branch is merged with latest non-nullsafety changes
 

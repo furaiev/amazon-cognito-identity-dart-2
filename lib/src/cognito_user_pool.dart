@@ -30,7 +30,7 @@ class CognitoUserPool {
   String? _region;
   bool advancedSecurityDataCollectionFlag;
   Client? client;
-  late final CognitoStorage storage;
+  late CognitoStorage storage;
   String? _userAgent;
   final ParamsDecorator _analyticsMetadataParamsDecorator;
 

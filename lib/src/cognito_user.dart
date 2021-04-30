@@ -43,7 +43,7 @@ class CognitoUser {
   String? authenticationFlowType;
   String? deviceName;
   String? verifierDevices;
-  late final CognitoStorage storage;
+  late CognitoStorage storage;
   final ParamsDecorator _analyticsMetadataParamsDecorator;
 
   CognitoUser(
