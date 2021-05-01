@@ -75,7 +75,7 @@ class CognitoUser {
 
   Future<CognitoUserSession?> _authenticateUserInternal(
       dataAuthenticate, AuthenticationHelper authenticationHelper) async {
-    final String challengeName = dataAuthenticate['ChallengeName'];
+    final String? challengeName = dataAuthenticate['ChallengeName'];
 
     var challengeParameters = dataAuthenticate['ChallengeParameters'];
 
