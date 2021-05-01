@@ -1,3 +1,6 @@
+## 1.0.2
+- Changed: challengeName as nullable variable
+
 ## 1.0.1
 - Storage initialization fixes
 
