@@ -175,24 +175,11 @@ class AuthenticationHelper {
     return result % N!;
   }
 
-  /// Temporary workaround to BigInt.modPow's bug
-  /// Based on https://github.com/dart-lang/googleapis_auth/blob/master/lib/src/crypto/rsa.dart
   BigInt modPow(BigInt? b, BigInt e, BigInt? m) {
-    if (e < BigInt.one) {
-      return BigInt.one;
+    if (b!=null && m!=null) {
+      return b.modPow(e, m);
     }
-    if (b! < BigInt.zero || b > m!) {
-      b = b % m!;
-    }
-    var r = BigInt.one;
-    while (e > BigInt.zero) {
-      if ((e & BigInt.one) > BigInt.zero) {
-        r = (r * b!) % m;
-      }
-      e >>= 1;
-      b = (b! * b) % m;
-    }
-    return r;
+    return BigInt.one;
   }
 
   /// Standard hkdf algorithm
