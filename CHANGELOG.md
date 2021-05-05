@@ -1,3 +1,6 @@
+## 1.0.3
+- Removed: Temporary workaround to BigInt.modPow
+
 ## 1.0.2
 - Changed: challengeName as nullable variable
 

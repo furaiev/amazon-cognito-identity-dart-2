@@ -38,6 +38,7 @@ class AuthenticationHelper {
   String? _randomPassword;
   String? _saltToHashDevices;
   String? _verifierDevices;
+
   AuthenticationHelper(this.poolName) {
     N = BigInt.parse(initN, radix: 16);
     g = BigInt.parse('2', radix: 16);
@@ -176,7 +177,7 @@ class AuthenticationHelper {
   }
 
   BigInt modPow(BigInt? b, BigInt e, BigInt? m) {
-    if (b!=null && m!=null) {
+    if (b != null && m != null) {
       return b.modPow(e, m);
     }
     return BigInt.one;

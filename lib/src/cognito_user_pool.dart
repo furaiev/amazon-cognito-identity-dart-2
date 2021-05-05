@@ -11,6 +11,7 @@ class CognitoUserPoolData {
   CognitoUser user;
   bool? userConfirmed;
   String? userSub;
+
   CognitoUserPoolData(this.user, {this.userConfirmed, this.userSub});
 
   factory CognitoUserPoolData.fromData(
