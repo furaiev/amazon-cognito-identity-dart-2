@@ -749,6 +749,16 @@ class CognitoUser {
     return data;
   }
 
+  /// This is used by a user to change password when admin creates user which requires force change password
+  Future<void> completeNewPasswordChallenge(String newPassword) async {
+    final challengeResponses = {
+      'USERNAME': username!,
+      'NEW_PASSWORD': newPassword,
+    };
+
+    await respondToChallenge('NEW_PASSWORD_REQUIRED', challengeResponses);
+  }
+
   /// This is used by the user once he has the responses to a custom challenge
 
   Future<CognitoUserSession?> sendCustomChallengeAnswer(String answerChallenge,
@@ -829,6 +839,30 @@ class CognitoUser {
         await _analyticsMetadataParamsDecorator.call(paramsReq));
 
     return _authenticateUserInternal(data, authenticationHelper);
+  }
+
+  Future<dynamic> respondToChallenge(
+    String challengeName,
+    Map<String, String> responses,
+  ) async {
+    await getCachedDeviceKeyAndPassword();
+    
+    if (_deviceKey != null) {
+      responses['DEVICE_KEY'] = _deviceKey!;
+    }
+
+    final paramsReq = {
+      'ChallengeName': challengeName,
+      'ChallengeResponses': responses,
+      'ClientId': pool.getClientId(),
+      'Session': _session,
+    };
+
+    if (getUserContextData() != null) {
+      paramsReq['UserContextData'] = getUserContextData();
+    }
+
+    return await client!.request('RespondToAuthChallenge', paramsReq);
   }
 
   /// This is used by the user once he has an MFA code
