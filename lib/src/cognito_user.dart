@@ -74,7 +74,8 @@ class CognitoUser {
     pool.storage = storage;
   }
 
-  String get keyPrefix => 'CognitoIdentityServiceProvider.${pool.getClientId()}.$username';
+  String get keyPrefix =>
+      'CognitoIdentityServiceProvider.${pool.getClientId()}.$username';
 
   Future<CognitoUserSession> _authenticateUserInternal(
       dataAuthenticate, AuthenticationHelper authenticationHelper) async {
@@ -255,6 +256,7 @@ class CognitoUser {
       username = await storage.getItem(pool.lastUserKey);
       final deviceKeyKey = '$keyPrefix.deviceKey';
       _deviceKey = await storage.getItem(deviceKeyKey);
+      authParameters['USERNAME'] = username;
       authParameters['DEVICE_KEY'] = _deviceKey;
       if (_clientSecretHash != null) {
         authParameters['SECRET_HASH'] = _clientSecretHash;
