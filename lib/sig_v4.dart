@@ -63,13 +63,14 @@ class SigV4Request {
   }) {
     this.method = method.toUpperCase();
     this.path = '${awsSigV4Client.pathComponent}$path';
-    headers = headers ?? {};
+    headers =
+        headers?.map((key, value) => MapEntry(key.toLowerCase(), value)) ?? {};
 
-    if (headers!['Content-Type'] == null && this.method != 'GET') {
-      headers!['Content-Type'] = awsSigV4Client.defaultContentType;
+    if (headers!['content-type'] == null && this.method != 'GET') {
+      headers!['content-type'] = awsSigV4Client.defaultContentType;
     }
-    if (headers!['Accept'] == null) {
-      headers!['Accept'] = awsSigV4Client.defaultAcceptType;
+    if (headers!['accept'] == null) {
+      headers!['accept'] = awsSigV4Client.defaultAcceptType;
     }
     if (body == null || this.method == 'GET') {
       this.body = '';
@@ -77,7 +78,7 @@ class SigV4Request {
       this.body = json.encode(body);
     }
     if (body == '') {
-      headers!.remove('Content-Type');
+      headers!.remove('content-type');
     }
     datetime = datetime ?? SigV4.generateDatetime();
 
@@ -201,8 +202,8 @@ class SigV4 {
     return sortedKeys.join(';');
   }
 
-  static String buildStringToSign(
-      String datetime, String? credentialScope, String? hashedCanonicalRequest) {
+  static String buildStringToSign(String datetime, String? credentialScope,
+      String? hashedCanonicalRequest) {
     return '$_aws_sha_256\n$datetime\n$credentialScope\n$hashedCanonicalRequest';
   }
 
