@@ -23,6 +23,7 @@ class AwsSigV4Client {
   String serviceName;
   String defaultContentType;
   String defaultAcceptType;
+
   AwsSigV4Client(this.accessKey, this.secretKey, String endpoint,
       {this.serviceName = 'execute-api',
       this.region = 'us-east-1',
@@ -51,6 +52,7 @@ class SigV4Request {
   String? datetime;
   late List<int> signingKey;
   late String signature;
+
   SigV4Request(
     this.awsSigV4Client, {
     required String method,

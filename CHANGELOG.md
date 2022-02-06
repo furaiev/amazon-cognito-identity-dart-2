@@ -1,3 +1,9 @@
+## 1.0.5
+- Changed: exports client.dart to facilitate using injection for automated testing
+
+## 1.0.4
+- Changed: SigV4Request headers is case insensitive
+
 ## 1.0.3
 - Removed: Temporary workaround to BigInt.modPow
 
