@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 
+import 'big_int_modpow_base.dart' if (dart.library.io) 'big_int_modpow_mobile.dart' if (dart.library.html) 'big_int_modpow_web.dart';
 import 'random_string_helper.dart';
 
 final String initN = 'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'
@@ -22,8 +23,7 @@ final String initN = 'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'
     'BBE117577A615D6C770988C0BAD946E208E24FA074E5AB31'
     '43DB5BFCE0FD108E4B82D120A93AD2CAFFFFFFFFFFFFFFFF';
 
-final String _newPasswordRequiredChallengeUserAttributePrefix =
-    'userAttributes.';
+final String _newPasswordRequiredChallengeUserAttributePrefix = 'userAttributes.';
 
 class AuthenticationHelper {
   String? poolName;
@@ -80,8 +80,7 @@ class AuthenticationHelper {
   }
 
   /// Calculates the final hkdf based on computed S value, and computed U value and the key
-  List<int> getPasswordAuthenticationKey(
-      String? username, String? password, BigInt serverBValue, BigInt salt) {
+  List<int> getPasswordAuthenticationKey(String? username, String? password, BigInt serverBValue, BigInt salt) {
     if (serverBValue % N! == BigInt.zero) {
       throw ArgumentError('B cannot be zero.');
     }
@@ -92,12 +91,10 @@ class AuthenticationHelper {
 
     final usernamePassword = '$poolName$username:$password';
     final usernamePasswordHash = hash(utf8.encode(usernamePassword));
-    final xValue =
-        BigInt.parse(hexHash(padHex(salt) + usernamePasswordHash), radix: 16);
+    final xValue = BigInt.parse(hexHash(padHex(salt) + usernamePasswordHash), radix: 16);
 
     final sValue = calculateS(xValue, serverBValue);
-    final hkdf =
-        computehkdf(hex.decode(padHex(sValue)), hex.decode(padHex(_uValue!)));
+    final hkdf = computehkdf(hex.decode(padHex(sValue)), hex.decode(padHex(_uValue!)));
     return hkdf;
   }
 
@@ -139,8 +136,7 @@ class AuthenticationHelper {
   /// Calculate a hash from a bitArray
   String hash(List<int> buf) {
     final hashHex = sha256.convert(buf).toString();
-    return (List.filled(64 - hashHex.length, null, growable: false).join('0')) +
-        hashHex;
+    return (List.filled(64 - hashHex.length, null, growable: false).join('0')) + hashHex;
   }
 
   /// Calculate a hash from a hex string
@@ -176,19 +172,11 @@ class AuthenticationHelper {
     return result % N!;
   }
 
-  BigInt modPow(BigInt? b, BigInt e, BigInt? m) {
-    if (b != null && m != null) {
-      return b.modPow(e, m);
-    }
-    return BigInt.one;
-  }
-
   /// Standard hkdf algorithm
   List<int> computehkdf(List<int> ikm, List<int> salt) {
     final hmac1 = Hmac(sha256, salt);
     final prk = hmac1.convert(ikm);
-    final infoBitsUpdate = List<int>.from(_infoBits)
-      ..addAll(utf8.encode(String.fromCharCode(1)));
+    final infoBitsUpdate = List<int>.from(_infoBits)..addAll(utf8.encode(String.fromCharCode(1)));
     final hmac2 = Hmac(sha256, prk.bytes);
     final dig = hmac2.convert(infoBitsUpdate);
     return dig.bytes.getRange(0, 16).toList();
@@ -227,8 +215,7 @@ class AuthenticationHelper {
     if (negative) {
       final toReplace = output[0];
       output = output.substring(1);
-      final updatedLeadingDigit =
-          (int.parse(toReplace) | 0x8).toRadixString(16);
+      final updatedLeadingDigit = (int.parse(toReplace) | 0x8).toRadixString(16);
       output = updatedLeadingDigit + output;
     }
     return output;
