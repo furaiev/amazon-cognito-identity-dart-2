@@ -51,12 +51,11 @@ class Client {
         e.message,
         code: 'NetworkError',
       );
-    } on Object catch (e) {
-      print(e);
+    } on Object catch (_) {
       throw CognitoClientException('Unknown Error', code: 'Unknown error');
     }
 
-    var data;
+    dynamic data;
 
     try {
       data = json.decode(utf8.decode(response.bodyBytes));

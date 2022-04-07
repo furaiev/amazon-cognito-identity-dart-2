@@ -2,7 +2,7 @@ import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final sampleJwt = '0.eyJzdWIiOiIxYzQyMWYwYy03ZmNlLTQ0MDEtOTVlYy'
+  const sampleJwt = '0.eyJzdWIiOiIxYzQyMWYwYy03ZmNlLTQ0MDEtOTVlYy'
       '1lYzA1YTBjNzc0NDkiLCJldmVudF9pZCI6Ijk5NzQ5ODliLTRjNTAtM'
       'TFlOC04ZTcwLWQzNTEwZGY2NDY5YiIsInRva2VuX3VzZSI6ImFjY2Vz'
       'cyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4'

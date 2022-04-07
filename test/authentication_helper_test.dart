@@ -13,15 +13,15 @@ void main() {
   });
   test('.getLargeAValue() returns largeAValue', () {
     final h = AuthenticationHelper('pool_name');
-    expect(h.getLargeAValue(), TypeMatcher<BigInt>());
+    expect(h.getLargeAValue(), const TypeMatcher<BigInt>());
   });
   test('.getSmallAValue() returns largeAValue', () {
     final h = AuthenticationHelper('pool_name');
-    expect(h.getSmallAValue(), TypeMatcher<BigInt>());
+    expect(h.getSmallAValue(), const TypeMatcher<BigInt>());
   });
   test('.generateRandomSmallA() returns 128-length BigInteger', () {
     final h = AuthenticationHelper('pool_name');
-    expect(h.generateRandomSmallA(), TypeMatcher<BigInt>());
+    expect(h.generateRandomSmallA(), const TypeMatcher<BigInt>());
     expect(h.generateRandomSmallA().toRadixString(16).length, equals(128));
   });
   test('.hexHash() generates valid hash', () {

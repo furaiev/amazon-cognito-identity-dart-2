@@ -7,7 +7,7 @@ void main() {
   group('CognitoMemoryStorage', () {
     test('new CognitoStorageHelper() sets up default CognitoMemoryStorage', () {
       final s = CognitoStorageHelper(CognitoMemoryStorage());
-      expect(s.getStorage(), TypeMatcher<CognitoMemoryStorage>());
+      expect(s.getStorage(), const TypeMatcher<CognitoMemoryStorage>());
     });
     test('.getItem() returns default null', () async {
       final s = CognitoStorageHelper(CognitoMemoryStorage()).getStorage();
@@ -39,7 +39,7 @@ void main() {
   group('custom storage', () {
     test('new CognitoStorageHelper() sets up default TestCustomStorage', () {
       final s = CognitoStorageHelper(TestCustomStorage('test:'));
-      expect(s.getStorage(), TypeMatcher<TestCustomStorage>());
+      expect(s.getStorage(), const TypeMatcher<TestCustomStorage>());
     });
     test('.setItem() sets up json value with custom prefixed key', () async {
       final s = CognitoStorageHelper(TestCustomStorage('test:')).getStorage();

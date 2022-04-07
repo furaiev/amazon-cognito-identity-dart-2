@@ -1,3 +1,7 @@
+## 2.0.0
+- implement js BigInt workaround to speed up authenticateUser on flutter web
+- deprecated pedantic replaced with flutter_lints + code style
+
 ## 1.0.5
 - Changed: exports client.dart to facilitate using injection for automated testing
 

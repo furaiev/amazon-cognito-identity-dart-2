@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
-import 'package:amazon_cognito_identity_dart_2/src/client.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:test/test.dart';
@@ -80,7 +79,7 @@ void main() {
       final paramsReq = {
         'color': 'Green',
       };
-      var data;
+      dynamic data;
       try {
         data = await client.request('TestOperation', paramsReq,
             endpoint: '/400_unknown_error');
@@ -101,7 +100,7 @@ void main() {
       final paramsReq = {
         'color': 'Green',
       };
-      var data;
+      dynamic data;
       try {
         data = await client.request('TestOperation', paramsReq,
             endpoint: '/400___type');
@@ -124,7 +123,7 @@ void main() {
       final paramsReq = {
         'color': 'Green',
       };
-      var data;
+      dynamic data;
       try {
         data = await client.request('TestOperation', paramsReq,
             endpoint: '/400_x-amzn-ErrorType');

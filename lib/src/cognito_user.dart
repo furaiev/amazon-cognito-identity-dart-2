@@ -23,6 +23,7 @@ class CognitoUserAuthResult {
   String? challengeName;
   String? session;
   dynamic authenticationResult;
+
   CognitoUserAuthResult({
     this.challengeName,
     this.session,
@@ -268,7 +269,7 @@ class CognitoUser {
       paramsReq['UserContextData'] = getUserContextData();
     }
 
-    var authResult;
+    dynamic authResult;
     try {
       authResult = await client!.request('InitiateAuth',
           await _analyticsMetadataParamsDecorator.call(paramsReq));
@@ -576,7 +577,7 @@ class CognitoUser {
       params['UserContextData'] = getUserContextData();
     }
 
-    var data;
+    dynamic data;
     try {
       data = await client!.request(
           'InitiateAuth', await _analyticsMetadataParamsDecorator.call(params));
@@ -592,14 +593,14 @@ class CognitoUser {
 
     final challengeParameters = data['ChallengeParameters'];
 
-    String srp_username = challengeParameters['USER_ID_FOR_SRP'];
+    String srpUsername = challengeParameters['USER_ID_FOR_SRP'];
     serverBValue = BigInt.parse(challengeParameters['SRP_B'], radix: 16);
     saltString =
         authenticationHelper.toUnsignedHex(challengeParameters['SALT']);
     salt = BigInt.parse(saltString, radix: 16);
 
     var hkdf = authenticationHelper.getPasswordAuthenticationKey(
-      srp_username,
+      srpUsername,
       authDetails.getPassword(),
       serverBValue,
       salt,
@@ -611,14 +612,14 @@ class CognitoUser {
     final signatureData = <int>[];
     signatureData
       ..addAll(utf8.encode(pool.getUserPoolId().split('_')[1]))
-      ..addAll(utf8.encode(srp_username))
+      ..addAll(utf8.encode(srpUsername))
       ..addAll(base64.decode(challengeParameters['SECRET_BLOCK']))
       ..addAll(utf8.encode(dateNow));
     final dig = signature.convert(signatureData);
     final signatureString = base64.encode(dig.bytes);
 
     final challengeResponses = {
-      'USERNAME': srp_username,
+      'USERNAME': srpUsername,
       'PASSWORD_CLAIM_SECRET_BLOCK': challengeParameters['SECRET_BLOCK'],
       'TIMESTAMP': dateNow,
       'PASSWORD_CLAIM_SIGNATURE': signatureString,
@@ -633,7 +634,7 @@ class CognitoUser {
     }
 
     Future<dynamic> respondToAuthChallenge(challenge) async {
-      var dataChallenge;
+      dynamic dataChallenge;
       try {
         dataChallenge =
             await client!.request('RespondToAuthChallenge', challenge);
@@ -671,8 +672,8 @@ class CognitoUser {
     final challengeName = dataAuthenticate['ChallengeName'];
     if (challengeName == 'NEW_PASSWORD_REQUIRED') {
       _session = dataAuthenticate['Session'];
-      var userAttributes;
-      var rawRequiredAttributes;
+      dynamic userAttributes;
+      dynamic rawRequiredAttributes;
       final requiredAttributes = [];
       final userAttributesPrefix = authenticationHelper
           .getNewPasswordRequiredChallengeUserAttributePrefix();

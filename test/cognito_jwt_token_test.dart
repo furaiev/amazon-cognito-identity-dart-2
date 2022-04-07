@@ -2,7 +2,7 @@ import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final sampleJwt = 'eyJraWQiOiJ3dzdRQWdvcmhGaXVqK09qcUdtXC9taWhITkFhMHRyR'
+  const sampleJwt = 'eyJraWQiOiJ3dzdRQWdvcmhGaXVqK09qcUdtXC9taWhITkFhMHRyR'
       'ThcL1wvSnNtWU94VG1ZPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOi'
       'IxYzQyMWYwYy03ZmNlLTQ0MDEtOTVlYy1lYzA1YTBjNzc0NDkiLCJ'
       'ldmVudF9pZCI6Ijk5NzQ5ODliLTRjNTAtMTFlOC04ZTcwLWQzNTEw'
@@ -48,6 +48,9 @@ void main() {
   });
   test('.getIss() returns issuer', () {
     var jwt = CognitoJwtToken(sampleJwt);
-    expect(jwt.getIss(), equals('https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_K8gTNb6fO'));
+    expect(
+        jwt.getIss(),
+        equals(
+            'https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_K8gTNb6fO'));
   });
 }
