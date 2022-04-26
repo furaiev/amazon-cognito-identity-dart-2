@@ -1,3 +1,6 @@
+## 2.0.3
+- added: flutter_test dev dependency
+
 ## 2.0.2
 - added: flutter sdk dependency
 
