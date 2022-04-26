@@ -1,3 +1,6 @@
+## 2.0.1
+- added: flutter dependency
+
 ## 2.0.0
 - implement js BigInt workaround to speed up authenticateUser on flutter web
 - deprecated pedantic replaced with flutter_lints + code style
