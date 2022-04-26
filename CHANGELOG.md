@@ -1,3 +1,6 @@
+## 2.0.2
+- added: flutter sdk dependency
+
 ## 2.0.1
 - added: flutter dependency
 
