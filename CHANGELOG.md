@@ -1,3 +1,6 @@
+## 2.1.0
+- changed: SocketException detecting via pattern (removed dart:io dependency)
+
 ## 2.0.3
 - added: flutter_test dev dependency
 
