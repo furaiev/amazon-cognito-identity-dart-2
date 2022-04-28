@@ -432,7 +432,7 @@ class CognitoUser {
   Future<CognitoUserSession?> initiateAuth(
       AuthenticationDetails authDetails) async {
     final authParameters =
-        authDetails.getAuthParameters()!.fold({}, (dynamic value, element) {
+        (authDetails.getAuthParameters() ?? []).fold({}, (dynamic value, element) {
       value[element.name] = element.value;
       return value;
     });
