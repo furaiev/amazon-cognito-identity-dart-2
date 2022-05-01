@@ -1,3 +1,6 @@
+## 2.1.1
+- fixed: unexpected nullref during "initiateAuth" (authParameters is optional parameter in AuthenticationDetails)
+
 ## 2.1.0
 - changed: SocketException detecting via pattern (removed dart:io dependency)
 
