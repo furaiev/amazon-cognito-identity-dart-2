@@ -1,3 +1,6 @@
+## 2.1.2
+- adds: optional clientMetadata (Map<string,string>) to signup
+
 ## 2.1.1
 - fixed: unexpected nullref during "initiateAuth" (authParameters is optional parameter in AuthenticationDetails)
 

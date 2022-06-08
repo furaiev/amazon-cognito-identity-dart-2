@@ -233,15 +233,7 @@ class SigV4 {
 
   static String buildAuthorizationHeader(String accessKey,
       String credentialScope, Map<String, String?> headers, String signature) {
-    return _awsSha256 +
-        ' Credential=' +
-        accessKey +
-        '/' +
-        credentialScope +
-        ', SignedHeaders=' +
-        buildCanonicalSignedHeaders(headers) +
-        ', Signature=' +
-        signature;
+    return '$_awsSha256 Credential=$accessKey/$credentialScope, SignedHeaders=${buildCanonicalSignedHeaders(headers)}, Signature=$signature';
   }
 
   static List<int> calculateSigningKey(

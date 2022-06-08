@@ -216,7 +216,7 @@ class AuthenticationHelper {
 
     /// Pad string to 32 hex digits (128 bits total)
     while (output.length < 32) {
-      output = '0' + output;
+      output = '0$output';
     }
 
     /// OR in a 1 to the top bit if the original string was negative
