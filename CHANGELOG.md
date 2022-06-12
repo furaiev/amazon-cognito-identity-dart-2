@@ -1,3 +1,6 @@
+## 2.1.3
+- fixes: SECRET_HASH parameter in  `CognitoUser` `refreshSession()`
+
 ## 2.1.2
 - adds: optional clientMetadata (Map<string,string>) to signup
 
