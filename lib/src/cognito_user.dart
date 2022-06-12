@@ -255,9 +255,10 @@ class CognitoUser {
       final deviceKeyKey = '$keyPrefix.deviceKey';
       _deviceKey = await storage.getItem(deviceKeyKey);
       authParameters['DEVICE_KEY'] = _deviceKey;
-      if (_clientSecretHash != null) {
-        authParameters['SECRET_HASH'] = _clientSecretHash;
-      }
+    }
+
+    if (_clientSecretHash != null) {
+      authParameters['SECRET_HASH'] = _clientSecretHash;
     }
 
     final paramsReq = {
