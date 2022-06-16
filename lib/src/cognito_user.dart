@@ -713,8 +713,8 @@ class CognitoUser {
 
   /// This is used for a certain user to confirm the registration by using a confirmation code
   Future<bool> confirmRegistration(String confirmationCode,
-      [bool forceAliasCreation = false,
-      Map<String, String>? clientMetadata]) async {
+      {bool forceAliasCreation = false,
+      Map<String, String>? clientMetadata}) async {
     final params = {
       'ClientId': pool.getClientId(),
       'ConfirmationCode': confirmationCode,
