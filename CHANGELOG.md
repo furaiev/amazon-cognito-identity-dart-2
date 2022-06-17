@@ -1,3 +1,7 @@
+## 3.0.0
+- breaking: confirmRegistration forceAliasCreation parameter as named
+- added: confirmRegistration clientMetadata parameter
+
 ## 2.1.3
 - fixes: SECRET_HASH parameter in  `CognitoUser` `refreshSession()`
 
