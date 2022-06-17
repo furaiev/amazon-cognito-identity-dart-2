@@ -432,8 +432,8 @@ class CognitoUser {
   /// This is used for authenticating the user through the custom authentication flow.
   Future<CognitoUserSession?> initiateAuth(
       AuthenticationDetails authDetails) async {
-    final authParameters =
-        (authDetails.getAuthParameters() ?? []).fold({}, (dynamic value, element) {
+    final authParameters = (authDetails.getAuthParameters() ?? []).fold({},
+        (dynamic value, element) {
       value[element.name] = element.value;
       return value;
     });
@@ -713,12 +713,14 @@ class CognitoUser {
 
   /// This is used for a certain user to confirm the registration by using a confirmation code
   Future<bool> confirmRegistration(String confirmationCode,
-      [bool forceAliasCreation = false]) async {
+      {bool forceAliasCreation = false,
+      Map<String, String>? clientMetadata}) async {
     final params = {
       'ClientId': pool.getClientId(),
       'ConfirmationCode': confirmationCode,
       'Username': username,
       'ForceAliasCreation': forceAliasCreation,
+      'ClientMetadata': clientMetadata
     };
 
     if (getUserContextData() != null) {
