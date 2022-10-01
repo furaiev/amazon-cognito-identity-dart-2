@@ -61,7 +61,10 @@ class CognitoUser {
     if (clientSecret != null) {
       _clientSecret = clientSecret;
       _clientSecretHash = calculateClientSecretHash(
-          username!, pool.getClientId()!, _clientSecret!);
+        username!,
+        pool.getClientId()!,
+        _clientSecret!,
+      );
     }
     if (signInUserSession != null) {
       _signInUserSession = signInUserSession;
@@ -635,7 +638,10 @@ class CognitoUser {
     if (_clientSecretHash != null) {
       // Update client hash with the response from the auth challenge
       _clientSecretHash = calculateClientSecretHash(
-          srpUsername, pool.getClientId()!, _clientSecret!);
+        srpUsername,
+        pool.getClientId()!,
+        _clientSecret!,
+      );
 
       challengeResponses['SECRET_HASH'] = _clientSecretHash;
     }

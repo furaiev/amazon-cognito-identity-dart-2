@@ -1,3 +1,6 @@
+## 3.0.1
+- added: Regen SECRET_HASH using the srp username
+
 ## 3.0.0
 - breaking: confirmRegistration forceAliasCreation parameter as named
 - added: confirmRegistration clientMetadata parameter
