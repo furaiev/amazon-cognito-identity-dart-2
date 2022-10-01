@@ -38,6 +38,7 @@ class CognitoUser {
   String? _session;
   CognitoUserSession? _signInUserSession;
   String? username;
+  String? _clientSecret;
   String? _clientSecretHash;
   CognitoUserPool pool;
   Client? client;
@@ -58,8 +59,9 @@ class CognitoUser {
   }) : _analyticsMetadataParamsDecorator =
             analyticsMetadataParamsDecorator ?? NoOpsParamsDecorator() {
     if (clientSecret != null) {
+      _clientSecret = clientSecret;
       _clientSecretHash = calculateClientSecretHash(
-          username!, pool.getClientId()!, clientSecret);
+          username!, pool.getClientId()!, _clientSecret!);
     }
     if (signInUserSession != null) {
       _signInUserSession = signInUserSession;
@@ -631,6 +633,10 @@ class CognitoUser {
     }
 
     if (_clientSecretHash != null) {
+      // Update client hash with the response from the auth challenge
+      _clientSecretHash = calculateClientSecretHash(
+          srpUsername, pool.getClientId()!, _clientSecret!);
+
       challengeResponses['SECRET_HASH'] = _clientSecretHash;
     }
 
