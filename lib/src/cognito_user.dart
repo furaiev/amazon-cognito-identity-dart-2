@@ -830,6 +830,10 @@ class CognitoUser {
       challengeResponses['DEVICE_KEY'] = _deviceKey;
     }
 
+    if (_clientSecretHash != null) {
+      challengeResponses['SECRET_HASH'] = _clientSecretHash;
+    }
+
     final paramsReq = {
       'ChallengeName': 'NEW_PASSWORD_REQUIRED',
       'ChallengeResponses': challengeResponses,
