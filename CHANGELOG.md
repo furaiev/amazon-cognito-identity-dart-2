@@ -1,3 +1,6 @@
+## 3.0.3
+- fixed: clientSecret instead of client secret hash in refresh session
+-
 ## 3.0.2
 - added: secret hash to sendNewPasswordRequired function
 
