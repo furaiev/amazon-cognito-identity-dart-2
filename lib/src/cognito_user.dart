@@ -262,8 +262,8 @@ class CognitoUser {
       authParameters['DEVICE_KEY'] = _deviceKey;
     }
 
-    if (_clientSecretHash != null) {
-      authParameters['SECRET_HASH'] = _clientSecretHash;
+    if (_clientSecret != null) {
+      authParameters['SECRET_HASH'] = _clientSecret;
     }
 
     final paramsReq = {
