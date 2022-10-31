@@ -481,7 +481,8 @@ class CognitoUser {
       AuthenticationDetails authDetails) async {
     if (authenticationFlowType == 'USER_PASSWORD_AUTH') {
       return await _authenticateUserPlainUsernamePassword(authDetails);
-    } else if (authenticationFlowType == 'USER_SRP_AUTH') {
+    } else if (authenticationFlowType == 'USER_SRP_AUTH' ||
+			         authenticationFlowType == 'CUSTOM_AUTH') {
       return await _authenticateUserDefaultAuth(authDetails);
     }
     throw UnimplementedError('Authentication flow type is not supported.');
