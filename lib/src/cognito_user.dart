@@ -188,34 +188,50 @@ class CognitoUser {
     final refreshTokenKey = '$keyPrefix.refreshToken';
     final clockDriftKey = '$keyPrefix.clockDrift';
 
-    if (await storage.getItem(idTokenKey) != null) {
-      final idToken = CognitoIdToken(await storage.getItem(idTokenKey));
-      final accessToken =
-          CognitoAccessToken(await storage.getItem(accessTokenKey));
-      final refreshToken =
-          CognitoRefreshToken(await storage.getItem(refreshTokenKey));
-      final clockDrift = int.parse(await storage.getItem(clockDriftKey));
+    final refreshTokenValue = await storage.getItem(refreshTokenKey);
+    final refreshToken = CognitoRefreshToken(refreshTokenValue);
+    final canRefreshToken = refreshToken.getToken() != null;
 
-      final cachedSession = CognitoUserSession(
-        idToken,
-        accessToken,
-        refreshToken: refreshToken,
-        clockDrift: clockDrift,
-      );
+    final clockDriftValue = await storage.getItem(clockDriftKey);
+    final clockDrift = int.tryParse(clockDriftValue);
 
-      if (cachedSession.isValid()) {
-        _signInUserSession = cachedSession;
-        return _signInUserSession;
+    final idTokenValue = await storage.getItem(idTokenKey);
+    if (idTokenValue == null) {
+      if (canRefreshToken) {
+        return refreshSession(refreshToken);
       }
+      throw Exception(
+        'Local storage is missing an ID Token, Please authenticate');
+    }
+    final idToken = CognitoIdToken(idTokenValue);
 
-      if (refreshToken.getToken() == null) {
-        throw Exception('Cannot retrieve a new session. Please authenticate.');
+    final accessTokenValue = await storage.getItem(accessTokenKey);
+    if (accessTokenValue == null) {
+      if (canRefreshToken) {
+        return refreshSession(refreshToken);
       }
+      throw Exception(
+        'Local storage is missing an Access Token, Please authenticate');
+    }
+    final accessToken = CognitoAccessToken(accessTokenValue);
 
+    final cachedSession = CognitoUserSession(
+      idToken,
+      accessToken,
+      refreshToken: refreshToken,
+      clockDrift: clockDrift,
+    );
+
+    if (cachedSession.isValid()) {
+      _signInUserSession = cachedSession;
+      return _signInUserSession;
+    }
+
+    if (canRefreshToken) {
       return refreshSession(refreshToken);
     }
-    throw Exception(
-        'Local storage is missing an ID Token, Please authenticate');
+
+    throw Exception('Cannot retrieve a new session. Please authenticate.');
   }
 
   /// This is used to initiate an attribute confirmation request
