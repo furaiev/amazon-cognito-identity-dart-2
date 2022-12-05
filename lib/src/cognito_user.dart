@@ -201,7 +201,7 @@ class CognitoUser {
         return refreshSession(refreshToken);
       }
       throw Exception(
-        'Local storage is missing an ID Token, Please authenticate');
+          'Local storage is missing an ID Token, Please authenticate');
     }
     final idToken = CognitoIdToken(idTokenValue);
 
@@ -211,7 +211,7 @@ class CognitoUser {
         return refreshSession(refreshToken);
       }
       throw Exception(
-        'Local storage is missing an Access Token, Please authenticate');
+          'Local storage is missing an Access Token, Please authenticate');
     }
     final accessToken = CognitoAccessToken(accessTokenValue);
 
