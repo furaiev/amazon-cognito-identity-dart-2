@@ -193,7 +193,7 @@ class CognitoUser {
     final canRefreshToken = refreshToken.getToken() != null;
 
     final clockDriftValue = await storage.getItem(clockDriftKey);
-    final clockDrift = int.tryParse(clockDriftValue);
+    final clockDrift = int.tryParse(clockDriftValue ?? '');
 
     final idTokenValue = await storage.getItem(idTokenKey);
     if (idTokenValue == null) {
