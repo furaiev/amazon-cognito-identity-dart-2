@@ -1,3 +1,6 @@
+## 3.1.1
+- fixed: CognitoUser.getSession throws TypeError when storage returns null for clockDrift
+
 ## 3.1.0
 - feat: try to refresh session if access token is null
 
