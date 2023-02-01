@@ -194,7 +194,7 @@ try {
 }
 ```
 
-__Use case 9.__ Enabling MFA for a user on a pool that has an optional MFA setting for authenticated users.
+__Use case 9.__ Enabling SMS-MFA for a user on a pool that has an optional MFA setting for authenticated users. The phone number needs to be verified
 
 ```dart
 bool mfaEnabled = false;
