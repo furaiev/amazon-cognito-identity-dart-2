@@ -137,4 +137,33 @@ void main() {
           equals('CognitoUserException: User Confirmation Necessary'));
     }
   });
+  test(
+      'throw CognitoUserPhoneNumberVerificationNecessaryException generates message',
+      () {
+    t() => throw CognitoUserPhoneNumberVerificationNecessaryException();
+    try {
+      t();
+    } on CognitoUserPhoneNumberVerificationNecessaryException catch (e) {
+      expect(
+          e.toString(),
+          equals(
+              'CognitoUserException: Verification of Attribute \'phone_number\' Necessary'));
+    }
+    try {
+      t();
+    } on CognitoUserException catch (e) {
+      expect(
+          e.toString(),
+          equals(
+              'CognitoUserException: Verification of Attribute \'phone_number\' Necessary'));
+    }
+    try {
+      t();
+    } catch (e) {
+      expect(
+          e.toString(),
+          equals(
+              'CognitoUserException: Verification of Attribute \'phone_number\' Necessary'));
+    }
+  });
 }
