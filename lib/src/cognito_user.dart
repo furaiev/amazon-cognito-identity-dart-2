@@ -989,7 +989,7 @@ class CognitoUser {
       throw Exception('User is not authenticated');
     }
     
-    bool? phoneNumberVerified = false;
+    bool phoneNumberVerified = false;
     final getUserParamsReq = {
       'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
     };
