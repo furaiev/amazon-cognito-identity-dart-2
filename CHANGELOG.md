@@ -1,3 +1,7 @@
+## 3.2.0
+- added: better handling of unverified phone numbers using sms mfa
+- added: allow CUSTOM_AUTH authentication flow via SRP password verification
+
 ## 3.1.1
 - fixed: CognitoUser.getSession throws TypeError when storage returns null for clockDrift
 
