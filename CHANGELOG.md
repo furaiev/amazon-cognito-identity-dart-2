@@ -1,3 +1,6 @@
+## 3.3.0
+- changed: a specific exception `CognitoUserDeviceConfirmationNecessaryException` that can be handled whenever an users device needs confirmation is separated from `CognitoUserConfirmationNecessaryException`
+
 ## 3.2.0
 - added: better handling of unverified phone numbers using sms mfa
 - added: allow CUSTOM_AUTH authentication flow via SRP password verification
