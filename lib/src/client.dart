@@ -46,7 +46,7 @@ class Client {
         body: body,
       );
     } catch (e) {
-      if (e.toString().contains('SocketException:')) {
+      if (e.cause is SocketException) {
         throw CognitoClientException(
           'SocketException',
           code: 'NetworkError',
