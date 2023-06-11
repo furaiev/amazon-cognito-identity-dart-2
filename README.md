@@ -516,8 +516,9 @@ class Policy {
     this.credential,
     this.maxFileSize,
     this.sessionToken,
-    {this.region = 'us-east-1'},
-   );
+    {
+    this.region = 'us-east-1',
+   });
 
   factory Policy.fromS3PresignedPost(
     String key,
@@ -525,9 +526,9 @@ class Policy {
     int expiryMinutes,
     String accessKeyId,
     int maxFileSize,
-    String sessionToken,
-    {String region},
-   ) {
+    String sessionToken, {
+    String region,
+   }) {
     final datetime = SigV4.generateDatetime();
     final expiration = (DateTime.now())
         .add(Duration(minutes: expiryMinutes))
