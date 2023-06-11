@@ -1,3 +1,6 @@
+## 3.5.0
+- dependencies are updated to the latest
+
 ## 3.4.0
 - fixed: SocketException when network is disabled
 
