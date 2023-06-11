@@ -1,3 +1,6 @@
+## 3.4.0
+- fixed: SocketException when network is disabled
+
 ## 3.3.0
 - changed: a specific exception `CognitoUserDeviceConfirmationNecessaryException` that can be handled whenever an users device needs confirmation is separated from `CognitoUserConfirmationNecessaryException`
 

@@ -46,7 +46,7 @@ class Client {
         body: body,
       );
     } catch (e) {
-      if (e.toString().contains('SocketException:')) {
+      if (e.toString().contains('Failed host lookup:')) {
         throw CognitoClientException(
           'SocketException',
           code: 'NetworkError',
