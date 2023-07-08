@@ -1,3 +1,6 @@
+## 3.6.0-dev.1
+- http dependency includes older 0.13.1 version as valid
+
 ## 3.5.0
 - dependencies are updated to the latest
 
