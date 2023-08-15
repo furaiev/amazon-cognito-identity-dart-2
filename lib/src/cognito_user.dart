@@ -498,7 +498,7 @@ class CognitoUser {
     if (authenticationFlowType == 'USER_PASSWORD_AUTH') {
       return await _authenticateUserPlainUsernamePassword(authDetails);
     } else if (authenticationFlowType == 'USER_SRP_AUTH' ||
-			         authenticationFlowType == 'CUSTOM_AUTH') {
+        authenticationFlowType == 'CUSTOM_AUTH') {
       return await _authenticateUserDefaultAuth(authDetails);
     }
     throw UnimplementedError('Authentication flow type is not supported.');
@@ -581,7 +581,8 @@ class CognitoUser {
     final srpA = authenticationHelper.getLargeAValue()!;
     authParameters['SRP_A'] = srpA.toRadixString(16);
 
-    if (authenticationFlowType == 'CUSTOM_AUTH') {
+    if (authenticationFlowType == 'CUSTOM_AUTH' &&
+        authDetails.getPassword() != null) {
       authParameters['CHALLENGE_NAME'] = 'SRP_A';
     }
 
@@ -989,7 +990,7 @@ class CognitoUser {
     if (_signInUserSession == null || !_signInUserSession!.isValid()) {
       throw Exception('User is not authenticated');
     }
-    
+
     bool phoneNumberVerified = false;
     final getUserParamsReq = {
       'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
@@ -1010,7 +1011,7 @@ class CognitoUser {
     if (!phoneNumberVerified) {
       throw CognitoUserPhoneNumberVerificationNecessaryException(
           signInUserSession: _signInUserSession);
-    }    
+    }
 
     final mfaOptions = [];
     final mfaEnabled = {
