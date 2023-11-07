@@ -1338,4 +1338,36 @@ class CognitoUser {
 
     return this.setUserMfaPreference(smsMfaSettings, softwareTokenMfaSettings);
   }
+
+  /// This is used by an authenticated user to get the preferred MFA method
+  Future<String?> getPreferredMFA() async {
+    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
+      throw Exception('User is not authenticated');
+    }
+
+    final userData = await client!.request(
+      'GetUser',
+      {
+        'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
+      },
+    );
+
+    return userData['PreferredMfaSetting'];
+  }
+
+  /// This is used by an authenticated user to get the available MFA methods
+  Future<String?> getUserMFASettingList() async {
+    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
+      throw Exception('User is not authenticated');
+    }
+
+    final userData = await client!.request(
+      'GetUser',
+      {
+        'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
+      },
+    );
+
+    return userData['UserMFASettingList'];
+  }
 }
