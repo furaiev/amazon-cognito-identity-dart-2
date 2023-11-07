@@ -31,6 +31,34 @@ class CognitoUserAuthResult {
   });
 }
 
+class IMfaSettings {
+  final bool preferredMfa;
+  final bool enabled;
+  IMfaSettings({
+    required this.preferredMfa,
+    required this.enabled,
+  });
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'PreferredMfa': preferredMfa,
+      'Enabled': enabled,
+    };
+  }
+
+  factory IMfaSettings.fromMap(Map<String, dynamic> map) {
+    return IMfaSettings(
+      preferredMfa: map['PreferredMfa'] as bool,
+      enabled: map['Enabled'] as bool,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory IMfaSettings.fromJson(String source) =>
+      IMfaSettings.fromMap(json.decode(source) as Map<String, dynamic>);
+}
+
 class CognitoUser {
   String? _deviceKey;
   String? _randomPassword;
@@ -498,7 +526,7 @@ class CognitoUser {
     if (authenticationFlowType == 'USER_PASSWORD_AUTH') {
       return await _authenticateUserPlainUsernamePassword(authDetails);
     } else if (authenticationFlowType == 'USER_SRP_AUTH' ||
-			         authenticationFlowType == 'CUSTOM_AUTH') {
+        authenticationFlowType == 'CUSTOM_AUTH') {
       return await _authenticateUserDefaultAuth(authDetails);
     }
     throw UnimplementedError('Authentication flow type is not supported.');
@@ -989,7 +1017,7 @@ class CognitoUser {
     if (_signInUserSession == null || !_signInUserSession!.isValid()) {
       throw Exception('User is not authenticated');
     }
-    
+
     bool phoneNumberVerified = false;
     final getUserParamsReq = {
       'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
@@ -1010,7 +1038,7 @@ class CognitoUser {
     if (!phoneNumberVerified) {
       throw CognitoUserPhoneNumberVerificationNecessaryException(
           signInUserSession: _signInUserSession);
-    }    
+    }
 
     final mfaOptions = [];
     final mfaEnabled = {
@@ -1226,5 +1254,88 @@ class CognitoUser {
     await clearCachedTokens();
 
     return true;
+  }
+
+  ///  This is used by an authenticated user trying to authenticate to associate a TOTP MFA
+  Future<String?> associateSoftwareToken() async {
+    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
+      throw Exception('User is not authenticated');
+    }
+    final data = await this.client!.request(
+      'AssociateSoftwareToken',
+      {
+        'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
+      },
+    );
+
+    return data['SecretCode'];
+  }
+
+  /// This is used by an authenticated user trying to authenticate to verify a TOTP MFA
+  Future<bool> verifySoftwareToken(
+      {required String totpCode, String? friendlyDeviceName}) async {
+    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
+      throw Exception('User is not authenticated');
+    }
+    try {
+      final data = await client!.request('VerifySoftwareToken', {
+        'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
+        'UserCode': totpCode,
+        'FriendlyDeviceName': friendlyDeviceName ?? 'My TOTP device',
+      });
+
+      return data['Status'] == 'SUCCESS';
+    } catch (err) {
+      return false;
+    }
+  }
+
+  /// This is used by an authenticated user to enable MFA for itself
+  Future<bool> setUserMfaPreference(IMfaSettings? smsMfaSettings,
+      IMfaSettings? softwareTokenMfaSettings) async {
+    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
+      throw Exception('User is not authenticated');
+    }
+    try {
+      await client!.request('SetUserMFAPreference', {
+        'SMSMfaSettings': smsMfaSettings?.toMap(),
+        'SoftwareTokenMfaSettings': softwareTokenMfaSettings?.toMap(),
+        'AccessToken': _signInUserSession?.getAccessToken().getJwtToken(),
+      });
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  /// Set prefered MFA Method which can be one of the following 'SOFTWARE_TOKEN_MFA' | 'SMS_MFA' | 'NOMFA'
+  Future<bool> setPreferredMFA(String mfaMethod) async {
+    IMfaSettings? smsMfaSettings;
+    IMfaSettings? softwareTokenMfaSettings;
+
+    switch (mfaMethod) {
+      case 'SOFTWARE_TOKEN_MFA':
+        {
+          softwareTokenMfaSettings =
+              IMfaSettings(preferredMfa: true, enabled: true);
+          break;
+        }
+      case 'SMS_MFA':
+        {
+          smsMfaSettings = IMfaSettings(preferredMfa: true, enabled: true);
+          break;
+        }
+      case 'NOMFA':
+        {
+          smsMfaSettings = IMfaSettings(preferredMfa: false, enabled: false);
+          softwareTokenMfaSettings =
+              IMfaSettings(preferredMfa: false, enabled: false);
+          break;
+        }
+      default:
+        throw Exception('No valid MFA method provided');
+    }
+
+    return this.setUserMfaPreference(smsMfaSettings, softwareTokenMfaSettings);
   }
 }
