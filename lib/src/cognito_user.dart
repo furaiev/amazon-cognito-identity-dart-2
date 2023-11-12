@@ -264,9 +264,7 @@ class CognitoUser {
 
   /// This is used to initiate an attribute confirmation request
   Future getAttributeVerificationCode(String attributeName) async {
-    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
-      throw Exception('User is not authenticated');
-    }
+    _signInUserSessionCheck();
 
     final paramsReq = {
       'AttributeName': attributeName,
@@ -278,9 +276,7 @@ class CognitoUser {
 
   /// This is used to confirm an attribute using a confirmation code
   Future<bool> verifyAttribute(attributeName, confirmationCode) async {
-    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
-      throw Exception('User is not authenticated');
-    }
+    _signInUserSessionCheck();
 
     final paramsReq = {
       'AttributeName': attributeName,
@@ -540,9 +536,8 @@ class CognitoUser {
 
   /// This is used to globally revoke all tokens issued to a user
   Future<void> globalSignOut() async {
-    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
-      throw Exception('User is not authenticated');
-    }
+    _signInUserSessionCheck();
+
     final paramsReq = {
       'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
     };
@@ -1014,9 +1009,7 @@ class CognitoUser {
   /// This is used by authenticated users to enable SMS-MFA for him/herself.
   /// A verified phone number is required.
   Future<bool> enableMfa() async {
-    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
-      throw Exception('User is not authenticated');
-    }
+    _signInUserSessionCheck();
 
     bool phoneNumberVerified = false;
     final getUserParamsReq = {
@@ -1058,9 +1051,7 @@ class CognitoUser {
 
   /// This is used by an authenticated user to disable MFA for him/herself
   Future<bool> disableMfa() async {
-    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
-      throw Exception('User is not authenticated');
-    }
+    _signInUserSessionCheck();
 
     final mfaOptions = [];
 
@@ -1213,9 +1204,7 @@ class CognitoUser {
   /// If phone_number is changed it needs to be verified to be able to use it
   /// for MFA.
   Future<bool> updateAttributes(List<CognitoUserAttribute> attributes) async {
-    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
-      throw Exception('User is not authenticated');
-    }
+    _signInUserSessionCheck();
 
     final paramsReq = {
       'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
@@ -1243,9 +1232,7 @@ class CognitoUser {
 
   /// This is used by an authenticated user to delete him/herself
   Future<bool> deleteUser() async {
-    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
-      throw Exception('User is not authenticated');
-    }
+    _signInUserSessionCheck();
 
     final paramsReq = {
       'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
@@ -1258,10 +1245,9 @@ class CognitoUser {
 
   ///  This is used by an authenticated user trying to authenticate to associate a TOTP MFA
   Future<String?> associateSoftwareToken() async {
-    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
-      throw Exception('User is not authenticated');
-    }
-    final data = await this.client!.request(
+    _signInUserSessionCheck();
+
+    final data = await client!.request(
       'AssociateSoftwareToken',
       {
         'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
@@ -1274,9 +1260,7 @@ class CognitoUser {
   /// This is used by an authenticated user trying to authenticate to verify a TOTP MFA
   Future<bool> verifySoftwareToken(
       {required String totpCode, String? friendlyDeviceName}) async {
-    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
-      throw Exception('User is not authenticated');
-    }
+    _signInUserSessionCheck();
     try {
       final data = await client!.request('VerifySoftwareToken', {
         'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
@@ -1291,11 +1275,12 @@ class CognitoUser {
   }
 
   /// This is used by an authenticated user to enable MFA for itself
-  Future<bool> setUserMfaPreference(IMfaSettings? smsMfaSettings,
-      IMfaSettings? softwareTokenMfaSettings) async {
-    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
-      throw Exception('User is not authenticated');
-    }
+  Future<bool> setUserMfaPreference(
+    IMfaSettings? smsMfaSettings,
+    IMfaSettings? softwareTokenMfaSettings,
+  ) async {
+    _signInUserSessionCheck();
+
     try {
       await client!.request('SetUserMFAPreference', {
         'SMSMfaSettings': smsMfaSettings?.toMap(),
@@ -1336,14 +1321,12 @@ class CognitoUser {
         throw Exception('No valid MFA method provided');
     }
 
-    return this.setUserMfaPreference(smsMfaSettings, softwareTokenMfaSettings);
+    return setUserMfaPreference(smsMfaSettings, softwareTokenMfaSettings);
   }
 
   /// This is used by an authenticated user to get the preferred MFA method
   Future<String?> getPreferredMFA() async {
-    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
-      throw Exception('User is not authenticated');
-    }
+    _signInUserSessionCheck();
 
     final userData = await client!.request(
       'GetUser',
@@ -1357,9 +1340,7 @@ class CognitoUser {
 
   /// This is used by an authenticated user to get the available MFA methods
   Future<String?> getUserMFASettingList() async {
-    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
-      throw Exception('User is not authenticated');
-    }
+    _signInUserSessionCheck();
 
     final userData = await client!.request(
       'GetUser',
@@ -1369,5 +1350,11 @@ class CognitoUser {
     );
 
     return userData['UserMFASettingList'];
+  }
+
+  void _signInUserSessionCheck() {
+    if (_signInUserSession == null || !_signInUserSession!.isValid()) {
+      throw Exception('User is not authenticated');
+    }
   }
 }

@@ -1,3 +1,7 @@
+## 3.6.0
+- http dependency includes older 0.13.1 version as valid
+- added: additional support for mfa functionalities
+
 ## 3.6.0-dev.1
 - http dependency includes older 0.13.1 version as valid
 
