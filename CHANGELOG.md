@@ -1,3 +1,6 @@
+## 3.6.2
+- bumped: js from 0.6.7 to 0.7.0
+
 ## 3.6.1
 - fixed: username assignment during _authenticateUserDefaultAuth in CognitoUser
 
