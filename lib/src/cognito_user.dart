@@ -640,6 +640,9 @@ class CognitoUser {
     final challengeParameters = data['ChallengeParameters'];
 
     String srpUsername = challengeParameters['USER_ID_FOR_SRP'];
+    if (username != srpUsername) {
+      username = srpUsername;
+    }
     serverBValue = BigInt.parse(challengeParameters['SRP_B'], radix: 16);
     saltString =
         authenticationHelper.toUnsignedHex(challengeParameters['SALT']);
