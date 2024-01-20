@@ -1,3 +1,6 @@
+## 3.6.1
+- fixed: username assignment during _authenticateUserDefaultAuth in CognitoUser
+
 ## 3.6.0
 - http dependency includes older 0.13.1 version as valid
 - added: additional support for mfa functionalities
