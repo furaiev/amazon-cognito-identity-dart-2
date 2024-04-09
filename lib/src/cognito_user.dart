@@ -904,6 +904,9 @@ class CognitoUser {
     if (mfaType == 'SOFTWARE_TOKEN_MFA') {
       challengeResponses['SOFTWARE_TOKEN_MFA_CODE'] = confirmationCode;
     }
+    if (_clientSecretHash != null) {
+      challengeResponses['SECRET_HASH'] = _clientSecretHash;
+    }
 
     await getCachedDeviceKeyAndPassword();
     if (_deviceKey != null) {
