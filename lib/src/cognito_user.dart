@@ -529,7 +529,18 @@ class CognitoUser {
   }
 
   /// This is used for the user to signOut of the application and clear the cached tokens.
-  Future<void> signOut() async {
+  /// If `revokeRefreshToken` is set to true, it will revoke the refresh token.
+  Future<void> signOut({bool revokeRefreshToken = false}) async {
+    if (revokeRefreshToken && _signInUserSession != null) {
+      final paramsReq = {
+        'ClientId': pool.getClientId(),
+        'Token': _signInUserSession!.getRefreshToken()!.getToken(),
+      };
+      if (_clientSecret != null) {
+        paramsReq['ClientSecret'] = _clientSecret;
+      }
+      await client!.request('RevokeToken', paramsReq);
+    }
     _signInUserSession = null;
     await clearCachedTokens();
   }
