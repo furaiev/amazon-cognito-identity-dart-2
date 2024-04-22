@@ -1,3 +1,6 @@
+## 3.6.4
+- added: optional Refresh Token revocation on sign-out
+
 ## 3.6.3
 - added: secret hash in SMS MFA
 
