@@ -1,3 +1,6 @@
+## 3.6.3
+- added: secret hash in SMS MFA
+
 ## 3.6.2
 - bumped: js from 0.6.7 to 0.7.0
 
