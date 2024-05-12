@@ -1,3 +1,6 @@
+## 3.6.5
+- added: ClientMetaData to a parameter of respondToAuthChallenge
+
 ## 3.6.4
 - added: optional Refresh Token revocation on sign-out
 
