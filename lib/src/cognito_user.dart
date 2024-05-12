@@ -727,6 +727,7 @@ class CognitoUser {
       'ClientId': pool.getClientId(),
       'ChallengeResponses': challengeResponses,
       'Session': data['Session'],
+      'ClientMetadata': authDetails.getValidationData(),
     };
 
     if (getUserContextData() != null) {
