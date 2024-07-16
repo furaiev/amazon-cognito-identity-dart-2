@@ -1114,7 +1114,7 @@ class CognitoUser {
   }
 
   /// This is used to confirm a new password using a confirmation code
-  Future<bool> confirmPassword(
+  Future confirmPassword(
       String confirmationCode, String newPassword) async {
     final paramsReq = {
       'ClientId': pool.getClientId(),
@@ -1129,9 +1129,8 @@ class CognitoUser {
       paramsReq['UserContextData'] = getUserContextData();
     }
 
-    await client!.request('ConfirmForgotPassword',
+    return await client!.request('ConfirmForgotPassword',
         await _analyticsMetadataParamsDecorator.call(paramsReq));
-    return true;
   }
 
   /// This is used to save the session tokens to local storage
