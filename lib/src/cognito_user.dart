@@ -1114,7 +1114,7 @@ class CognitoUser {
   }
 
   /// This is used to confirm a new password using a confirmation code
-  Future<bool> confirmPassword(
+  Future confirmPassword(
       String confirmationCode, String newPassword) async {
     final paramsReq = {
       'ClientId': pool.getClientId(),
