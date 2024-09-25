@@ -34,7 +34,6 @@ class CognitoUserAuthResult {
 class IMfaSettings {
   final bool preferredMfa;
   final bool enabled;
-
   IMfaSettings({
     required this.preferredMfa,
     required this.enabled,
@@ -1264,16 +1263,26 @@ class CognitoUser {
 
   ///  This is used by an authenticated user trying to authenticate to associate a TOTP MFA
   Future<String?> associateSoftwareToken() async {
-    if ((_signInUserSession == null || !_signInUserSession!.isValid()) &&
-        _session == null) {
-      throw Exception('User is not authenticated');
-    }
+    _signInUserSessionCheck();
 
     final data = await client!.request(
       'AssociateSoftwareToken',
       {
-        'AccessToken':
-            _signInUserSession?.getAccessToken().getJwtToken() ?? _session,
+        'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
+      },
+    );
+
+    return data['SecretCode'];
+  }
+
+  ///  This is used by an unauthenticated user trying to authenticate to associate a TOTP MFA
+  Future<String?> associateUnauthenticatedSoftwareToken() async {
+    if (_session == null) throw Exception('Session is not available');
+
+    final data = await client!.request(
+      'AssociateSoftwareToken',
+      {
+        'Session': _session,
       },
     );
 
