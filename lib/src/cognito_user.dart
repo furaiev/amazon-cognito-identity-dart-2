@@ -1314,17 +1314,13 @@ class CognitoUser {
   }) async {
     if (_session == null) throw Exception('Session is not available');
 
-    try {
-      final data = await client!.request('VerifySoftwareToken', {
-        'Session': _session,
-        'UserCode': totpCode,
-        'FriendlyDeviceName': friendlyDeviceName ?? 'My TOTP device',
-      });
+    final data = await client!.request('VerifySoftwareToken', {
+      'Session': _session,
+      'UserCode': totpCode,
+      'FriendlyDeviceName': friendlyDeviceName ?? 'My TOTP device',
+    });
 
-      return data['Status'] == 'SUCCESS';
-    } catch (err) {
-      return false;
-    }
+    return data['Status'] == 'SUCCESS';
   }
 
   /// This is used by an authenticated user to enable MFA for itself
