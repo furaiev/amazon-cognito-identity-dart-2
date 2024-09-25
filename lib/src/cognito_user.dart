@@ -34,6 +34,7 @@ class CognitoUserAuthResult {
 class IMfaSettings {
   final bool preferredMfa;
   final bool enabled;
+
   IMfaSettings({
     required this.preferredMfa,
     required this.enabled,
@@ -1296,6 +1297,26 @@ class CognitoUser {
     try {
       final data = await client!.request('VerifySoftwareToken', {
         'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
+        'UserCode': totpCode,
+        'FriendlyDeviceName': friendlyDeviceName ?? 'My TOTP device',
+      });
+
+      return data['Status'] == 'SUCCESS';
+    } catch (err) {
+      return false;
+    }
+  }
+
+  /// This is used by an unauthenticated user trying to authenticate to verify a TOTP MFA
+  Future<bool> verifyUnauthenticatedSoftwareToken({
+    required String totpCode,
+    String? friendlyDeviceName,
+  }) async {
+    if (_session == null) throw Exception('Session is not available');
+
+    try {
+      final data = await client!.request('VerifySoftwareToken', {
+        'Session': _session,
         'UserCode': totpCode,
         'FriendlyDeviceName': friendlyDeviceName ?? 'My TOTP device',
       });
