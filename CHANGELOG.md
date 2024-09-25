@@ -1,3 +1,6 @@
+## 3.6.5
+- fixed: fallback to `_session` during associateSoftwareToken in CognitoUser if `_signInUserSession` is null or is invalid
+
 ## 3.6.4
 - added: optional Refresh Token revocation on sign-out
 
