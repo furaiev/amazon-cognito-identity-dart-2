@@ -1277,7 +1277,7 @@ class CognitoUser {
   }
 
   ///  This is used by an unauthenticated user trying to authenticate to associate a TOTP MFA
-  Future<String?> associateUnauthenticatedSoftwareToken() async {
+  Future<String?> associateSoftwareTokenPreAuth() async {
     if (_session == null) throw Exception('Session is not available');
 
     final data = await client!.request(
@@ -1286,6 +1286,8 @@ class CognitoUser {
         'Session': _session,
       },
     );
+
+    _session = data["Session"];
 
     return data['SecretCode'];
   }
@@ -1308,7 +1310,7 @@ class CognitoUser {
   }
 
   /// This is used by an unauthenticated user trying to authenticate to verify a TOTP MFA
-  Future<bool> verifyUnauthenticatedSoftwareToken({
+  Future<bool> verifySoftwareTokenPreAuth({
     required String totpCode,
     String? friendlyDeviceName,
   }) async {
