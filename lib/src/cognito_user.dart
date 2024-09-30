@@ -1262,41 +1262,35 @@ class CognitoUser {
     return true;
   }
 
-  ///  This is used by an authenticated user trying to authenticate to associate a TOTP MFA
+  ///  This is used to associate a TOTP MFA
   Future<String?> associateSoftwareToken() async {
-    _signInUserSessionCheck();
+    if (_signInUserSession != null && _signInUserSession!.isValid()) {
+      final data = await client!.request(
+        'AssociateSoftwareToken',
+        {'AccessToken': _signInUserSession!.getAccessToken().getJwtToken()},
+      );
 
-    final data = await client!.request(
-      'AssociateSoftwareToken',
-      {
-        'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
-      },
-    );
+      return data['SecretCode'];
+    } else if (_session != null) {
+      final data = await client!.request(
+        'AssociateSoftwareToken',
+        {'Session': _session},
+      );
 
-    return data['SecretCode'];
+      _session = data["Session"];
+
+      return data['SecretCode'];
+    }
+
+    throw Exception("User is not authenticated");
   }
 
-  ///  This is used by an unauthenticated user trying to authenticate to associate a TOTP MFA
-  Future<String?> associateSoftwareTokenPreAuth() async {
-    if (_session == null) throw Exception('Session is not available');
-
-    final data = await client!.request(
-      'AssociateSoftwareToken',
-      {
-        'Session': _session,
-      },
-    );
-
-    _session = data["Session"];
-
-    return data['SecretCode'];
-  }
-
-  /// This is used by an authenticated user trying to authenticate to verify a TOTP MFA
-  Future<bool> verifySoftwareToken(
-      {required String totpCode, String? friendlyDeviceName}) async {
-    _signInUserSessionCheck();
-    try {
+  /// This is used to verify a TOTP MFA
+  Future<bool> verifySoftwareToken({
+    required String totpCode,
+    String? friendlyDeviceName,
+  }) async {
+    if (_signInUserSession != null && _signInUserSession!.isValid()) {
       final data = await client!.request('VerifySoftwareToken', {
         'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
         'UserCode': totpCode,
@@ -1304,25 +1298,17 @@ class CognitoUser {
       });
 
       return data['Status'] == 'SUCCESS';
-    } catch (err) {
-      return false;
+    } else if (_session != null) {
+      final data = await client!.request('VerifySoftwareToken', {
+        'Session': _session,
+        'UserCode': totpCode,
+        'FriendlyDeviceName': friendlyDeviceName ?? 'My TOTP device',
+      });
+
+      return data['Status'] == 'SUCCESS';
     }
-  }
 
-  /// This is used by an unauthenticated user trying to authenticate to verify a TOTP MFA
-  Future<bool> verifySoftwareTokenPreAuth({
-    required String totpCode,
-    String? friendlyDeviceName,
-  }) async {
-    if (_session == null) throw Exception('Session is not available');
-
-    final data = await client!.request('VerifySoftwareToken', {
-      'Session': _session,
-      'UserCode': totpCode,
-      'FriendlyDeviceName': friendlyDeviceName ?? 'My TOTP device',
-    });
-
-    return data['Status'] == 'SUCCESS';
+    throw Exception("User is not authenticated");
   }
 
   /// This is used by an authenticated user to enable MFA for itself
