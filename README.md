@@ -122,6 +122,8 @@ try {
   // handle MFA_SETUP challenge
 } on CognitoUserTotpRequiredException catch (e) {
   // handle SOFTWARE_TOKEN_MFA challenge
+} on CognitoUserEmailOtpRequiredException catch (e) {
+  // handle EMAIL_OTP challenge
 } on CognitoUserCustomChallengeException catch (e) {
   // handle CUSTOM_CHALLENGE challenge
 } on CognitoUserConfirmationNecessaryException catch (e) {
@@ -359,6 +361,8 @@ try {
     // handle MFA_SETUP challenge
   } on CognitoUserTotpRequiredException catch (e) {
     // handle SOFTWARE_TOKEN_MFA challenge
+  } on CognitoUserEmailOtpRequiredException catch (e) {
+    // handle EMAIL_OTP challenge
   } on CognitoUserCustomChallengeException catch (e) {
     // handle CUSTOM_CHALLENGE challenge
   } catch (e) {
@@ -372,6 +376,8 @@ try {
   // handle MFA_SETUP challenge
 } on CognitoUserTotpRequiredException catch (e) {
   // handle SOFTWARE_TOKEN_MFA challenge
+} on CognitoUserEmailOtpRequiredException catch (e) {
+  // handle EMAIL_OTP . challenge
 } on CognitoUserCustomChallengeException catch (e) {
   // handle CUSTOM_CHALLENGE challenge
 } on CognitoUserConfirmationNecessaryException catch (e) {

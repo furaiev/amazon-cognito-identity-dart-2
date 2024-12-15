@@ -98,6 +98,27 @@ void main() {
           e.toString(), equals('CognitoUserException: "SOFTWARE_TOKEN_MFA"'));
     }
   });
+  test('throw CognitoUserEmailOtpRequiredException generates message', () {
+    t() => throw CognitoUserEmailOtpRequiredException();
+    try {
+      t();
+    } on CognitoUserEmailOtpRequiredException catch (e) {
+      expect(
+          e.toString(), equals('CognitoUserException: "EMAIL_OTP"'));
+    }
+    try {
+      t();
+    } on CognitoUserException catch (e) {
+      expect(
+          e.toString(), equals('CognitoUserException: "EMAIL_OTP"'));
+    }
+    try {
+      t();
+    } catch (e) {
+      expect(
+          e.toString(), equals('CognitoUserException: "EMAIL_OTP"'));
+    }
+  });
   test('throw CognitoUserCustomChallengeException generates message', () {
     t() => throw CognitoUserCustomChallengeException();
     try {
