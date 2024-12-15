@@ -1264,7 +1264,7 @@ class CognitoUser {
 
   ///  This is used to associate a TOTP MFA
   Future<String?> associateSoftwareToken() async {
-    if (_signInUserSession != null && _signInUserSession!.isValid()) {
+    if (_signInUserSession?.isValid() ?? false) {
       final data = await client!.request(
         'AssociateSoftwareToken',
         {'AccessToken': _signInUserSession!.getAccessToken().getJwtToken()},
@@ -1290,7 +1290,7 @@ class CognitoUser {
     required String totpCode,
     String? friendlyDeviceName,
   }) async {
-    if (_signInUserSession != null && _signInUserSession!.isValid()) {
+    if (_signInUserSession?.isValid() ?? false) {
       final data = await client!.request('VerifySoftwareToken', {
         'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
         'UserCode': totpCode,

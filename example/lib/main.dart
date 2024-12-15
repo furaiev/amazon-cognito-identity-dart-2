@@ -22,7 +22,8 @@ class CounterService {
 
   /// Retrieve user's previous count from Lambda + DynamoDB
   Future<Counter> getCounter() async {
-    final signedRequest = SigV4Request(awsSigV4Client, method: 'GET', path: '/counter');
+    final signedRequest =
+        SigV4Request(awsSigV4Client, method: 'GET', path: '/counter');
     final url = signedRequest.url;
 
     Map<String, String>? headers;
@@ -33,8 +34,11 @@ class CounterService {
     if (url != null) {
       final response = await http.get(Uri.parse(url), headers: headers);
 
-      if (response.statusCode != 200 || json.decode(response.body)['count'] == null) {
-        throw HttpException('Cannot get counter, statusCode: ${response.statusCode}, body: ${response.body}');
+      if (response.statusCode != 200 ||
+          json.decode(response.body)['count'] == null) {
+        throw HttpException(
+          'Cannot get counter, statusCode: ${response.statusCode}, body: ${response.body}',
+        );
       }
 
       return Counter.fromJson(json.decode(response.body));
@@ -45,7 +49,8 @@ class CounterService {
 
   /// Increment user's count in DynamoDB
   Future<Counter> incrementCounter() async {
-    final signedRequest = SigV4Request(awsSigV4Client, method: 'PUT', path: '/counter');
+    final signedRequest =
+        SigV4Request(awsSigV4Client, method: 'PUT', path: '/counter');
     final url = signedRequest.url;
     Map<String, String>? headers;
     if (signedRequest.headers != null) {
@@ -53,8 +58,11 @@ class CounterService {
     }
     if (url != null) {
       final response = await http.put(Uri.parse(url), headers: headers);
-      if (response.statusCode != 200 || json.decode(response.body)['count'] == null) {
-        throw HttpException('Cannot get counter, statusCode: ${response.statusCode}, body: ${response.body}');
+      if (response.statusCode != 200 ||
+          json.decode(response.body)['count'] == null) {
+        throw HttpException(
+          'Cannot get counter, statusCode: ${response.statusCode}, body: ${response.body}',
+        );
       }
       return Counter.fromJson(json.decode(response.body));
     } else {
@@ -63,9 +71,11 @@ class CounterService {
   }
 }
 
-void main() => runApp(SecureCounterApp());
+void main() => runApp(const SecureCounterApp());
 
 class SecureCounterApp extends StatelessWidget {
+  const SecureCounterApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -73,7 +83,7 @@ class SecureCounterApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.orange,
       ),
-      home: HomePage(title: 'Cognito on Flutter'),
+      home: const HomePage(title: 'Cognito on Flutter'),
     );
   }
 }

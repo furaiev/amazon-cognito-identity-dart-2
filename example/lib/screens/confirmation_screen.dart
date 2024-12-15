@@ -6,12 +6,12 @@ import 'package:secure_counter/user.dart';
 import 'package:secure_counter/user_service.dart';
 
 class ConfirmationScreen extends StatefulWidget {
-  ConfirmationScreen({Key? key, this.email}) : super(key: key);
+  const ConfirmationScreen({Key? key, this.email}) : super(key: key);
 
   final String? email;
 
   @override
-  _ConfirmationScreenState createState() => _ConfirmationScreenState();
+  State<ConfirmationScreen> createState() => _ConfirmationScreenState();
 }
 
 class _ConfirmationScreenState extends State<ConfirmationScreen> {
@@ -26,7 +26,8 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
     String message;
     try {
       if (_user.email != null) {
-        accountConfirmed = await _userService.confirmAccount(_user.email!, confirmationCode);
+        accountConfirmed =
+            await _userService.confirmAccount(_user.email!, confirmationCode);
         message = 'Account successfully confirmed!';
       } else {
         message = 'Unknown client error occurred';
@@ -54,15 +55,19 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
             Navigator.pop(context);
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => LoginScreen(email: _user.email)),
+              MaterialPageRoute(
+                builder: (context) => LoginScreen(email: _user.email),
+              ),
             );
           }
         },
       ),
-      duration: Duration(seconds: 30),
+      duration: const Duration(seconds: 30),
     );
 
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 
   Future _resendConfirmation(BuildContext context) async {
@@ -76,7 +81,9 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
         message = 'Unknown client error occurred';
       }
     } on CognitoClientException catch (e) {
-      if (e.code == 'LimitExceededException' || e.code == 'InvalidParameterException' || e.code == 'ResourceNotFoundException') {
+      if (e.code == 'LimitExceededException' ||
+          e.code == 'InvalidParameterException' ||
+          e.code == 'ResourceNotFoundException') {
         message = e.message ?? e.code ?? e.toString();
       } else {
         message = 'Unknown client error occurred';
@@ -91,10 +98,12 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
         label: 'OK',
         onPressed: () {},
       ),
-      duration: Duration(seconds: 30),
+      duration: const Duration(seconds: 30),
     );
 
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 
   @override
@@ -102,59 +111,62 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Confirm Account'),
+        title: const Text('Confirm Account'),
       ),
       body: Builder(
-          builder: (BuildContext context) => Container(
-                child: Form(
-                  key: _formKey,
-                  child: ListView(
-                    children: <Widget>[
-                      ListTile(
-                        leading: const Icon(Icons.email),
-                        title: TextFormField(
-                          initialValue: widget.email,
-                          decoration: InputDecoration(hintText: 'example@inspire.my', labelText: 'Email'),
-                          keyboardType: TextInputType.emailAddress,
-                          onSaved: (n) => _user.email = n ?? '',
+          builder: (BuildContext context) => Form(
+                key: _formKey,
+                child: ListView(
+                  children: <Widget>[
+                    ListTile(
+                      leading: const Icon(Icons.email),
+                      title: TextFormField(
+                        initialValue: widget.email,
+                        decoration: const InputDecoration(
+                          hintText: 'example@inspire.my',
+                          labelText: 'Email',
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        onSaved: (n) => _user.email = n ?? '',
+                      ),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.lock),
+                      title: TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Confirmation Code',
+                        ),
+                        onSaved: (c) => confirmationCode = c ?? '',
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(20.0),
+                      width: screenSize.width,
+                      margin: const EdgeInsets.only(
+                        top: 10.0,
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _submit(context);
+                        },
+                        child: const Text(
+                          'Submit',
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
-                      ListTile(
-                        leading: const Icon(Icons.lock),
-                        title: TextFormField(
-                          decoration: InputDecoration(labelText: 'Confirmation Code'),
-                          onSaved: (c) => confirmationCode = c ?? '',
+                    ),
+                    Center(
+                      child: InkWell(
+                        onTap: () {
+                          _resendConfirmation(context);
+                        },
+                        child: const Text(
+                          'Resend Confirmation Code',
+                          style: TextStyle(color: Colors.blueAccent),
                         ),
                       ),
-                      Container(
-                        padding: EdgeInsets.all(20.0),
-                        width: screenSize.width,
-                        margin: EdgeInsets.only(
-                          top: 10.0,
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _submit(context);
-                          },
-                          child: Text(
-                            'Submit',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                      Center(
-                        child: InkWell(
-                          onTap: () {
-                            _resendConfirmation(context);
-                          },
-                          child: Text(
-                            'Resend Confirmation Code',
-                            style: TextStyle(color: Colors.blueAccent),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               )),
     );

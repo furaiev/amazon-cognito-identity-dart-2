@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Extend CognitoStorage with Shared Preferences to persist account
@@ -19,7 +20,9 @@ class Storage extends CognitoStorage {
 
       return json.decode(item);
     } on Object catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
 
       return null;
     }

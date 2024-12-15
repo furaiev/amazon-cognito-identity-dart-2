@@ -8,10 +8,10 @@ import 'package:secure_counter/user.dart';
 import 'package:secure_counter/user_service.dart';
 
 class SecureCounterScreen extends StatefulWidget {
-  SecureCounterScreen({Key? key}) : super(key: key);
+  const SecureCounterScreen({Key? key}) : super(key: key);
 
   @override
-  _SecureCounterScreenState createState() => _SecureCounterScreenState();
+  State<SecureCounterScreen> createState() => _SecureCounterScreenState();
 }
 
 class _SecureCounterScreenState extends State<SecureCounterScreen> {
@@ -55,8 +55,10 @@ class _SecureCounterScreenState extends State<SecureCounterScreen> {
           try {
             _counter = await _counterService.getCounter();
           } catch (e) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(e.toString())));
+            if (context.mounted) {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(e.toString())));
+            }
           }
         }
       }
@@ -64,7 +66,9 @@ class _SecureCounterScreenState extends State<SecureCounterScreen> {
     } on CognitoClientException catch (e) {
       if (e.code == 'NotAuthorizedException') {
         await _userService.signOut();
-        Navigator.pop(context);
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
       }
       rethrow;
     }
@@ -77,12 +81,12 @@ class _SecureCounterScreenState extends State<SecureCounterScreen> {
         builder: (context, AsyncSnapshot<UserService> snapshot) {
           if (snapshot.hasData) {
             if (!_isAuthenticated) {
-              return LoginScreen();
+              return const LoginScreen();
             }
 
             return Scaffold(
               appBar: AppBar(
-                title: Text('Secure Counter'),
+                title: const Text('Secure Counter'),
               ),
               body: Center(
                 child: Column(
@@ -92,22 +96,22 @@ class _SecureCounterScreenState extends State<SecureCounterScreen> {
                       'Welcome ${_user?.name}!',
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
-                    Divider(),
-                    Text(
+                    const Divider(),
+                    const Text(
                       'You have pushed the button this many times:',
                     ),
                     Text(
                       '${_counter.count}',
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
-                    Divider(),
+                    const Divider(),
                     Center(
                       child: InkWell(
                         onTap: () {
                           _userService.signOut();
                           Navigator.pop(context);
                         },
-                        child: Text(
+                        child: const Text(
                           'Logout',
                           style: TextStyle(color: Colors.blueAccent),
                         ),
@@ -123,11 +127,11 @@ class _SecureCounterScreenState extends State<SecureCounterScreen> {
                   }
                 },
                 tooltip: 'Increment',
-                child: Icon(Icons.add),
+                child: const Icon(Icons.add),
               ),
             );
           }
-          return Scaffold(appBar: AppBar(title: Text('Loading...')));
+          return Scaffold(appBar: AppBar(title: const Text('Loading...')));
         });
   }
 }
