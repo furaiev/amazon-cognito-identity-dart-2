@@ -1130,9 +1130,13 @@ class CognitoUser {
       paramsReq['UserContextData'] = getUserContextData();
     }
 
-    await client!.request('ConfirmForgotPassword',
-        await _analyticsMetadataParamsDecorator.call(paramsReq));
-    return true;
+    try {
+      await client!.request('ConfirmForgotPassword',
+          await _analyticsMetadataParamsDecorator.call(paramsReq));
+      return true;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// This is used to save the session tokens to local storage
