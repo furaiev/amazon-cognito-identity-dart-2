@@ -142,6 +142,13 @@ class CognitoUser {
           challengeParameters: challengeParameters);
     }
 
+    if (challengeName == 'EMAIL_OTP') {
+      _session = dataAuthenticate['Session'];
+      throw CognitoUserEmailOtpRequiredException(
+          challengeName: challengeName,
+          challengeParameters: challengeParameters);
+    }
+
     if (challengeName == 'CUSTOM_CHALLENGE') {
       _session = dataAuthenticate['Session'];
       throw CognitoUserCustomChallengeException(
@@ -917,6 +924,9 @@ class CognitoUser {
     if (mfaType == 'SOFTWARE_TOKEN_MFA') {
       challengeResponses['SOFTWARE_TOKEN_MFA_CODE'] = confirmationCode;
     }
+    if (mfaType == 'EMAIL_OTP') {
+      challengeResponses['EMAIL_OTP_CODE'] = confirmationCode;
+    }
     if (_clientSecretHash != null) {
       challengeResponses['SECRET_HASH'] = _clientSecretHash;
     }
@@ -1130,9 +1140,13 @@ class CognitoUser {
       paramsReq['UserContextData'] = getUserContextData();
     }
 
-    await client!.request('ConfirmForgotPassword',
-        await _analyticsMetadataParamsDecorator.call(paramsReq));
-    return true;
+    try {
+      await client!.request('ConfirmForgotPassword',
+          await _analyticsMetadataParamsDecorator.call(paramsReq));
+      return true;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// This is used to save the session tokens to local storage

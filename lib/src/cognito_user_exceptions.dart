@@ -79,6 +79,19 @@ class CognitoUserTotpRequiredException extends CognitoUserException {
       this.message});
 }
 
+class CognitoUserEmailOtpRequiredException extends CognitoUserException {
+  @override
+  String? message;
+  @override
+  String? challengeName;
+  dynamic challengeParameters;
+
+  CognitoUserEmailOtpRequiredException(
+      {this.challengeName = 'EMAIL_OTP',
+      this.challengeParameters,
+      this.message});
+}
+
 class CognitoUserCustomChallengeException extends CognitoUserException {
   @override
   String? message;
