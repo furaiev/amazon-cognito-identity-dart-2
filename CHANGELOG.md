@@ -1,4 +1,9 @@
-## 3.7.0
+## 3.8.0
+- fix: confirmPassword returns response rather than always true
+- feat: email OTP MFA support
+- bumped: flutter_lints from 4.0.0 to 5.0.0
+
+- ## 3.7.0
 - feat: upgraded associateSoftwareToken and verifySoftwareToken to use AssociateSoftwareToken with either an access token or a session string
 - bumped: flutter_lints from 3.0.2 to 4.0.0
 
