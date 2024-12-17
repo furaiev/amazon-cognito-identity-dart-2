@@ -806,9 +806,13 @@ class CognitoUser {
       params['SecretHash'] = _clientSecretHash;
     }
 
-    await client!.request(
-        'ConfirmSignUp', await _analyticsMetadataParamsDecorator.call(params));
-    return true;
+    try {
+      await client!.request(
+          'ConfirmSignUp', await _analyticsMetadataParamsDecorator.call(params));
+      return true;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// This is used by a user to resend a confirmation code
