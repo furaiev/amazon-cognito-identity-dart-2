@@ -66,6 +66,7 @@ class CognitoUser {
   String? _deviceGroupKey;
   String? _session;
   CognitoUserSession? _signInUserSession;
+  String? email;
   String? username;
   String? _clientSecret;
   String? _clientSecretHash;
@@ -80,6 +81,7 @@ class CognitoUser {
   CognitoUser(
     this.username,
     this.pool, {
+    String? email,
     clientSecret,
     CognitoStorage? storage,
     this.deviceName = 'Dart-device',
@@ -87,6 +89,8 @@ class CognitoUser {
     ParamsDecorator? analyticsMetadataParamsDecorator,
   }) : _analyticsMetadataParamsDecorator =
             analyticsMetadataParamsDecorator ?? NoOpsParamsDecorator() {
+    this.email = email ?? username;
+
     if (clientSecret != null) {
       _clientSecret = clientSecret;
       _clientSecretHash = calculateClientSecretHash(
@@ -106,7 +110,7 @@ class CognitoUser {
   }
 
   String get keyPrefix =>
-      'CognitoIdentityServiceProvider.${pool.getClientId()}.$username';
+      'CognitoIdentityServiceProvider.${pool.getClientId()}.$email';
 
   Future<CognitoUserSession?> _authenticateUserInternal(
       dataAuthenticate, AuthenticationHelper authenticationHelper) async {
@@ -303,8 +307,12 @@ class CognitoUser {
       'REFRESH_TOKEN': refreshToken.getToken(),
     };
 
-    if (await storage.getItem(pool.lastUserKey) != null) {
-      username = await storage.getItem(pool.lastUserKey);
+    final lastUsername = await storage.getItem(pool.lastUserUsernameKey);
+    final lastEmail = await storage.getItem(pool.lastUserEmailKey);
+
+    if (lastUsername != null && lastEmail != null) {
+      username = lastUsername;
+      email = lastEmail;
       final deviceKeyKey = '$keyPrefix.deviceKey';
       _deviceKey = await storage.getItem(deviceKeyKey);
       authParameters['DEVICE_KEY'] = _deviceKey;
@@ -1164,7 +1172,8 @@ class CognitoUser {
       storage.setItem(
           refreshTokenKey, _signInUserSession?.getRefreshToken()?.getToken()),
       storage.setItem(clockDriftKey, '${_signInUserSession?.getClockDrift()}'),
-      storage.setItem(pool.lastUserKey, username),
+      storage.setItem(pool.lastUserUsernameKey, username),
+      storage.setItem(pool.lastUserEmailKey, email),
     ]);
   }
 
@@ -1180,7 +1189,8 @@ class CognitoUser {
       storage.removeItem(accessTokenKey),
       storage.removeItem(refreshTokenKey),
       storage.removeItem(clockDriftKey),
-      storage.removeItem(pool.lastUserKey),
+      storage.removeItem(pool.lastUserUsernameKey),
+      storage.removeItem(pool.lastUserEmailKey),
     ]);
   }
 
