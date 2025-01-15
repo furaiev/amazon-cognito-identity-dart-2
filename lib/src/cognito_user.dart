@@ -156,6 +156,22 @@ class CognitoUser {
           challengeParameters: challengeParameters);
     }
 
+    if (challengeName == 'NEW_PASSWORD_REQUIRED') {
+      _session = dataAuthenticate['Session'];
+      dynamic userAttributes = null;
+      List<dynamic>? requiredAttributes = [];
+      if (challengeParameters['userAttributes'] != null) {
+        userAttributes = json.decode(challengeParameters['userAttributes']);
+        requiredAttributes = json.decode(
+          challengeParameters['requiredAttributes'],
+        );
+      }
+      throw CognitoUserNewPasswordRequiredException(
+        userAttributes: userAttributes,
+        requiredAttributes: requiredAttributes,
+      );
+    }
+
     if (challengeName == 'DEVICE_SRP_AUTH') {
       await getDeviceResponse();
       return _signInUserSession;
