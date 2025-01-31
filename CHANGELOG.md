@@ -1,3 +1,6 @@
+## 3.8.1
+- feat: new password challenge support
+
 ## 3.8.0
 - fix: confirmPassword returns response rather than always true
 - feat: email OTP MFA support

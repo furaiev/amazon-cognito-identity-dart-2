@@ -158,7 +158,7 @@ class CognitoUser {
 
     if (challengeName == 'NEW_PASSWORD_REQUIRED') {
       _session = dataAuthenticate['Session'];
-      dynamic userAttributes = null;
+      dynamic userAttributes;
       List<dynamic>? requiredAttributes = [];
       if (challengeParameters['userAttributes'] != null) {
         userAttributes = json.decode(challengeParameters['userAttributes']);
@@ -1156,13 +1156,9 @@ class CognitoUser {
       paramsReq['UserContextData'] = getUserContextData();
     }
 
-    try {
-      await client!.request('ConfirmForgotPassword',
-          await _analyticsMetadataParamsDecorator.call(paramsReq));
-      return true;
-    } catch (e) {
-      rethrow;
-    }
+    await client!.request('ConfirmForgotPassword',
+        await _analyticsMetadataParamsDecorator.call(paramsReq));
+    return true;
   }
 
   /// This is used to save the session tokens to local storage
