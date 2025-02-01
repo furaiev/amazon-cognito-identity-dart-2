@@ -6,8 +6,10 @@ import 'package:secure_counter/user.dart';
 import 'package:secure_counter/user_service.dart';
 
 class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({Key? key}) : super(key: key);
+
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
@@ -22,7 +24,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     var signUpSuccess = false;
     if (_user.email != null && _user.password != null && _user.name != null) {
       try {
-        _user = await userService.signUp(_user.email!, _user.password!, _user.name!);
+        _user = await userService.signUp(
+          _user.email!,
+          _user.password!,
+          _user.name!,
+        );
         signUpSuccess = true;
         message = 'User sign up successful!';
       } on CognitoClientException catch (e) {
@@ -51,75 +57,78 @@ class _SignUpScreenState extends State<SignUpScreen> {
             if (!_user.confirmed) {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ConfirmationScreen(email: _user.email!)),
+                MaterialPageRoute(
+                  builder: (context) => ConfirmationScreen(email: _user.email!),
+                ),
               );
             }
           }
         },
       ),
-      duration: Duration(seconds: 30),
+      duration: const Duration(seconds: 30),
     );
 
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Sign Up'),
-      ),
+      appBar: AppBar(title: const Text('Sign Up')),
       body: Builder(
         builder: (BuildContext context) {
-          return Container(
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                children: <Widget>[
-                  ListTile(
-                    leading: const Icon(Icons.account_box),
-                    title: TextFormField(
-                      decoration: InputDecoration(labelText: 'Name'),
-                      onSaved: (n) => _user.name = n,
+          return Form(
+            key: _formKey,
+            child: ListView(
+              children: <Widget>[
+                ListTile(
+                  leading: const Icon(Icons.account_box),
+                  title: TextFormField(
+                    decoration: const InputDecoration(labelText: 'Name'),
+                    onSaved: (n) => _user.name = n,
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.email),
+                  title: TextFormField(
+                    decoration: const InputDecoration(
+                      hintText: 'example@inspire.my',
+                      labelText: 'Email',
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    onSaved: (n) => _user.email = n,
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.lock),
+                  title: TextFormField(
+                    decoration: const InputDecoration(
+                      hintText: 'Password!',
+                    ),
+                    obscureText: true,
+                    onSaved: (n) => _user.password = n,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(20.0),
+                  width: screenSize.width,
+                  margin: const EdgeInsets.only(
+                    top: 10.0,
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      submit(context);
+                    },
+                    child: const Text(
+                      'Sign Up',
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.email),
-                    title: TextFormField(
-                      decoration: InputDecoration(hintText: 'example@inspire.my', labelText: 'Email'),
-                      keyboardType: TextInputType.emailAddress,
-                      onSaved: (n) => _user.email = n,
-                    ),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.lock),
-                    title: TextFormField(
-                      decoration: InputDecoration(
-                        hintText: 'Password!',
-                      ),
-                      obscureText: true,
-                      onSaved: (n) => _user.password = n,
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(20.0),
-                    width: screenSize.width,
-                    margin: EdgeInsets.only(
-                      top: 10.0,
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        submit(context);
-                      },
-                      child: Text(
-                        'Sign Up',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         },

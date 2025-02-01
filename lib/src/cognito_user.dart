@@ -34,6 +34,7 @@ class CognitoUserAuthResult {
 class IMfaSettings {
   final bool preferredMfa;
   final bool enabled;
+
   IMfaSettings({
     required this.preferredMfa,
     required this.enabled,
@@ -145,11 +146,34 @@ class CognitoUser {
           challengeParameters: challengeParameters);
     }
 
+    if (challengeName == 'EMAIL_OTP') {
+      _session = dataAuthenticate['Session'];
+      throw CognitoUserEmailOtpRequiredException(
+          challengeName: challengeName,
+          challengeParameters: challengeParameters);
+    }
+
     if (challengeName == 'CUSTOM_CHALLENGE') {
       _session = dataAuthenticate['Session'];
       throw CognitoUserCustomChallengeException(
           challengeName: challengeName,
           challengeParameters: challengeParameters);
+    }
+
+    if (challengeName == 'NEW_PASSWORD_REQUIRED') {
+      _session = dataAuthenticate['Session'];
+      dynamic userAttributes;
+      List<dynamic>? requiredAttributes = [];
+      if (challengeParameters['userAttributes'] != null) {
+        userAttributes = json.decode(challengeParameters['userAttributes']);
+        requiredAttributes = json.decode(
+          challengeParameters['requiredAttributes'],
+        );
+      }
+      throw CognitoUserNewPasswordRequiredException(
+        userAttributes: userAttributes,
+        requiredAttributes: requiredAttributes,
+      );
     }
 
     if (challengeName == 'DEVICE_SRP_AUTH') {
@@ -537,7 +561,18 @@ class CognitoUser {
   }
 
   /// This is used for the user to signOut of the application and clear the cached tokens.
-  Future<void> signOut() async {
+  /// If `revokeRefreshToken` is set to true, it will revoke the refresh token.
+  Future<void> signOut({bool revokeRefreshToken = false}) async {
+    if (revokeRefreshToken && _signInUserSession != null) {
+      final paramsReq = {
+        'ClientId': pool.getClientId(),
+        'Token': _signInUserSession!.getRefreshToken()!.getToken(),
+      };
+      if (_clientSecret != null) {
+        paramsReq['ClientSecret'] = _clientSecret;
+      }
+      await client!.request('RevokeToken', paramsReq);
+    }
     _signInUserSession = null;
     await clearCachedTokens();
   }
@@ -724,6 +759,7 @@ class CognitoUser {
       'ClientId': pool.getClientId(),
       'ChallengeResponses': challengeResponses,
       'Session': data['Session'],
+      'ClientMetadata': authDetails.getValidationData(),
     };
 
     if (getUserContextData() != null) {
@@ -911,6 +947,9 @@ class CognitoUser {
     };
     if (mfaType == 'SOFTWARE_TOKEN_MFA') {
       challengeResponses['SOFTWARE_TOKEN_MFA_CODE'] = confirmationCode;
+    }
+    if (mfaType == 'EMAIL_OTP') {
+      challengeResponses['EMAIL_OTP_CODE'] = confirmationCode;
     }
     if (_clientSecretHash != null) {
       challengeResponses['SECRET_HASH'] = _clientSecretHash;
@@ -1259,25 +1298,35 @@ class CognitoUser {
     return true;
   }
 
-  ///  This is used by an authenticated user trying to authenticate to associate a TOTP MFA
+  ///  This is used to associate a TOTP MFA
   Future<String?> associateSoftwareToken() async {
-    _signInUserSessionCheck();
+    if (_signInUserSession?.isValid() ?? false) {
+      final data = await client!.request(
+        'AssociateSoftwareToken',
+        {'AccessToken': _signInUserSession!.getAccessToken().getJwtToken()},
+      );
 
-    final data = await client!.request(
-      'AssociateSoftwareToken',
-      {
-        'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
-      },
-    );
+      return data['SecretCode'];
+    } else if (_session != null) {
+      final data = await client!.request(
+        'AssociateSoftwareToken',
+        {'Session': _session},
+      );
 
-    return data['SecretCode'];
+      _session = data["Session"];
+
+      return data['SecretCode'];
+    }
+
+    throw Exception("User is not authenticated");
   }
 
-  /// This is used by an authenticated user trying to authenticate to verify a TOTP MFA
-  Future<bool> verifySoftwareToken(
-      {required String totpCode, String? friendlyDeviceName}) async {
-    _signInUserSessionCheck();
-    try {
+  /// This is used to verify a TOTP MFA
+  Future<bool> verifySoftwareToken({
+    required String totpCode,
+    String? friendlyDeviceName,
+  }) async {
+    if (_signInUserSession?.isValid() ?? false) {
       final data = await client!.request('VerifySoftwareToken', {
         'AccessToken': _signInUserSession!.getAccessToken().getJwtToken(),
         'UserCode': totpCode,
@@ -1285,9 +1334,17 @@ class CognitoUser {
       });
 
       return data['Status'] == 'SUCCESS';
-    } catch (err) {
-      return false;
+    } else if (_session != null) {
+      final data = await client!.request('VerifySoftwareToken', {
+        'Session': _session,
+        'UserCode': totpCode,
+        'FriendlyDeviceName': friendlyDeviceName ?? 'My TOTP device',
+      });
+
+      return data['Status'] == 'SUCCESS';
     }
+
+    throw Exception("User is not authenticated");
   }
 
   /// This is used by an authenticated user to enable MFA for itself

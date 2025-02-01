@@ -7,12 +7,12 @@ import 'package:secure_counter/user.dart';
 import 'package:secure_counter/user_service.dart';
 
 class LoginScreen extends StatefulWidget {
-  LoginScreen({Key? key, this.email}) : super(key: key);
+  const LoginScreen({Key? key, this.email}) : super(key: key);
 
   final String? email;
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -67,18 +67,28 @@ class _LoginScreenState extends State<LoginScreen> {
             if (!_user.confirmed) {
               await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ConfirmationScreen(email: _user.email ?? 'no email found')),
+                MaterialPageRoute(
+                  builder: (context) => ConfirmationScreen(
+                      email: _user.email ?? 'no email found'),
+                ),
               );
             } else {
-              await Navigator.push(context, MaterialPageRoute(builder: (context) => SecureCounterScreen()));
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SecureCounterScreen(),
+                ),
+              );
             }
           }
         },
       ),
-      duration: Duration(seconds: 30),
+      duration: const Duration(seconds: 30),
     );
 
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 
   @override
@@ -88,60 +98,62 @@ class _LoginScreenState extends State<LoginScreen> {
         builder: (context, AsyncSnapshot<UserService> snapshot) {
           if (snapshot.hasData) {
             if (_isAuthenticated) {
-              return SecureCounterScreen();
+              return const SecureCounterScreen();
             }
             final screenSize = MediaQuery.of(context).size;
             return Scaffold(
               appBar: AppBar(
-                title: Text('Login'),
+                title: const Text('Login'),
               ),
               body: Builder(
                 builder: (BuildContext context) {
-                  return Container(
-                    child: Form(
-                      key: _formKey,
-                      child: ListView(
-                        children: <Widget>[
-                          ListTile(
-                            leading: const Icon(Icons.email),
-                            title: TextFormField(
-                              initialValue: widget.email,
-                              decoration: InputDecoration(hintText: 'example@inspire.my', labelText: 'Email'),
-                              keyboardType: TextInputType.emailAddress,
-                              onSaved: (n) => _user.email = n,
+                  return Form(
+                    key: _formKey,
+                    child: ListView(
+                      children: <Widget>[
+                        ListTile(
+                          leading: const Icon(Icons.email),
+                          title: TextFormField(
+                            initialValue: widget.email,
+                            decoration: const InputDecoration(
+                              hintText: 'example@inspire.my',
+                              labelText: 'Email',
+                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            onSaved: (n) => _user.email = n,
+                          ),
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.lock),
+                          title: TextFormField(
+                            decoration:
+                                const InputDecoration(labelText: 'Password'),
+                            obscureText: true,
+                            onSaved: (n) => _user.password = n,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(20.0),
+                          width: screenSize.width,
+                          margin: const EdgeInsets.only(
+                            top: 10.0,
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () => submit(context),
+                            child: const Text(
+                              'Login',
+                              style: TextStyle(color: Colors.white),
                             ),
                           ),
-                          ListTile(
-                            leading: const Icon(Icons.lock),
-                            title: TextFormField(
-                              decoration: InputDecoration(labelText: 'Password'),
-                              obscureText: true,
-                              onSaved: (n) => _user.password = n,
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(20.0),
-                            width: screenSize.width,
-                            margin: EdgeInsets.only(
-                              top: 10.0,
-                            ),
-                            child: ElevatedButton(
-                              onPressed: () => submit(context),
-                              child: Text(
-                                'Login',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   );
                 },
               ),
             );
           }
-          return Scaffold(appBar: AppBar(title: Text('Loading...')));
+          return Scaffold(appBar: AppBar(title: const Text('Loading...')));
         });
   }
 }
