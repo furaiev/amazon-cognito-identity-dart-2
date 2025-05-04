@@ -1168,16 +1168,14 @@ class CognitoUser {
     final refreshTokenKey = '$keyPrefix.refreshToken';
     final clockDriftKey = '$keyPrefix.clockDrift';
 
-    await Future.wait([
-      storage.setItem(
-          idTokenKey, _signInUserSession?.getIdToken().getJwtToken()),
-      storage.setItem(
-          accessTokenKey, _signInUserSession?.getAccessToken().getJwtToken()),
-      storage.setItem(
-          refreshTokenKey, _signInUserSession?.getRefreshToken()?.getToken()),
-      storage.setItem(clockDriftKey, '${_signInUserSession?.getClockDrift()}'),
-      storage.setItem(pool.lastUserKey, username),
-    ]);
+    await storage.setItem(
+      idTokenKey, _signInUserSession?.getIdToken().getJwtToken());
+    await storage.setItem(
+      accessTokenKey, _signInUserSession?.getAccessToken().getJwtToken());
+    await storage.setItem(
+      refreshTokenKey, _signInUserSession?.getRefreshToken()?.getToken());
+    await storage.setItem(clockDriftKey, '${_signInUserSession?.getClockDrift()}');
+    await storage.setItem(pool.lastUserKey, username);
   }
 
   /// This is used to clear the session tokens from local storage
