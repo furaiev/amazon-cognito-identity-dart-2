@@ -1,7 +1,5 @@
 import 'dart:async';
 
-Map<String, dynamic> _dataMemory = {};
-
 abstract class CognitoStorage {
   Future<dynamic> setItem(String key, value);
   Future<dynamic> getItem(String key);
@@ -10,6 +8,7 @@ abstract class CognitoStorage {
 }
 
 class CognitoMemoryStorage extends CognitoStorage {
+  Map<String, dynamic> _dataMemory = {};
   @override
   Future<dynamic> setItem(String key, value) async {
     _dataMemory[key] = value;
