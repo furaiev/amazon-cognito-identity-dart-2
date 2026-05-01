@@ -362,6 +362,57 @@ class CognitoUser {
     return null;
   }
 
+  /// Retrieves a new session using the refreshToken via the
+  /// `GetTokensFromRefreshToken` API. Required when the Cognito app client
+  /// has refresh token rotation enabled, since [refreshSession]'s
+  /// `InitiateAuth` / `REFRESH_TOKEN_AUTH` flow does not return a rotated
+  /// refresh token.
+  Future<CognitoUserSession?> getTokensFromRefreshToken(
+      CognitoRefreshToken refreshToken,
+      {Map<String, String>? clientMetadata}) async {
+    if (await storage.getItem(pool.lastUserKey) != null) {
+      username = await storage.getItem(pool.lastUserKey);
+      final deviceKeyKey = '$keyPrefix.deviceKey';
+      _deviceKey = await storage.getItem(deviceKeyKey);
+    }
+
+    final paramsReq = <String, dynamic>{
+      'ClientId': pool.getClientId(),
+      'RefreshToken': refreshToken.getToken(),
+    };
+    if (_clientSecret != null) {
+      paramsReq['ClientSecret'] = _clientSecret;
+    }
+    if (_deviceKey != null) {
+      paramsReq['DeviceKey'] = _deviceKey;
+    }
+    if (clientMetadata != null) {
+      paramsReq['ClientMetadata'] = clientMetadata;
+    }
+
+    dynamic authResult;
+    try {
+      authResult = await client!.request('GetTokensFromRefreshToken',
+          await _analyticsMetadataParamsDecorator.call(paramsReq));
+    } on CognitoClientException catch (e) {
+      if (e.code == 'NotAuthorizedException') {
+        await clearCachedTokens();
+      }
+      rethrow;
+    }
+
+    if (authResult != null) {
+      final authenticationResult = authResult['AuthenticationResult'];
+      if (authenticationResult['RefreshToken'] == null) {
+        authenticationResult['RefreshToken'] = refreshToken.getToken();
+      }
+      _signInUserSession = getCognitoUserSession(authenticationResult);
+      await cacheTokens();
+      return _signInUserSession;
+    }
+    return null;
+  }
+
   CognitoUserSession? getSignInUserSession() {
     return _signInUserSession;
   }
