@@ -1,3 +1,6 @@
+## Unreleased
+- feat: `CognitoUser.getTokensFromRefreshToken` for the `GetTokensFromRefreshToken` API (required for refresh token rotation)
+
 ## 3.8.1
 - feat: new password challenge support
 
