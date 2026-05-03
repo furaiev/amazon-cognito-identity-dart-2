@@ -1,5 +1,5 @@
-## Unreleased
-- feat: `CognitoUser.getTokensFromRefreshToken` for the `GetTokensFromRefreshToken` API (required for refresh token rotation)
+## 3.8.2
+- feat: `CognitoUser.getTokensFromRefreshToken` for the `GetTokensFromRefreshToken` API (required for refresh token rotation). With rotation, reuse of an invalidated refresh token is reported as `RefreshTokenReuseException` on the client
 
 ## 3.8.1
 - feat: new password challenge support

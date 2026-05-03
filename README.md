@@ -27,6 +27,7 @@ Need ideas to get started?
 - Get AWS credentials with facebook found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/#get-aws-credentials-with-facebook).
 - Use client secret found [here](https://github.com/furaiev/amazon-cognito-identity-dart-2/#use-client-secret).
 - [How to use refresh token to keep session valid?](https://github.com/furaiev/amazon-cognito-identity-dart-2/issues/97)
+- Refresh token rotation (GetTokensFromRefreshToken): [Refresh tokens and rotation](#refresh-tokens-and-rotation).
 
 
 ## Usage
@@ -907,6 +908,26 @@ void main() async {
   }
   print(response.body);
 }
+```
+
+### Refresh tokens and rotation
+
+By default you can refresh access and ID tokens with `refreshSession(CognitoRefreshToken(...))`, which uses Cognito `InitiateAuth` with `REFRESH_TOKEN_AUTH`.
+
+If your app client has **refresh token rotation** enabled, use `getTokensFromRefreshToken` instead. That calls the [`GetTokensFromRefreshToken`](https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_GetTokensFromRefreshToken.html) API so Cognito can return a **new** refresh token when it rotates; `refreshSession` does not surface rotated refresh tokens in that setup.
+
+Reuse of an invalidated refresh token (for example after rotation) may yield `CognitoClientException` with code `RefreshTokenReuseException` — treat it as requiring a new sign-in.
+
+```dart
+final session = await cognitoUser.getTokensFromRefreshToken(
+  CognitoRefreshToken(refreshTokenString),
+);
+
+// Optional metadata for user-pool Lambda triggers:
+// await cognitoUser.getTokensFromRefreshToken(
+//   CognitoRefreshToken(refreshTokenString),
+//   clientMetadata: {'example': 'value'},
+// );
 ```
 
 ### Use Custom Storage

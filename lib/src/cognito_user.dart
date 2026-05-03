@@ -312,7 +312,11 @@ class CognitoUser {
     return true;
   }
 
-  /// This uses the refreshToken to retrieve a new session
+  /// This uses the refreshToken to retrieve a new session via `InitiateAuth`
+  /// with `REFRESH_TOKEN_AUTH`. When the app client has [refresh token rotation](https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-the-refresh-token.html)
+  /// enabled, Cognito does not return a rotated refresh token from this flow;
+  /// use [getTokensFromRefreshToken] instead (including handling of
+  /// `RefreshTokenReuseException` when a rotated token is reused).
   Future<CognitoUserSession?> refreshSession(
       CognitoRefreshToken refreshToken) async {
     final authParameters = {
@@ -367,6 +371,11 @@ class CognitoUser {
   /// has refresh token rotation enabled, since [refreshSession]'s
   /// `InitiateAuth` / `REFRESH_TOKEN_AUTH` flow does not return a rotated
   /// refresh token.
+  ///
+  /// With rotation enabled, reuse of an invalidated refresh token (for example
+  /// after it was rotated) surfaces as `CognitoClientException` with code
+  /// `RefreshTokenReuseException`; callers should treat that as a hard
+  /// authentication failure and sign the user in again.
   Future<CognitoUserSession?> getTokensFromRefreshToken(
       CognitoRefreshToken refreshToken,
       {Map<String, String>? clientMetadata}) async {
@@ -1220,12 +1229,13 @@ class CognitoUser {
     final clockDriftKey = '$keyPrefix.clockDrift';
 
     await storage.setItem(
-      idTokenKey, _signInUserSession?.getIdToken().getJwtToken());
+        idTokenKey, _signInUserSession?.getIdToken().getJwtToken());
     await storage.setItem(
-      accessTokenKey, _signInUserSession?.getAccessToken().getJwtToken());
+        accessTokenKey, _signInUserSession?.getAccessToken().getJwtToken());
     await storage.setItem(
-      refreshTokenKey, _signInUserSession?.getRefreshToken()?.getToken());
-    await storage.setItem(clockDriftKey, '${_signInUserSession?.getClockDrift()}');
+        refreshTokenKey, _signInUserSession?.getRefreshToken()?.getToken());
+    await storage.setItem(
+        clockDriftKey, '${_signInUserSession?.getClockDrift()}');
     await storage.setItem(pool.lastUserKey, username);
   }
 
