@@ -19,9 +19,12 @@ void main() {
       await s.setItem('some', 'value');
       expect(await s.getItem('some'), equals('value'));
     });
-    test('.getItem() retrieves item from previous storage', () async {
-      final s = CognitoStorageHelper(CognitoMemoryStorage()).getStorage();
-      expect(await s.getItem('some'), equals('value'));
+    test('separate CognitoMemoryStorage instances do not share data', () async {
+      final a = CognitoStorageHelper(CognitoMemoryStorage()).getStorage();
+      final b = CognitoStorageHelper(CognitoMemoryStorage()).getStorage();
+      await a.setItem('key', 'from-a');
+      expect(await b.getItem('key'), isNull);
+      expect(await a.getItem('key'), equals('from-a'));
     });
     test('.removeItem() returns item and removes from storage', () async {
       final s = CognitoStorageHelper(CognitoMemoryStorage()).getStorage();
@@ -32,6 +35,7 @@ void main() {
     });
     test('.clear() clears storage', () async {
       final s = CognitoStorageHelper(CognitoMemoryStorage()).getStorage();
+      await s.setItem('some', 'value');
       await s.clear();
       expect(await s.getItem('some'), equals(null));
     });

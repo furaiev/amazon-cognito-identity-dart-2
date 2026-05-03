@@ -1,7 +1,5 @@
 import 'dart:async';
 
-Map<String, dynamic> _dataMemory = {};
-
 abstract class CognitoStorage {
   Future<dynamic> setItem(String key, value);
   Future<dynamic> getItem(String key);
@@ -9,26 +7,29 @@ abstract class CognitoStorage {
   Future<void> clear();
 }
 
+/// In-memory [CognitoStorage]. Each instance has its own map; instances do not share data.
 class CognitoMemoryStorage extends CognitoStorage {
+  final Map<String, dynamic> _data = {};
+
   @override
   Future<dynamic> setItem(String key, value) async {
-    _dataMemory[key] = value;
-    return _dataMemory[key];
+    _data[key] = value;
+    return _data[key];
   }
 
   @override
   Future<dynamic> getItem(String key) async {
-    return _dataMemory[key];
+    return _data[key];
   }
 
   @override
   Future<dynamic> removeItem(String key) async {
-    return _dataMemory.remove(key);
+    return _data.remove(key);
   }
 
   @override
   Future<void> clear() async {
-    _dataMemory = {};
+    _data.clear();
   }
 }
 
