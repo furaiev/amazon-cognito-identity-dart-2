@@ -30,7 +30,7 @@ class RandomString {
   String generate({int length = 1024, List<String> charList = _hexCharList}) {
     final strings = [];
     for (var point = 0; point < length; ++point) {
-      strings.add(charList[_random.nextInt(charList.length - 1)]);
+      strings.add(charList[_random.nextInt(charList.length)]);
     }
     return strings.join();
   }

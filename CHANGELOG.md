@@ -1,3 +1,6 @@
+## 4.0.1
+- fix: RandomString.generate() to include the last character from charList
+
 ## 4.0.0
 - **breaking:** `CognitoMemoryStorage` no longer uses a single library-level map shared by all instances ([issue #277](https://github.com/furaiev/amazon-cognito-identity-dart-2/issues/277)). Each `CognitoMemoryStorage` now has its own in-memory map. Code that created multiple `CognitoMemoryStorage` objects and relied on them seeing the same keys (or on clearing one instance affecting another) must be updated: use one shared instance, inject a custom `CognitoStorage` implementation, or merge migration data explicitly. Typical usage with a single storage instance per app is unchanged.
 
